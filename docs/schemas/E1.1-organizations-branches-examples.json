@@ -1,0 +1,27 @@
+{
+  "description": "E1.1 Example documents — organizations & branches",
+  "collections": {
+    "organizations": {
+      "example_doc_id": "org_abc123",
+      "document": {
+        "name": "คลินิกความงาม สวยใส",
+        "plan": "professional",
+        "createdAt": "2025-02-10T08:00:00.000Z",
+        "updatedAt": "2025-02-10T08:00:00.000Z",
+        "_legacy_clinic_id": "clinic_xyz789",
+        "affiliate_id": null,
+        "white_label_config": null
+      }
+    },
+    "branches": {
+      "example_doc_id": "branch_def456",
+      "document": {
+        "org_id": "org_abc123",
+        "name": "สาขาสยาม",
+        "address": "123 ถ.พระราม 1 แขวงปทุมวัน เขตปทุมวัน กรุงเทพฯ",
+        "createdAt": "2025-02-10T08:00:00.000Z",
+        "updatedAt": "2025-02-10T08:00:00.000Z"
+      }
+    }
+  }
+}

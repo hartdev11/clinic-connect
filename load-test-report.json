@@ -1,0 +1,17 @@
+{
+  "timestamp": "2026-02-12T15:42:59.170Z",
+  "server": "http://localhost:3000",
+  "concurrency": 500,
+  "success": 0,
+  "fail": 500,
+  "success_rate_pct": 0,
+  "wall_time_ms": 4909,
+  "throughput_req_s": 101.85373803218579,
+  "latency_p50_ms": 4181,
+  "latency_p95_ms": 4780,
+  "latency_p99_ms": 4836,
+  "memory_at_end": "rss=101MB heap=32/55MB",
+  "status_codes": {
+    "429": 500
+  }
+}

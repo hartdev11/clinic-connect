@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --sidebar-width: 17rem;
+  --topbar-height: 4rem;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-smooth: 0.3s var(--ease-out-expo);
+}
+
+@layer base {
+  body {
+    @apply bg-[#fefbfb] text-surface-800 antialiased;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-semibold tracking-tight text-surface-800;
+  }
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Selection - โทนคลินิกความงาม */
+::selection {
+  @apply bg-primary-200/60 text-primary-900;
+}
+
+/* Stagger animation delays (use with animate-fade-in-up / animate-slide-up) */
+.animate-delay-100 { animation-delay: 100ms; }
+.animate-delay-200 { animation-delay: 200ms; }
+.animate-delay-300 { animation-delay: 300ms; }
+.animate-delay-400 { animation-delay: 400ms; }
+.animate-delay-500 { animation-delay: 500ms; }
+.animate-delay-600 { animation-delay: 600ms; }
+.animate-delay-700 { animation-delay: 700ms; }
+.animate-delay-800 { animation-delay: 800ms; }
+
+/* Initial state for entrance animations - respect reduced motion */
+@media (prefers-reduced-motion: no-preference) {
+  .animate-fade-in-up,
+  .animate-slide-up,
+  .animate-scale-in,
+  .animate-fade-in {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in-up,
+  .animate-slide-up,
+  .animate-scale-in,
+  .animate-fade-in {
+    opacity: 1;
+    animation: none !important;
+  }
+}
+
+/* Professional link underline animation */
+@layer utilities {
+  .link-underline {
+    @apply relative;
+  }
+  .link-underline::after {
+    content: "";
+    @apply absolute left-0 bottom-0 h-0.5 w-0 bg-primary-500 transition-all duration-300 origin-left;
+  }
+  .link-underline:hover::after,
+  .link-underline[data-active="true"]::after {
+    @apply w-full;
+  }
+
+  /* Card hover lift */
+  .card-hover-lift {
+    @apply transition-all duration-300 ease-out;
+  }
+  .card-hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 50px -15px rgba(0, 0, 0, 0.12),
+      0 4px 15px -4px rgba(0, 0, 0, 0.06);
+  }
+
+  /* Subtle gradient border on focus/hover */
+  .focus-ring-primary {
+    @apply focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:ring-offset-2;
+  }
+}
+
+/* Print styles — Enterprise */
+@media print {
+  body {
+    background: white !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .print\:hidden {
+    display: none !important;
+  }
+  /* Full width for printed content */
+  main {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+  /* Avoid breaking inside cards/sections */
+  .break-inside-avoid {
+    break-inside: avoid;
+  }
+  section,
+  [class*="Card"] {
+    break-inside: avoid;
+  }
+}

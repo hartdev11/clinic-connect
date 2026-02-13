@@ -1,0 +1,50 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ─── E1.2 Multi-tenant: organizations & branches ─────────────────────
+    // เซิร์ฟเวอร์ใช้ Admin SDK (bypass rules) — client ไม่ให้เข้าถึงโดยตรง
+    // Rules ด้านล่างใช้เมื่อมี Firebase Auth + custom claim org_id
+    // ป้องกัน cross-org access เป็นหลัก
+
+    // organizations: เข้าถึงได้เฉพาะ org ของตัวเอง (doc id = org_id ใน token)
+    match /organizations/{orgId} {
+      allow read, write: if request.auth != null
+        && request.auth.token.org_id == orgId;
+    }
+
+    // branches: เข้าถึงได้เฉพาะ branch ที่มี org_id ตรงกับ token
+    match /branches/{branchId} {
+      allow read: if request.auth != null
+        && request.auth.token.org_id != null
+        && resource.data.org_id == request.auth.token.org_id;
+      allow create: if request.auth != null
+        && request.auth.token.org_id != null
+        && request.resource.data.org_id == request.auth.token.org_id;
+      allow update, delete: if request.auth != null
+        && request.auth.token.org_id != null
+        && resource.data.org_id == request.auth.token.org_id
+        && (request.resource == null || request.resource.data.org_id == resource.data.org_id);
+    }
+
+    // customers: read-only สำหรับ Realtime Listeners (Customers & Chat)
+    match /customers/{customerId} {
+      allow read: if request.auth != null
+        && request.auth.token.org_id != null
+        && resource.data.org_id == request.auth.token.org_id;
+      allow write: if false;
+    }
+
+    // conversation_feedback: read-only สำหรับ Realtime Listeners (แชท)
+    match /conversation_feedback/{feedbackId} {
+      allow read: if request.auth != null
+        && request.auth.token.org_id != null
+        && resource.data.org_id == request.auth.token.org_id;
+      allow write: if false;
+    }
+
+    // collections อื่น: deny client (ใช้ Admin SDK เท่านั้น)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
