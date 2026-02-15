@@ -13,6 +13,7 @@ import {
   markLineEventProcessed,
   getMessageHash,
 } from "@/lib/line-idempotency";
+import { checkOrSetIdempotency, setLineEventReply } from "@/lib/idempotency";
 import { usePipeline, use7AgentChat } from "@/lib/feature-flags";
 import { chatOrchestrate } from "@/lib/ai/orchestrator";
 
@@ -123,6 +124,10 @@ export async function POST(request: NextRequest) {
     const userText = event.message.text?.trim();
     const userId = event.source?.userId || "";
     if (!replyToken || !userText) continue;
+
+    const { duplicate } = await checkOrSetIdempotency(replyToken);
+    if (duplicate) return new NextResponse("OK", { status: 200 });
+
     const msgHash = getMessageHash(userText);
     if (await isLineEventProcessed(replyToken, userId, msgHash)) continue;
     await markLineEventProcessed(replyToken, userId, msgHash).catch(() => {});
@@ -181,6 +186,7 @@ export async function POST(request: NextRequest) {
         if (token) {
           const ok = await sendLineReply(replyToken, finalText, token);
           console.log("[LINE Webhook] Reply sent:", ok ? "OK" : "FAIL");
+          setLineEventReply(replyToken, JSON.stringify({ text: finalText })).catch(() => {});
         } else if (process.env.NODE_ENV === "development") {
           console.log("[LINE Webhook] Would reply:", finalText.slice(0, 80));
         }

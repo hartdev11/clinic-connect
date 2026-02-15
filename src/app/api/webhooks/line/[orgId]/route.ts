@@ -29,12 +29,26 @@ function truncateForLine(text: string): string {
   return text.slice(0, LINE_MAX_TEXT_LENGTH - 3) + "...";
 }
 
+type LineMessage = { type: "text"; text: string } | { type: "image"; originalContentUrl: string; previewImageUrl: string } | { type: "video"; originalContentUrl: string; previewImageUrl: string };
+
 async function sendLineReply(
   replyToken: string,
   text: string,
-  accessToken: string
+  accessToken: string,
+  mediaUrls?: string[]
 ): Promise<boolean> {
   const safeText = truncateForLine(text);
+  const messages: LineMessage[] = [{ type: "text", text: safeText }];
+  if (mediaUrls && mediaUrls.length > 0) {
+    for (const url of mediaUrls.slice(0, 4)) {
+      const isVideo = /\.(mp4|mov|webm)(\?|$)/i.test(url) || /video/i.test(url);
+      if (isVideo) {
+        messages.push({ type: "video", originalContentUrl: url, previewImageUrl: url });
+      } else {
+        messages.push({ type: "image", originalContentUrl: url, previewImageUrl: url });
+      }
+    }
+  }
   try {
     const res = await fetch(LINE_REPLY_URL, {
       method: "POST",
@@ -42,10 +56,7 @@ async function sendLineReply(
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,
       },
-      body: JSON.stringify({
-        replyToken,
-        messages: [{ type: "text", text: safeText }],
-      }),
+      body: JSON.stringify({ replyToken, messages }),
     });
     if (!res.ok) {
       const err = await res.text();
@@ -124,6 +135,7 @@ export async function POST(
         const shouldUse7Agent = use7AgentChat();
         const shouldUsePipeline = usePipeline();
 
+        let mediaUrls: string[] | undefined;
         if (shouldUse7Agent) {
           const result = await chatOrchestrate({
             message: userText,
@@ -133,6 +145,7 @@ export async function POST(
             channel: "line",
           });
           replyText = result.reply?.trim() || "";
+          mediaUrls = result.media;
           intent = { intent: "general_chat" };
           correlationId = result.correlationId;
         } else if (shouldUsePipeline) {
@@ -157,7 +170,7 @@ export async function POST(
         }
 
         const finalText = replyText || composeSafeFallbackMessage();
-        const ok = await sendLineReply(replyToken, finalText, channelToken);
+        const ok = await sendLineReply(replyToken, finalText, channelToken, mediaUrls);
         if (isDevelopment) {
           console.log("[LINE Webhook]", orgId, "Reply sent:", ok ? "OK" : "FAIL");
         }

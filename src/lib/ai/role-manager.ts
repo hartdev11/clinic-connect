@@ -19,6 +19,12 @@ import {
   recordProviderFailure,
   recordProviderSuccess,
 } from "@/lib/provider-circuit-breaker";
+import {
+  isCircuitOpen,
+  recordCircuitSuccess,
+  recordCircuitFailure,
+  OPENAI_CIRCUIT_KEY,
+} from "@/lib/circuit-breaker";
 import { sanitizeForLLM } from "./input-sanitizer";
 import { llmJudgeReply } from "./llm-judge";
 import type { AggregatedAnalyticsContext } from "./types";
@@ -134,6 +140,8 @@ export interface RoleManagerOutput {
   usage?: { prompt_tokens: number; completion_tokens: number; total_tokens: number };
   prompt_version?: string;
   prompt_variant?: string;
+  /** When promotion/media exists — channel adapters send images/videos to LINE, FB, IG, TikTok */
+  media?: string[];
 }
 
 export async function runRoleManager(
@@ -151,6 +159,14 @@ export async function runRoleManager(
     };
   }
 
+  if (await isCircuitOpen(OPENAI_CIRCUIT_KEY)) {
+    return {
+      reply: SAFE_FALLBACK_LOW_CONFIDENCE,
+      success: true,
+      totalMs: Date.now() - start,
+      error: "openai_circuit_open",
+    };
+  }
   if (isProviderOpen("openai")) {
     return {
       reply: SAFE_FALLBACK_LOW_CONFIDENCE,
@@ -180,6 +196,14 @@ export async function runRoleManager(
 
   const { out: publicCtx, knowledgeSummary } = buildPublicContext(input.analyticsContext);
   const internalCtx = buildInternalContext(input.analyticsContext);
+
+  const promotionDetails = (input.analyticsContext.promotion as { promotionDetails?: Array<{ media?: string[] }> })?.promotionDetails;
+  const mediaUrls: string[] = [];
+  if (Array.isArray(promotionDetails)) {
+    for (const p of promotionDetails) {
+      if (Array.isArray(p.media)) mediaUrls.push(...p.media);
+    }
+  }
 
   const contextStr = JSON.stringify(
     {
@@ -230,6 +254,7 @@ ${truncated}${restrictedNote}
     );
 
     clearTimeout(timeoutId);
+    await recordCircuitSuccess(OPENAI_CIRCUIT_KEY);
     recordProviderSuccess("openai");
 
     let reply =
@@ -287,8 +312,10 @@ ${truncated}${restrictedNote}
       usage,
       prompt_version: promptVersion,
       prompt_variant: promptVariant,
+      media: mediaUrls.length > 0 ? [...new Set(mediaUrls)].slice(0, 5) : undefined,
     };
   } catch (err) {
+    await recordCircuitFailure(OPENAI_CIRCUIT_KEY);
     recordProviderFailure("openai");
     const msg = (err as Error)?.message ?? "Unknown error";
     const isAbort = msg.includes("abort") || msg.includes("timeout");

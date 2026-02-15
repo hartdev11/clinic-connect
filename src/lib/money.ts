@@ -47,3 +47,10 @@ export function safeSumBaht(values: unknown[]): number {
 export function safeAddBaht(a: number, b: number): number {
   return satangToBaht(toSatang(a) + toSatang(b));
 }
+
+/**
+ * รวม array ของ satang (integer) — ใช้กับ DB ที่เก็บ _satang
+ */
+export function sumSatang(values: number[]): number {
+  return values.reduce((acc, v) => acc + (Number.isInteger(v) ? v : Math.round(Number(v)) || 0), 0);
+}

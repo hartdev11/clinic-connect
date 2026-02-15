@@ -3,11 +3,22 @@
  * Production-ready type definitions
  */
 
+/** Promotion detail for Role Manager — name, summary, endAt, media URLs, urgency */
+export interface PromotionDetailForAI {
+  name: string;
+  aiSummary?: string;
+  endAt?: string;
+  media: string[];
+  urgency?: boolean;
+}
+
 /** ผลลัพธ์จาก Analytics Agent — format เดียวกันทุกตัว */
 export interface AnalyticsAgentOutput {
   keyFindings: string[];
   recommendation: string | null;
   riskFlags: string[];
+  /** Promotion agent: active promotions with media for Role Manager */
+  promotionDetails?: PromotionDetailForAI[];
 }
 
 /** Context สำหรับ query — ต้อง validate ก่อนใช้ */

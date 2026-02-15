@@ -52,6 +52,8 @@ export interface ChatOrchestratorOutput {
   usage?: { prompt_tokens: number; completion_tokens: number; total_tokens: number };
   /** Phase 2 #20: For feedback loop trace */
   correlationId?: string;
+  /** When promotion/media exists — channel adapters send images/videos */
+  media?: string[];
 }
 
 /**
@@ -293,6 +295,7 @@ export async function chatOrchestrate(
       error: rmResult.error,
       usage: rmResult.usage,
       correlationId,
+      media: rmResult.media,
     };
   } catch (err) {
     const msg = (err as Error)?.message ?? "Unknown error";

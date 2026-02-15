@@ -34,14 +34,31 @@ html {
 }
 
 /* Stagger animation delays (use with animate-fade-in-up / animate-slide-up) */
+.animate-delay-50 { animation-delay: 50ms; }
 .animate-delay-100 { animation-delay: 100ms; }
+.animate-delay-150 { animation-delay: 150ms; }
 .animate-delay-200 { animation-delay: 200ms; }
+.animate-delay-250 { animation-delay: 250ms; }
 .animate-delay-300 { animation-delay: 300ms; }
 .animate-delay-400 { animation-delay: 400ms; }
 .animate-delay-500 { animation-delay: 500ms; }
 .animate-delay-600 { animation-delay: 600ms; }
 .animate-delay-700 { animation-delay: 700ms; }
 .animate-delay-800 { animation-delay: 800ms; }
+
+/* Enterprise card hover elevation (200–400ms ease-out) */
+.card-hover-elevation {
+  @apply transition-all duration-300 ease-out;
+}
+.card-hover-elevation:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-hover-elevation:hover {
+    transform: none;
+  }
+}
 
 /* Initial state for entrance animations - respect reduced motion */
 @media (prefers-reduced-motion: no-preference) {

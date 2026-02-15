@@ -73,6 +73,9 @@ export async function runPipeline(
   state?: ConversationState;
   memory?: { interest?: string[]; customer_stage?: string; sentiment?: string; follow_up_needed?: boolean } | null;
 }> {
+  const orgId = pipelineOptions?.org_id ?? "";
+  const channel = pipelineOptions?.channel ?? "default";
+
   // Presentation: normalize
   const normalized = normalizeLineMessage(userText);
   const text = normalized.message.trim();
@@ -93,7 +96,7 @@ export async function runPipeline(
     // ดึง state เดิม (ถ้ามี) เพื่อเก็บ context
     let greetingState: ConversationState;
     if (userId) {
-      const sessionState = getSessionState(userId);
+      const sessionState = await getSessionState(orgId, channel, userId);
       greetingState = sessionState || createInitialState();
     } else {
       greetingState = previousState || createInitialState();
@@ -107,7 +110,7 @@ export async function runPipeline(
     };
     
     if (userId) {
-      saveSessionState(userId, updatedGreetingState);
+      saveSessionState(orgId, channel, userId, updatedGreetingState);
     }
     
     return {
@@ -121,7 +124,7 @@ export async function runPipeline(
   // user พูดชัดว่า "เปลี่ยนเรื่องนะ" / "ขอถามอีกอย่าง"
   if (/เริ่มใหม่|ถามใหม่|เปลี่ยนเรื่อง|ลืมเมื่อกี้|รีเซ็ต/i.test(text)) {
     if (userId) {
-      clearSession(userId);
+      clearSession(orgId, channel, userId);
     }
     return {
       reply: "ได้เลยค่ะ 😊 งั้นเริ่มใหม่เลยนะคะ สนใจสอบถามเรื่องอะไรดีคะ"
@@ -134,7 +137,7 @@ export async function runPipeline(
   }
 
   // ดึง session ก่อน — ถ้าข้อความก่อนหน้าผู้ใช้พูด "จอง" ข้อความนี้มักเป็น follow-up ข้อมูลจอง
-  const priorState = userId ? getSessionState(userId) : previousState;
+  const priorState = userId ? await getSessionState(orgId, channel, userId) : previousState;
   const lastUserMessage = priorState?.recentMessages?.slice(-1)[0] ?? "";
   const isBookingFollowUp =
     priorState != null && /จอง|booking|นัด|สมัคร|ต้องการนัด/i.test(lastUserMessage);
@@ -176,7 +179,7 @@ export async function runPipeline(
             recentMessages: [...(priorState?.recentMessages ?? []).slice(-4), text].slice(-5),
             lastUpdated: Date.now(),
           };
-          saveSessionState(userId, bookingState);
+          saveSessionState(orgId, channel, userId, bookingState);
         }
         return { reply: msg, intent: { intent: "booking_request", service: undefined, area: undefined, confidence: 0.9 } };
       }
@@ -189,7 +192,7 @@ export async function runPipeline(
             recentMessages: [...(priorState?.recentMessages ?? []).slice(-4), text].slice(-5),
             lastUpdated: Date.now(),
           };
-          saveSessionState(userId, followUpState);
+          saveSessionState(orgId, channel, userId, followUpState);
         }
         return {
           reply:
@@ -203,7 +206,7 @@ export async function runPipeline(
   // ดึง state จาก session (ถ้ามี userId) หรือใช้ previousState หรือสร้างใหม่
   let currentState: ConversationState;
   if (userId) {
-    const sessionState = getSessionState(userId);
+    const sessionState = await getSessionState(orgId, channel, userId);
     currentState = sessionState || previousState || createInitialState();
   } else {
     currentState = previousState || createInitialState();
@@ -278,7 +281,7 @@ export async function runPipeline(
     };
     
     if (userId) {
-      saveSessionState(userId, preferenceResponseState);
+      saveSessionState(orgId, channel, userId, preferenceResponseState);
     }
     
     if (process.env.NODE_ENV === "development") {
@@ -346,7 +349,7 @@ export async function runPipeline(
     };
     
     if (userId) {
-      saveSessionState(userId, refinementState);
+      saveSessionState(orgId, channel, userId, refinementState);
     }
     
     return {
@@ -374,7 +377,7 @@ export async function runPipeline(
     };
     
     if (userId) {
-      saveSessionState(userId, duplicateState);
+      saveSessionState(orgId, channel, userId, duplicateState);
     }
     
     if (process.env.NODE_ENV === "development") {
@@ -526,7 +529,7 @@ export async function runPipeline(
     };
     
     if (userId) {
-      saveSessionState(userId, stickState);
+      saveSessionState(orgId, channel, userId, stickState);
     }
     
     if (process.env.NODE_ENV === "development") {
@@ -590,7 +593,7 @@ export async function runPipeline(
     };
     
     if (userId) {
-      saveSessionState(userId, dedupState);
+      saveSessionState(orgId, channel, userId, dedupState);
     }
     
     if (process.env.NODE_ENV === "development") {
@@ -611,7 +614,7 @@ export async function runPipeline(
   if (knowledgeReply) {
     // บันทึก state ลง session (ถ้ามี userId)
     if (userId) {
-      saveSessionState(userId, updatedState);
+      saveSessionState(orgId, channel, userId, updatedState);
     }
     return {
       reply: knowledgeReply,
@@ -627,7 +630,7 @@ export async function runPipeline(
   if (surgeryReply) {
     // บันทึก state ลง session (ถ้ามี userId)
     if (userId) {
-      saveSessionState(userId, updatedState);
+      saveSessionState(orgId, channel, userId, updatedState);
     }
     return {
       reply: surgeryReply,
@@ -661,7 +664,7 @@ export async function runPipeline(
       stage: "waiting_admin",
     };
     if (userId) {
-      saveSessionState(userId, handoffState);
+      saveSessionState(orgId, channel, userId, handoffState);
     }
     return { 
       reply: HANDOFF_MESSAGE, 
@@ -865,7 +868,7 @@ export async function runPipeline(
 
   // บันทึก state ลง session (ถ้ามี userId)
   if (userId) {
-    saveSessionState(userId, updatedState);
+    saveSessionState(orgId, channel, userId, updatedState);
   }
 
   return { 

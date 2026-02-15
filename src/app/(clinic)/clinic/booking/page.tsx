@@ -3,12 +3,9 @@
 import { Suspense, useState, useMemo, useCallback, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import useSWR from "swr";
-import { Card, CardHeader } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { SectionHeader } from "@/components/layout/SectionHeader";
 import { useClinicContext } from "@/contexts/ClinicContext";
 import { apiFetcher } from "@/lib/api-fetcher";
 import { BOOKING_CHANNELS } from "@/types/clinic";
@@ -40,6 +37,10 @@ const SOURCE_LABEL: Record<string, string> = {
   ai: "AI",
 };
 
+/** Workspace tabs — state-based rendering only */
+type WorkspaceTab = "today" | "calendar" | "all" | "reports";
+
+/** Visual tokens: Background #FFFFFF, Surface #F7F8FA, Border #E5E7EB, Primary text #111827, Secondary #6B7280. Spacing 4/8/12/16/24/32. Radius 8–12px. */
 const statusColors: Record<string, "default" | "success" | "warning" | "info" | "error"> = {
   pending: "warning",
   confirmed: "success",
@@ -91,7 +92,20 @@ function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString("th-TH", { day: "numeric", month: "short", year: "numeric" });
 }
 
-/** Enterprise: การ์ดรายการจองพร้อมปุ่มแก้ไข/ยกเลิก */
+/** Status accent for left border — muted, no bright fill */
+const statusAccentColor: Record<string, string> = {
+  pending: "#D97706",
+  confirmed: "#059669",
+  in_progress: "#2563EB",
+  completed: "#64748B",
+  "no-show": "#DC2626",
+  cancelled: "#94A3B8",
+  pending_admin_confirm: "#D97706",
+  reschedule_pending_admin: "#D97706",
+  cancel_requested: "#94A3B8",
+};
+
+/** iOS minimal: list-style card — no borders, dot+text status, system buttons, 100ms */
 function BookingCard({
   item: b,
   onEdit,
@@ -134,65 +148,73 @@ function BookingCard({
       setLoading(false);
     }
   };
+  const dotColor = statusAccentColor[b.status] ?? "#94A3B8";
   return (
-    <div className="p-3 rounded-xl border border-surface-200/80 hover:border-surface-300 group">
-      {error && <p className="text-xs text-red-600 mb-1">{error}</p>}
-      <div className="flex justify-between items-start">
-        <div>
-          <div className="flex items-center gap-2">
-            {b.queueNumber != null && (
-              <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary-100 text-primary-700 font-bold text-sm shrink-0">
-                {b.queueNumber}
-              </span>
-            )}
-            <p className="font-medium text-surface-900">{b.customerName}</p>
-          </div>
-          <p className="text-sm text-surface-600">{b.service}</p>
-          <p className="text-xs text-surface-500 mt-1 flex flex-wrap gap-2 items-center">
-            {formatTime(b.scheduledAt)}
-            {(b.channel || b.source) && (
-              <Badge variant="default" className="text-[10px] px-1.5">
-                {CHANNEL_LABEL[b.channel ?? ""] ?? SOURCE_LABEL[b.source ?? ""] ?? b.channel ?? b.source}
-              </Badge>
-            )}
-            {typeof b.amount === "number" && b.amount > 0 && (
-              <span>฿{b.amount.toLocaleString()}</span>
-            )}
-          </p>
-          <Badge variant={statusColors[b.status] || "default"} className="mt-1 text-[10px]">
-            {STATUS_LABEL[b.status] ?? b.status}
-          </Badge>
-        </div>
-        {canModify && (
-          <div className="flex gap-1 flex-shrink-0 flex-wrap">
-            {canConfirm && (
-              <Button size="sm" variant="primary" className="text-xs h-7" onClick={() => handleStatus("confirmed")} disabled={loading}>
-                {b.status === "reschedule_pending_admin" ? "ยืนยันเลื่อน" : "ยืนยัน"}
-              </Button>
-            )}
-            {canCallQueue && (
-              <Button size="sm" variant="primary" className="text-xs h-7 bg-primary-600" onClick={() => handleStatus("in_progress")} disabled={loading}>
-                เรียกคิว
-              </Button>
-            )}
-            {canComplete && (
-              <Button size="sm" variant="primary" className="text-xs h-7" onClick={() => handleStatus("completed")} disabled={loading}>
-                เสร็จสิ้น
-              </Button>
-            )}
-            <Button size="sm" variant="ghost" className="text-xs h-7" onClick={onEdit} disabled={loading}>
-              แก้ไข
-            </Button>
-            <Button size="sm" variant="ghost" className="text-xs h-7 text-red-600" onClick={() => handleStatus("cancelled")} disabled={loading}>
-              {b.status === "cancel_requested"
-                ? "ยืนยันยกเลิก"
-                : b.status === "confirmed"
-                  ? "ยกเลิก"
-                  : "ปฏิเสธ"}
-            </Button>
-          </div>
-        )}
+    <div
+      className="relative flex items-stretch gap-4 py-3 px-4 rounded-[10px] bg-white hover:bg-[#F2F2F7] transition-all duration-[90ms] min-h-0 leading-[1.4] hover:scale-[1.01]"
+      style={{ transitionTimingFunction: 'cubic-bezier(0.2, 0.8, 0.2, 1)' }}
+    >
+      {error && (
+        <p className="absolute top-0 left-0 right-0 text-xs text-red-600 bg-red-50/95 px-2 py-1 rounded-t-[10px] leading-tight" role="alert">
+          {error}
+        </p>
+      )}
+      <div className="flex flex-col items-center justify-center shrink-0 w-11">
+        <span className="text-[13px] font-medium text-neutral-500 tabular-nums leading-[1.4]" aria-label={`เวลา ${formatTime(b.scheduledAt)}`}>
+          {formatTime(b.scheduledAt)}
+        </span>
       </div>
+      <div className="flex-1 min-w-0 flex flex-col justify-center gap-0">
+        <div className="flex items-baseline justify-between gap-2">
+          <span className="font-semibold text-neutral-800 text-[15px] truncate leading-[1.4] align-middle">
+            {b.queueNumber != null && (
+              <span className="text-neutral-500 font-medium mr-1.5">{b.queueNumber}</span>
+            )}
+            {b.customerName}
+          </span>
+          {typeof b.amount === "number" && b.amount > 0 && (
+            <span className="text-[13px] text-neutral-500 shrink-0 tabular-nums text-right">฿{b.amount.toLocaleString()}</span>
+          )}
+        </div>
+        <p className="text-[13px] text-neutral-500 truncate leading-[1.4] mt-0.5">{b.service}{b.procedure ? ` · ${b.procedure}` : ""}</p>
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1">
+          {b.doctor && <span className="text-[12px] text-neutral-500">{b.doctor}</span>}
+          {(b.channel || b.source) && (
+            <span className="text-[12px] text-neutral-500">
+              {CHANNEL_LABEL[b.channel ?? ""] ?? SOURCE_LABEL[b.source ?? ""] ?? b.channel ?? b.source}
+            </span>
+          )}
+          <span className="flex items-center gap-1.5 text-[12px] text-neutral-600 align-baseline" title={STATUS_LABEL[b.status] ?? b.status}>
+            <span className="w-[6px] h-[6px] rounded-full shrink-0 self-center" style={{ backgroundColor: dotColor }} aria-hidden />
+            {STATUS_LABEL[b.status] ?? b.status}
+          </span>
+        </div>
+      </div>
+      {canModify && (
+        <div className="flex items-center gap-1.5 shrink-0">
+          {canConfirm && (
+            <button type="button" className="h-[34px] px-3 rounded-[10px] text-[13px] font-medium bg-black text-white hover:bg-neutral-800 transition-colors duration-100 disabled:opacity-50" onClick={() => handleStatus("confirmed")} disabled={loading} title={b.status === "reschedule_pending_admin" ? "ยืนยันเลื่อน" : "ยืนยัน"}>
+              {b.status === "reschedule_pending_admin" ? "ยืนยันเลื่อน" : "ยืนยัน"}
+            </button>
+          )}
+          {canCallQueue && (
+            <button type="button" className="h-[34px] px-3 rounded-[10px] text-[13px] font-medium bg-black text-white hover:bg-neutral-800 transition-colors duration-100 disabled:opacity-50" onClick={() => handleStatus("in_progress")} disabled={loading} title="เรียกคิว">
+              เรียกคิว
+            </button>
+          )}
+          {canComplete && (
+            <button type="button" className="h-[34px] px-3 rounded-[10px] text-[13px] font-medium bg-black text-white hover:bg-neutral-800 transition-colors duration-100 disabled:opacity-50" onClick={() => handleStatus("completed")} disabled={loading} title="เสร็จสิ้น">
+              เสร็จสิ้น
+            </button>
+          )}
+          <button type="button" className="h-[34px] px-3 rounded-[10px] text-[13px] font-medium bg-transparent text-neutral-800 hover:bg-[#F2F2F7] transition-colors duration-100 disabled:opacity-50" onClick={onEdit} disabled={loading} title="แก้ไข">
+            แก้ไข
+          </button>
+          <button type="button" className="h-[34px] px-3 rounded-[10px] text-[13px] font-medium text-red-600 hover:bg-red-50/50 transition-colors duration-100 disabled:opacity-50" onClick={() => handleStatus("cancelled")} disabled={loading} title={b.status === "cancel_requested" ? "ยืนยันยกเลิก" : "ยกเลิก"}>
+            {b.status === "cancel_requested" ? "ยืนยันยกเลิก" : b.status === "confirmed" ? "ยกเลิก" : "ปฏิเสธ"}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -248,73 +270,70 @@ function QueueWorkbench({
 
   return (
     <section>
-      <div className="flex justify-between items-start gap-4 mb-4">
+      <div className="flex justify-between items-start gap-4 mb-5">
         <div className="min-w-0">
-          <SectionHeader
-          title="หน้างานวันนี้"
-          description="คิวเรียงตามเวลา — เรียกคิวเมื่อลูกค้ามา แตะเสร็จสิ้นเมื่อให้บริการแล้ว"
-          />
+          <h2 className="text-[17px] font-semibold text-neutral-900 leading-[1.4]">หน้างานวันนี้</h2>
+          <p className="text-[13px] text-neutral-500 mt-1 leading-[1.4]">คิวเรียงตามเวลา — เรียกคิวเมื่อลูกค้ามา แตะเสร็จสิ้นเมื่อให้บริการแล้ว</p>
         </div>
         <a
           href={`/clinic/queue-display${queueBranch !== "all" ? `?branchId=${queueBranch}` : ""}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-sm text-primary-600 hover:underline shrink-0"
+          className="text-[13px] font-medium text-neutral-800 hover:opacity-80 transition-opacity duration-100 shrink-0"
         >
           เปิดหน้าจอคิว →
         </a>
       </div>
-      <Card padding="lg">
-        <div className="flex flex-wrap gap-4 mb-4 items-center">
-          <label className="flex items-center gap-2 text-sm">
-            <span className="text-surface-600">วันที่</span>
+      <div className="space-y-4">
+        <div className="flex flex-wrap gap-3 items-center">
+          <label className="flex items-center gap-2 text-[13px] font-medium text-neutral-500 leading-[1.4]">
+            <span>วันที่</span>
             <input
               type="date"
               value={queueDate}
               onChange={(e) => setQueueDate(e.target.value)}
-              className="px-2 py-1.5 rounded-lg border border-surface-200 text-sm"
+              className="min-h-[36px] px-3 py-2 rounded-[10px] border border-[#E5E7EB] text-[13px] text-neutral-800 bg-white focus:outline-none focus:ring-2 focus:ring-black/10 transition-shadow duration-100"
             />
           </label>
           <select
             value={queueBranch}
             onChange={(e) => setQueueBranch(e.target.value)}
-            className="px-3 py-1.5 rounded-lg border border-surface-200 text-sm"
+            className="min-h-[36px] px-3 py-2 rounded-[10px] border border-[#E5E7EB] text-[13px] text-neutral-800 bg-white focus:outline-none focus:ring-2 focus:ring-black/10 transition-shadow duration-100"
           >
             <option value="all">ทุกสาขา</option>
             {branches.map((b) => (
               <option key={b.id} value={b.id}>{b.name}</option>
             ))}
           </select>
-          <label className="flex items-center gap-2 text-sm cursor-pointer">
+          <label className="flex items-center gap-2 text-[13px] font-medium text-neutral-800 cursor-pointer leading-[1.4]">
             <input
               type="checkbox"
               checked={groupByDoctor}
               onChange={(e) => setGroupByDoctor(e.target.checked)}
+              className="rounded border-[#E5E7EB]"
             />
             <span>แยกตามแพทย์</span>
           </label>
         </div>
 
         {queueItems.length === 0 ? (
-          <p className="text-sm text-surface-500 py-8 text-center">ไม่มีคิววันนี้</p>
+          <p className="text-[13px] text-neutral-500 py-8 text-center leading-[1.4]">ไม่มีคิววันนี้</p>
         ) : groupByDoctor ? (
           <div className="space-y-4">
             {Array.from(byDoctor.entries()).map(([doctor, items]) => (
-              <div key={doctor} className="border border-surface-200 rounded-xl overflow-hidden">
+              <div key={doctor} className="space-y-0">
                 <button
                   type="button"
-                  className="w-full flex justify-between items-center px-4 py-3 bg-surface-50 hover:bg-surface-100 text-left"
+                  className="w-full flex justify-between items-center px-0 py-2 text-left text-[13px] font-medium text-neutral-800 leading-[1.4] hover:opacity-80 transition-opacity duration-100"
                   onClick={() => setExpandedDoctor((x) => (x === doctor ? null : doctor))}
                 >
-                  <span className="font-semibold text-surface-800">{doctor}</span>
-                  <span className="text-sm text-surface-500">{items.length} คิว</span>
+                  <span className="font-medium text-neutral-800">{doctor}</span>
+                  <span className="text-[13px] text-neutral-500">{items.length} คิว</span>
                 </button>
                 {(expandedDoctor === null || expandedDoctor === doctor) && (
-                  <div className="divide-y divide-surface-100">
+                  <div className="space-y-3 pt-1">
                     {items.map((b) => (
-                      <div key={b.id} className="px-4">
-                        <BookingCard item={b} onEdit={() => onEdit(b)} onMutate={onMutate} />
-                      </div>
+                      <BookingCard key={b.id} item={b} onEdit={() => onEdit(b)} onMutate={onMutate} />
                     ))}
                   </div>
                 )}
@@ -322,14 +341,41 @@ function QueueWorkbench({
             ))}
           </div>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-3 mt-1">
             {queueItems.map((b) => (
               <BookingCard key={b.id} item={b} onEdit={() => onEdit(b)} onMutate={onMutate} />
             ))}
           </div>
         )}
-      </Card>
+      </div>
     </section>
+  );
+}
+
+/** Insight block — signature metric 30–32px, 8px/16px spacing, contextual hint from existing data */
+function TodaySummaryPanel({
+  todayStr,
+  todayCount,
+  branchLabel,
+  waitingCount = 0,
+}: {
+  todayStr: string;
+  todayCount: number;
+  branchLabel: string;
+  waitingCount?: number;
+}) {
+  return (
+    <div className="bg-[#FAFAFA] rounded-[12px] p-6">
+      <p className="text-[32px] font-semibold text-neutral-900 tabular-nums leading-[1.2] tracking-[-0.01em]">{todayCount}</p>
+      <p className="text-[13px] font-medium text-neutral-500 leading-[1.4] mt-2">การจองวันนี้</p>
+      <div className="mt-4 space-y-3">
+        {waitingCount > 0 && (
+          <p className="text-[13px] text-neutral-500 leading-[1.4]">{waitingCount} รอรับบริการ</p>
+        )}
+        <p className="text-[13px] leading-[1.4] text-neutral-500"><span className="font-medium text-neutral-800">สาขา</span> {branchLabel}</p>
+        <p className="text-[13px] leading-[1.4] text-neutral-500"><span className="font-medium text-neutral-800">วันที่</span> {formatDate(todayStr + "T12:00:00")}</p>
+      </div>
+    </div>
   );
 }
 
@@ -368,17 +414,26 @@ function DayTimelineView({
   const busyCount = slots.filter((s) => s.status === "busy").length;
   const doneCount = slots.filter((s) => s.status === "completed").length;
 
-  if (isLoading) return <div className="py-4 text-center text-sm text-surface-500">กำลังโหลด...</div>;
+  if (isLoading) return (
+    <div className="py-4 space-y-2" aria-busy="true" aria-live="polite">
+      <div className="h-4 w-3/4 rounded bg-[#E5E7EB] animate-pulse" />
+      <div className="h-16 grid grid-cols-4 gap-1.5">
+        {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+          <div key={i} className="h-8 rounded bg-[#E5E7EB] animate-pulse" />
+        ))}
+      </div>
+    </div>
+  );
   if (slots.length === 0)
     return (
-      <div className="py-4 text-center text-sm text-surface-500">
+      <div className="py-4 text-center text-sm text-[#6B7280]">
         วันนี้งดให้บริการ{doctorName ? ` (${doctorName})` : ""}
       </div>
     );
 
   return (
     <div className="space-y-2">
-      <p className="text-xs text-surface-500">
+      <p className="text-[12px] font-medium text-[#6B7280] leading-[1.4]">
         ว่าง {freeCount} · มีคิว {busyCount} · เสร็จ {doneCount}
         {doctorName && ` · ${doctorName}`}
       </p>
@@ -393,11 +448,11 @@ function DayTimelineView({
             onClick={clickable ? () => onSelectBooking?.(s.bookingId!) : undefined}
             onKeyDown={clickable ? (e) => e.key === "Enter" && onSelectBooking?.(s.bookingId!) : undefined}
             className={`
-              rounded-lg p-2 text-xs truncate
-              ${s.status === "free" ? "bg-surface-50 text-surface-600 border border-surface-100" : ""}
-              ${s.status === "busy" ? "bg-primary-100 text-primary-800 font-medium border border-primary-200/60" : ""}
-              ${s.status === "completed" ? "bg-surface-100 text-surface-500 border border-surface-200 line-through" : ""}
-              ${clickable ? "cursor-pointer hover:ring-2 hover:ring-primary-300" : ""}
+              rounded-[10px] p-2 text-[12px] truncate leading-[1.4] transition-colors duration-100
+              ${s.status === "free" ? "bg-[#FAFAFA] text-[#6B7280]" : ""}
+              ${s.status === "busy" ? "bg-[#EFF6FF] text-[#1E40AF] font-medium" : ""}
+              ${s.status === "completed" ? "bg-[#FAFAFA] text-[#6B7280] line-through" : ""}
+              ${clickable ? "cursor-pointer hover:opacity-90" : ""}
             `}
             title={
               s.status === "free"
@@ -441,18 +496,18 @@ function SlotSelector({
   if (isLoading || slots.length === 0) return null;
   return (
     <div className="mt-2">
-      <span className="text-xs text-surface-500">หรือเลือกเวลาว่าง: </span>
+      <span className="text-[12px] font-medium text-[#6B7280]">หรือเลือกเวลาว่าง: </span>
       <div className="flex flex-wrap gap-1 mt-1">
         {slots.slice(0, 12).map((s) => (
           <button
             key={`${s.startISO}-${s.doctorId ?? ""}`}
             type="button"
-            className="px-2 py-1 rounded text-xs bg-surface-100 hover:bg-primary-100 text-surface-700"
+            className="min-h-[34px] px-3 py-2 rounded-[10px] text-[13px] font-medium bg-white text-[#111827] hover:bg-[#F5F5F7] transition-colors duration-100"
             onClick={() => onSelect(s.startISO, s.doctorId, s.doctorName)}
             title={s.doctorName ? `${s.start} - ${s.doctorName}` : s.start}
           >
             {s.start}
-            {s.doctorName && <span className="text-[10px] text-surface-500 ml-0.5">({s.doctorName})</span>}
+            {s.doctorName && <span className="text-[11px] text-[#6B7280] ml-0.5">({s.doctorName})</span>}
           </button>
         ))}
       </div>
@@ -525,7 +580,7 @@ function CalendarGrid({
   return (
     <div className="grid grid-cols-7 gap-1">
       {DAY_NAMES_TH.map((d) => (
-        <div key={d} className="text-center text-xs font-medium text-surface-500 py-1">
+        <div key={d} className="text-center text-[12px] font-medium text-[#6B7280] py-1 leading-[1.35]">
           {d}
         </div>
       ))}
@@ -537,11 +592,11 @@ function CalendarGrid({
         const cellStyle =
           hasActive || hasCompletedOnly
             ? hasCompletedOnly
-              ? "bg-surface-100 text-surface-600"
+              ? "bg-[#FAFAFA] text-[#6B7280]"
               : hasBoth
-                ? "bg-primary-100 text-primary-800 border border-primary-200/60"
-                : "bg-primary-100 text-primary-800 font-medium"
-            : "hover:bg-surface-100";
+                ? "bg-[#EFF6FF] text-[#1E40AF] font-medium"
+                : "bg-[#EFF6FF] text-[#1E40AF] font-medium"
+            : "hover:bg-[#F5F5F7]";
         return (
           <button
             key={i}
@@ -550,18 +605,19 @@ function CalendarGrid({
             disabled={!c.dateStr}
             aria-label={c.dateStr ? (c.dateStr === todayStr ? `วันนี้ ${c.day}` : `วันที่ ${c.day}`) : undefined}
             className={`
-              min-h-[44px] rounded-lg text-sm transition-colors
-              ${c.isCurrentMonth ? "" : "text-surface-300"}
+              min-h-[40px] rounded-[10px] text-[13px] leading-[1.4] transition-colors duration-[120ms] ease-out
+              hover:ring-2 hover:ring-inset hover:ring-neutral-200/80
+              ${c.isCurrentMonth ? "" : "text-[#9CA3AF]"}
               ${cellStyle}
-              ${selectedDate === c.dateStr ? "ring-2 ring-primary-500 bg-primary-50" : ""}
-              ${c.dateStr === todayStr ? "ring-1 ring-primary-400/60 font-semibold" : ""}
+              ${selectedDate === c.dateStr ? "ring-2 ring-black/20 bg-[#F5F5F7]" : ""}
+              ${c.dateStr === todayStr ? "font-semibold text-[#111827]" : ""}
             `}
           >
             {c.day}
             {c.count > 0 && (
               <span className="block text-[10px] font-normal mt-0.5">
                 {hasCompletedOnly ? (
-                  <span className="text-surface-500">✓ {stats.completed} เสร็จ</span>
+                  <span className="text-[#6B7280]">✓ {stats.completed} เสร็จ</span>
                 ) : hasBoth ? (
                   <span>{stats.active} คิว · ✓ {stats.completed}</span>
                 ) : (
@@ -597,6 +653,7 @@ function BookingPageContent() {
   });
   const [editingItem, setEditingItem] = useState<BookingItem | null>(null);
   const [doctorFilter, setDoctorFilter] = useState<string>("all");
+  const [activeTab, setActiveTab] = useState<WorkspaceTab>("today");
 
   const calendarParams = new URLSearchParams({
     year: String(viewYear),
@@ -739,16 +796,80 @@ function BookingPageContent() {
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
   }, []);
 
-  return (
-    <div className="space-y-8">
-      <PageHeader
-        title="การจอง"
-        description="จัดการการจองคิว — ปฏิทิน เลือกวัน จองด้วยแอดมิน หรือ AI"
-        aiAnalyze
-      />
+  const todayWaitingCount = useMemo(() => {
+    if (activeTab !== "today") return 0;
+    return calendarItems.filter((b) => b.scheduledAt.startsWith(todayStr) && (b.status === "pending" || b.status === "confirmed")).length;
+  }, [activeTab, todayStr, calendarItems]);
 
-      {/* Enterprise: หน้างานวันนี้ — คิวเรียงตามเวลา */}
-      <QueueWorkbench
+  const [tabUnderlineExpanded, setTabUnderlineExpanded] = useState(true);
+  useEffect(() => {
+    const id = requestAnimationFrame(() => {
+      requestAnimationFrame(() => setTabUnderlineExpanded(true));
+    });
+    return () => cancelAnimationFrame(id);
+  }, [activeTab]);
+  const setActiveTabWithUnderline = useCallback((tab: WorkspaceTab) => {
+    setActiveTab(tab);
+    setTabUnderlineExpanded(false);
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-white font-sans antialiased relative">
+      <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_50%_-10%,rgba(0,0,0,0.025),transparent_60%)]" aria-hidden />
+      <div className="relative max-w-[1440px] mx-auto px-4 md:px-6">
+        <PageHeader
+          title="การจอง"
+          description="จัดการการจองคิว — ปฏิทิน เลือกวัน จองด้วยแอดมิน หรือ AI"
+          aiAnalyze
+        />
+
+      {activeTab === "today" && (
+        <div className="pt-8 pb-2">
+          <h2 className="text-[21px] font-medium text-neutral-800 leading-[1.3]">หน้างานวันนี้</h2>
+          <p className="text-[13px] text-neutral-500 mt-1 leading-[1.4]">คิวเรียงตามเวลา — เรียกคิวเมื่อลูกค้ามา แตะเสร็จสิ้นเมื่อให้บริการแล้ว</p>
+        </div>
+      )}
+
+      {/* Sticky Workspace Tabs — underline active, 2px, ease-out */}
+      <div className="sticky top-0 z-10 bg-white -mx-4 px-4 md:-mx-6 md:px-6 pt-2 pb-4 flex gap-6 border-b border-neutral-100" role="tablist" aria-label="Workspace tabs">
+        {(
+          [
+            ["today", "วันนี้"],
+            ["calendar", "ปฏิทิน"],
+            ["all", "รายการจองทั้งหมด"],
+            ["reports", "รายงาน"],
+          ] as const
+        ).map(([tab, label]) => (
+          <button
+            key={tab}
+            type="button"
+            role="tab"
+            aria-selected={activeTab === tab}
+            tabIndex={activeTab === tab ? 0 : -1}
+            onClick={() => setActiveTabWithUnderline(tab)}
+            className={`relative min-h-[40px] px-1 pb-2 text-[14px] font-medium leading-[1.4] transition-colors duration-[120ms] ease-out focus:outline-none focus:ring-2 focus:ring-black/20 focus:ring-offset-2 ${
+              activeTab === tab ? "text-neutral-800" : "text-neutral-500 hover:text-neutral-800"
+            }`}
+          >
+            {label}
+            {activeTab === tab && (
+              <span
+                className="absolute bottom-0 left-0 h-[2px] bg-neutral-800 rounded-full transition-[width] duration-[120ms] ease-out"
+                style={{ width: tabUnderlineExpanded ? "100%" : "40%" }}
+                aria-hidden
+              />
+            )}
+          </button>
+        ))}
+      </div>
+
+      {/* TODAY: 48px below header→grid, 32px Queue→Timeline, 16px inside sections */}
+      {activeTab === "today" && (
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,2.6fr)_minmax(0,1fr)] gap-6 md:gap-8 lg:gap-10 pt-12 pb-10">
+          <div className="min-w-0 space-y-8">
+            <div className="bg-[#FAFAFA] rounded-[12px] p-6">
+              <div className="bg-white rounded-[12px] p-6">
+              <QueueWorkbench
         dateStr={todayStr}
         branchFilter={branchFilter}
         branches={branches}
@@ -758,72 +879,110 @@ function BookingPageContent() {
         }}
         onEdit={(item) => setEditingItem(item)}
       />
-
-      {/* ปฏิทิน + รายการจอง */}
-      <section>
-        <SectionHeader
-          title="ปฏิทิน"
-          description="รวมทุกแพทย์ หรือเลือกดูตามแพทย์ — ว่าง/มีคิว/เสร็จแล้ว"
-        />
-        <div className="grid lg:grid-cols-3 gap-6">
-          <Card className="lg:col-span-2" padding="lg">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-surface-800">
-                {MONTH_NAMES_TH[viewMonth - 1]} {viewYear + 543}
-              </h3>
-              <div className="flex gap-2">
-                <Button variant="ghost" size="sm" onClick={prevMonth}>
-                  ‹
-                </Button>
-                <Button variant="ghost" size="sm" onClick={nextMonth}>
-                  ›
-                </Button>
               </div>
             </div>
-            <div className="flex flex-wrap gap-2 mb-4 items-center">
-              <select
-                value={doctorFilter}
-                onChange={(e) => setDoctorFilter(e.target.value)}
-                className="px-3 py-2 rounded-lg border border-surface-200 text-sm focus:ring-2 focus:ring-primary-500/30"
-                title="เลือกรูปแบบปฏิทิน"
-              >
-                <option value="all">รวมทุกแพทย์</option>
-                {doctors.map((d) => (
-                  <option key={d.id} value={d.doctor_id || d.doctor_name || d.id}>
-                    {d.doctor_name || d.doctor_id || `แพทย์ ${d.id.slice(0, 6)}`}
-                  </option>
-                ))}
-              </select>
-              <select
-                value={branchFilter}
-                onChange={(e) => setBranchFilter(e.target.value)}
-                className="px-3 py-2 rounded-lg border border-surface-200 text-sm focus:ring-2 focus:ring-primary-500/30"
-              >
-                <option value="all">ทุกสาขา</option>
-                {branches.map((b) => (
-                  <option key={b.id} value={b.id}>{b.name}</option>
-                ))}
-              </select>
-              <select
-                value={channelFilter}
-                onChange={(e) => setChannelFilter(e.target.value)}
-                className="px-3 py-2 rounded-lg border border-surface-200 text-sm focus:ring-2 focus:ring-primary-500/30"
-                title="กรองตามช่องทาง"
-              >
-                <option value="all">ทุกช่องทาง</option>
-                {BOOKING_CHANNELS.map((ch) => (
-                  <option key={ch} value={ch}>{CHANNEL_LABEL[ch] ?? ch}</option>
-                ))}
-              </select>
-              <Button size="sm" onClick={() => setShowCreateModal(true)}>
-                + จองคิว
-              </Button>
+            <section className="bg-[#FAFAFA] rounded-[12px] p-6 space-y-4">
+              <h2 className="text-[17px] font-medium text-neutral-800 leading-[1.4]">Timeline วันนี้</h2>
+              <DayTimelineView
+                dateStr={todayStr}
+                branchId={branchFilter !== "all" ? branchFilter : branches[0]?.id ?? ""}
+                doctorId={doctorFilter !== "all" ? doctorFilter : undefined}
+                doctorName={doctorFilter !== "all" ? doctors.find((d) => (d.doctor_id || d.doctor_name || d.id) === doctorFilter)?.doctor_name : undefined}
+                onSelectBooking={(id) => {
+                  const item = calendarItems.find((b) => b.id === id);
+                  if (item) setEditingItem(item);
+                }}
+              />
+            </section>
+          </div>
+          <div className="min-w-0 lg:max-w-[300px]">
+            <TodaySummaryPanel
+              todayStr={todayStr}
+              todayCount={calendarData?.datesWithCount?.[todayStr] ?? 0}
+              branchLabel={branchFilter === "all" ? "ทุกสาขา" : branches.find((b) => b.id === branchFilter)?.name ?? branchFilter}
+              waitingCount={todayWaitingCount}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* CALENDAR: soft container, micro legend, grid-aligned */}
+      {activeTab === "calendar" && (
+      <section className="py-8">
+        <div className="sticky top-[52px] z-[9] bg-white -mx-4 px-4 md:-mx-6 md:px-6 py-3 mb-8 flex flex-wrap gap-3 items-center">
+          <select
+            value={doctorFilter}
+            onChange={(e) => setDoctorFilter(e.target.value)}
+            className="min-h-[36px] px-3 py-2 rounded-[10px] border border-[#E5E7EB] text-[13px] text-[#111827] bg-white focus:outline-none focus:ring-2 focus:ring-black/10 transition-shadow duration-100"
+            title="เลือกรูปแบบปฏิทิน"
+            aria-label="เลือกแพทย์"
+          >
+            <option value="all">รวมทุกแพทย์</option>
+            {doctors.map((d) => (
+              <option key={d.id} value={d.doctor_id || d.doctor_name || d.id}>
+                {d.doctor_name || d.doctor_id || `แพทย์ ${d.id.slice(0, 6)}`}
+              </option>
+            ))}
+          </select>
+          <select
+            value={branchFilter}
+            onChange={(e) => setBranchFilter(e.target.value)}
+            className="min-h-[36px] px-3 py-2 rounded-[10px] border border-[#E5E7EB] text-[13px] text-[#111827] bg-white focus:outline-none focus:ring-2 focus:ring-black/10 transition-shadow duration-100"
+            aria-label="เลือกสาขา"
+          >
+            <option value="all">ทุกสาขา</option>
+            {branches.map((b) => (
+              <option key={b.id} value={b.id}>{b.name}</option>
+            ))}
+          </select>
+          <select
+            value={channelFilter}
+            onChange={(e) => setChannelFilter(e.target.value)}
+            className="min-h-[36px] px-3 py-2 rounded-[10px] border border-[#E5E7EB] text-[13px] text-[#111827] bg-white focus:outline-none focus:ring-2 focus:ring-black/10 transition-shadow duration-100"
+            title="กรองตามช่องทาง"
+            aria-label="เลือกช่องทาง"
+          >
+            <option value="all">ทุกช่องทาง</option>
+            {BOOKING_CHANNELS.map((ch) => (
+              <option key={ch} value={ch}>{CHANNEL_LABEL[ch] ?? ch}</option>
+            ))}
+          </select>
+          <button type="button" onClick={() => setShowCreateModal(true)} className="min-h-[36px] px-4 py-2 rounded-[10px] text-[13px] font-medium bg-black text-white hover:bg-neutral-800 transition-colors duration-100">
+            + จองคิว
+          </button>
+        </div>
+        <div className="bg-[#FAFAFA] rounded-[12px] p-6 space-y-5">
+            <p className="text-[12px] font-medium text-neutral-500 uppercase tracking-wide">ปฏิทิน</p>
+            <div className="flex items-center justify-between">
+              <h3 className="text-[17px] font-medium text-neutral-800 leading-[1.4]">
+                {MONTH_NAMES_TH[viewMonth - 1]} {viewYear + 543}
+              </h3>
+              <div className="flex gap-1">
+                <button type="button" onClick={prevMonth} className="min-h-[36px] min-w-[36px] px-2 rounded-[10px] text-[13px] font-medium text-neutral-800 hover:bg-[#F2F2F7] transition-colors duration-100" aria-label="เดือนก่อน">
+                  ‹
+                </button>
+                <button type="button" onClick={nextMonth} className="min-h-[36px] min-w-[36px] px-2 rounded-[10px] text-[13px] font-medium text-neutral-800 hover:bg-[#F2F2F7] transition-colors duration-100" aria-label="เดือนถัดไป">
+                  ›
+                </button>
+              </div>
             </div>
             {calendarError && (
-              <p className="text-sm text-red-600 py-2">โหลดปฏิทินไม่สำเร็จ: {calendarError.message}</p>
+              <div className="flex items-center justify-between gap-4 py-3 px-4 rounded-[10px] bg-red-50 text-[13px] text-red-700 leading-[1.4]" role="alert">
+                <span>โหลดปฏิทินไม่สำเร็จ: {calendarError.message}</span>
+                <button type="button" className="shrink-0 text-[13px] font-medium text-red-700 hover:opacity-80" onClick={() => void mutateCalendar()}>
+                  ลองใหม่
+                </button>
+              </div>
             )}
             {calendarLoading && !calendarData && (
-              <div className="py-12 text-center text-surface-500 text-sm">กำลังโหลด...</div>
+              <div className="py-8 space-y-3" aria-busy="true">
+                <div className="h-4 w-24 rounded-[10px] bg-[#F5F5F7] animate-pulse mx-auto" />
+                <div className="grid grid-cols-7 gap-1.5">
+                  {Array.from({ length: 35 }).map((_, i) => (
+                    <div key={i} className="h-10 rounded-[10px] bg-[#F5F5F7] animate-pulse" />
+                  ))}
+                </div>
+              </div>
             )}
             {!calendarLoading && (
               <>
@@ -835,10 +994,10 @@ function BookingPageContent() {
                   selectedDate={selectedDate}
                   onSelectDate={setSelectedDate}
                 />
-                <p className="mt-3 text-[11px] text-surface-500 flex flex-wrap gap-x-4 gap-y-1">
-                  <span><span className="inline-block w-2 h-2 rounded-sm bg-primary-200 mr-1 align-middle" /> มีคิวรอ</span>
-                  <span><span className="inline-block w-2 h-2 rounded-sm bg-surface-200 mr-1 align-middle" /> เสร็จแล้ว</span>
-                  <span><span className="inline-block w-2 h-2 rounded-sm bg-emerald-200 mr-1 align-middle" /> ว่าง</span>
+                <p className="mt-5 text-[12px] text-neutral-500 flex flex-wrap gap-x-4 gap-y-1 leading-[1.4]">
+                  <span><span className="inline-block w-1.5 h-1.5 rounded-full bg-primary-300 mr-1.5 align-middle" /> มีคิวรอ</span>
+                  <span><span className="inline-block w-1.5 h-1.5 rounded-full bg-[#E5E7EB] mr-1.5 align-middle" /> เสร็จแล้ว</span>
+                  <span><span className="inline-block w-1.5 h-1.5 rounded-full bg-[#9CA3AF] mr-1.5 align-middle" /> ว่าง</span>
                 </p>
                 {selectedDate && (branchFilter !== "all" || branches[0]?.id) && (
                   <DayTimelineView
@@ -858,69 +1017,114 @@ function BookingPageContent() {
                 )}
               </>
             )}
-          </Card>
+          </div>
+      </section>
+      )}
 
-          <Card padding="lg">
-            <CardHeader
-              title={selectedDate ? `รายการจอง ${formatDate(selectedDate + "T12:00:00")}` : "รายการจอง"}
-              subtitle={
-                selectedDate
-                  ? `${selectedDayItems.length} รายการ${doctorFilter !== "all" ? ` (${doctors.find((d) => (d.doctor_id || d.doctor_name || d.id) === doctorFilter)?.doctor_name || doctorFilter})` : ""}`
-                  : `${doctorFilter !== "all" ? "กรองตามแพทย์ · " : ""}${allItems.length} รายการ${lastId ? " • มีเพิ่มเติม" : ""}`
-              }
-            />
-            <div className="space-y-2 max-h-80 overflow-y-auto">
-              {(selectedDate ? selectedDayItems : items).length === 0 ? (
-                <p className="text-sm text-surface-500 py-4">ยังไม่มีรายการจอง</p>
-              ) : (
-                (selectedDate ? selectedDayItems : items).map((b) => (
-                  <BookingCard
-                    key={b.id}
-                    item={b}
-                    onEdit={() => setEditingItem(b)}
-                    onMutate={() => {
-                      void mutateList();
-                      void mutateCalendar();
-                    }}
-                  />
-                ))
-              )}
-            </div>
-            {!selectedDate && lastId && (
-              <Button variant="ghost" size="sm" className="w-full mt-2" onClick={loadMore}>
+      {/* ALL BOOKINGS: soft container, summary, grid-aligned */}
+      {activeTab === "all" && (
+      <section className="py-8">
+        <div className="sticky top-[52px] z-[9] bg-white -mx-4 px-4 md:-mx-6 md:px-6 py-3 mb-8 flex flex-wrap gap-3 items-center">
+          <select
+            value={branchFilter}
+            onChange={(e) => setBranchFilter(e.target.value)}
+            className="min-h-[36px] px-3 py-2 rounded-[10px] border border-[#E5E7EB] text-[13px] text-[#111827] bg-white focus:outline-none focus:ring-2 focus:ring-black/10 transition-shadow duration-100"
+            aria-label="สาขา"
+          >
+            <option value="all">ทุกสาขา</option>
+            {branches.map((b) => (
+              <option key={b.id} value={b.id}>{b.name}</option>
+            ))}
+          </select>
+          <select
+            value={channelFilter}
+            onChange={(e) => setChannelFilter(e.target.value)}
+            className="min-h-[36px] px-3 py-2 rounded-[10px] border border-[#E5E7EB] text-[13px] text-[#111827] bg-white focus:outline-none focus:ring-2 focus:ring-black/10 transition-shadow duration-100"
+            aria-label="ช่องทาง"
+          >
+            <option value="all">ทุกช่องทาง</option>
+            {BOOKING_CHANNELS.map((ch) => (
+              <option key={ch} value={ch}>{CHANNEL_LABEL[ch] ?? ch}</option>
+            ))}
+          </select>
+          <button type="button" onClick={() => setShowCreateModal(true)} className="min-h-[36px] px-4 py-2 rounded-[10px] text-[13px] font-medium bg-black text-white hover:bg-neutral-800 transition-colors duration-100">
+            + จองคิว
+          </button>
+        </div>
+        <div className="bg-[#FAFAFA] rounded-[12px] p-6 space-y-4">
+          <div>
+            <p className="text-[12px] font-medium text-neutral-500 uppercase tracking-wide">รายการทั้งหมด</p>
+            <p className="text-[14px] font-medium text-neutral-800 leading-[1.4] mt-0.5">
+              {allItems.length} รายการ{lastId ? " · โหลดเพิ่มได้" : ""}
+            </p>
+          </div>
+          <div className="space-y-3 max-h-[calc(100vh-260px)] overflow-y-auto">
+          {items.length === 0 ? (
+            <p className="text-[13px] text-neutral-500 py-8 text-center leading-[1.4]">ยังไม่มีรายการจอง</p>
+          ) : (
+            items.map((b) => (
+              <BookingCard
+                key={b.id}
+                item={b}
+                onEdit={() => setEditingItem(b)}
+                onMutate={() => {
+                  void mutateList();
+                  void mutateCalendar();
+                }}
+              />
+            ))
+          )}
+          </div>
+          {lastId && (
+            <div className="pt-2">
+              <button type="button" className="w-full min-h-[36px] rounded-[10px] text-[13px] font-medium text-neutral-800 hover:bg-[#F2F2F7] transition-colors duration-100" onClick={loadMore}>
                 โหลดเพิ่ม
-              </Button>
-            )}
-          </Card>
+              </button>
+            </div>
+          )}
         </div>
       </section>
+      )}
 
-      {/* รายงานการจอง — Enterprise: ตามช่องทาง LINE/Facebook/IG/TikTok ฯลฯ */}
-      <section>
-        <SectionHeader
-          title="รายงานการจอง"
-          description="สรุปตามช่องทาง (LINE, Facebook, IG, TikTok) หัตถการ จำนวนเงิน"
-        />
-        <div className="flex flex-wrap gap-2 mb-4 items-center">
-          <label className="flex items-center gap-2 text-sm">
-            <span className="text-surface-600">ช่วงวันที่</span>
+      {/* REPORTS: type scale, micro-labels, soft containers */}
+      {activeTab === "reports" && (
+      <section className="py-8">
+        <div className="mb-8">
+          <h2 className="text-[17px] font-medium text-neutral-800 leading-[1.4]">รายงานการจอง</h2>
+          <p className="text-[13px] text-neutral-500 mt-1 leading-[1.4]">สรุปตามช่องทาง หัตถการ จำนวนเงิน</p>
+        </div>
+        <div className="grid grid-cols-2 gap-4 mb-8">
+          <div className="bg-[#FAFAFA] rounded-[12px] p-6 space-y-2">
+            <p className="text-[12px] font-medium text-neutral-500 uppercase tracking-wide">ช่วงที่เลือก</p>
+            <p className="text-[30px] font-semibold text-neutral-800 tabular-nums leading-[1.2]">{reports.totalCount}</p>
+            <p className="text-[13px] font-medium text-neutral-500 leading-[1.4]">จำนวนจองทั้งหมด</p>
+          </div>
+          <div className="bg-[#FAFAFA] rounded-[12px] p-6 space-y-2">
+            <p className="text-[12px] font-medium text-neutral-500 uppercase tracking-wide">ช่วงที่เลือก</p>
+            <p className="text-[30px] font-semibold text-neutral-800 tabular-nums leading-[1.2]">฿{reports.totalAmount.toLocaleString()}</p>
+            <p className="text-[13px] font-medium text-neutral-500 leading-[1.4]">ยอดรวม (บาท)</p>
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-3 items-center mb-8">
+          <label className="flex items-center gap-2 text-[13px] font-medium text-neutral-500 leading-[1.4]">
+            <span>ช่วงวันที่</span>
             <input
               type="date"
               value={reportFrom}
               onChange={(e) => setReportFrom(e.target.value)}
-              className="px-2 py-1 rounded border border-surface-200 text-sm"
+              className="min-h-[36px] px-3 py-2 rounded-[10px] border border-[#E5E7EB] text-[13px] text-[#111827] bg-white focus:outline-none focus:ring-2 focus:ring-black/10 transition-shadow duration-100"
             />
             <span>-</span>
             <input
               type="date"
               value={reportTo}
               onChange={(e) => setReportTo(e.target.value)}
-              className="px-2 py-1 rounded border border-surface-200 text-sm"
+              className="min-h-[36px] px-3 py-2 rounded-[10px] border border-[#E5E7EB] text-[13px] text-[#111827] bg-white focus:outline-none focus:ring-2 focus:ring-black/10 transition-shadow duration-100"
             />
           </label>
-          <Button
-            size="sm"
-            variant="outline"
+          <button
+            type="button"
+            className="min-h-[36px] px-4 py-2 rounded-[10px] text-[13px] font-medium bg-transparent text-neutral-800 hover:bg-[#F2F2F7] transition-colors duration-100"
             onClick={() => {
               const items = reportData?.items ?? [];
               const headers = ["วันที่", "ชื่อลูกค้า", "บริการ", "หัตถการ", "ช่องทาง", "จำนวนเงิน", "สถานะ", "สาขา"];
@@ -944,63 +1148,70 @@ function BookingPageContent() {
             }}
           >
             Export CSV
-          </Button>
+          </button>
         </div>
-        <div className="grid md:grid-cols-3 gap-6">
-          <Card padding="lg">
-            <CardHeader
-              title="ตามช่องทาง"
-              subtitle={`รวม ${reports.totalCount} รายการ • ฿${reports.totalAmount.toLocaleString()}`}
-            />
-            <div className="space-y-2">
+          <div className="grid md:grid-cols-3 gap-6">
+          <div className="bg-[#FAFAFA] rounded-[12px] p-6 space-y-4">
+            <div>
+              <h3 className="text-[17px] font-medium text-neutral-800 leading-[1.4]">ตามช่องทาง</h3>
+              <p className="text-[13px] text-neutral-500 mt-0.5 leading-[1.4]">รวม {reports.totalCount} รายการ · ฿{reports.totalAmount.toLocaleString()}</p>
+            </div>
+            <div className="space-y-3 text-[14px] text-neutral-800 leading-[1.4]">
               {reports.byChannel.map(([ch, v]) => (
-                <div key={ch} className="flex justify-between text-sm">
-                  <span>{CHANNEL_LABEL[ch] ?? SOURCE_LABEL[ch] ?? ch}</span>
-                  <span>
+                <div key={ch} className="flex justify-between">
+                  <span className="text-neutral-800">{CHANNEL_LABEL[ch] ?? SOURCE_LABEL[ch] ?? ch}</span>
+                  <span className="text-neutral-500 tabular-nums">
                     {v.count} รายการ
-                    {v.amount > 0 && ` • ฿${v.amount.toLocaleString()}`}
+                    {v.amount > 0 && ` · ฿${v.amount.toLocaleString()}`}
                   </span>
                 </div>
               ))}
               {reports.byChannel.length === 0 && (
-                <p className="text-sm text-surface-500 py-2">ไม่มีข้อมูลในช่วงนี้</p>
+                <p className="text-[13px] font-medium text-neutral-500 py-2 leading-[1.4]">ไม่มีข้อมูลในช่วงนี้</p>
               )}
-              <div className="pt-2 border-t border-surface-200 font-medium">
+              <div className="pt-4 mt-2 text-[13px] font-medium text-neutral-800 flex justify-between">
                 <span>รวมทั้งหมด</span>
-                <span>฿{reports.totalAmount.toLocaleString()}</span>
+                <span className="tabular-nums">฿{reports.totalAmount.toLocaleString()}</span>
               </div>
             </div>
-          </Card>
-          <Card padding="lg">
-            <CardHeader title="หัตถการยอดนิยม" subtitle="Top 10" />
-            <div className="space-y-2">
+          </div>
+          <div className="bg-[#FAFAFA] rounded-[12px] p-6 space-y-4">
+            <div>
+              <h3 className="text-[17px] font-medium text-neutral-800 leading-[1.4]">หัตถการยอดนิยม</h3>
+              <p className="text-[13px] text-neutral-500 mt-0.5 leading-[1.4]">Top 10</p>
+            </div>
+            <div className="space-y-3">
               {reports.byProcedure.map(([proc, count]) => (
-                <div key={proc} className="flex justify-between text-sm">
-                  <span className="truncate">{proc}</span>
-                  <span>{count} คน</span>
+                <div key={proc} className="flex justify-between text-[13px] leading-[1.4]">
+                  <span className="truncate text-neutral-800">{proc}</span>
+                  <span className="tabular-nums text-neutral-500">{count} คน</span>
                 </div>
               ))}
               {reports.byProcedure.length === 0 && (
-                <p className="text-sm text-surface-500 py-2">ไม่มีข้อมูล</p>
+                <p className="text-[13px] font-medium text-neutral-500 py-2 leading-[1.4]">ไม่มีข้อมูล</p>
               )}
             </div>
-          </Card>
-          <Card padding="lg">
-            <CardHeader title="จำนวนจองต่อวัน" subtitle="ตามช่วงที่เลือก" />
-            <div className="space-y-1 max-h-64 overflow-y-auto text-sm">
+          </div>
+          <div className="bg-[#FAFAFA] rounded-[12px] p-6 space-y-4">
+            <div>
+              <h3 className="text-[17px] font-medium text-neutral-800 leading-[1.4]">จำนวนจองต่อวัน</h3>
+              <p className="text-[13px] text-neutral-500 mt-0.5 leading-[1.4]">ตามช่วงที่เลือก</p>
+            </div>
+            <div className="space-y-3 max-h-56 overflow-y-auto text-[13px] leading-[1.4]">
               {reports.byDate.slice(-14).map(([date, count]) => (
                 <div key={date} className="flex justify-between">
-                  <span>{formatDate(date + "T12:00:00")}</span>
-                  <span>{count} รายการ</span>
+                  <span className="text-neutral-800">{formatDate(date + "T12:00:00")}</span>
+                  <span className="tabular-nums text-neutral-500">{count} รายการ</span>
                 </div>
               ))}
               {reports.byDate.length === 0 && (
-                <p className="text-sm text-surface-500 py-2">ไม่มีข้อมูล</p>
+                <p className="text-[13px] text-neutral-500 py-2">ไม่มีข้อมูล</p>
               )}
             </div>
-          </Card>
+          </div>
         </div>
       </section>
+      )}
 
       {/* Modal แก้ไขการจอง */}
       {editingItem && (
@@ -1031,6 +1242,7 @@ function BookingPageContent() {
           }}
         />
       )}
+      </div>
     </div>
   );
 }
@@ -1121,74 +1333,85 @@ function EditBookingModal({
       aria-labelledby="edit-booking-title"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="bg-white rounded-2xl shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-        <div className="p-6 border-b border-surface-200">
-          <h2 id="edit-booking-title" className="text-lg font-semibold text-surface-900">แก้ไขการจอง</h2>
+      <div className="bg-[#FFFFFF] rounded-[8px] border border-[#E5E7EB] max-w-md w-full mx-4 max-h-[90vh] flex flex-col shadow-none" onClick={(e) => e.stopPropagation()}>
+        <div className="p-4 border-b border-[#E5E7EB] shrink-0">
+          <h2 id="edit-booking-title" className="text-[16px] font-semibold text-[#111827] leading-[1.35]">แก้ไขการจอง</h2>
         </div>
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {error && (
-            <div className="p-3 rounded-lg bg-red-50 text-red-700 text-sm">{error}</div>
-          )}
-          <div>
-            <label className="block text-sm font-medium text-surface-700 mb-1">ชื่อลูกค้า *</label>
-            <Input value={customerName} onChange={(e) => setCustomerName(e.target.value)} placeholder="ชื่อ-นามสกุล" required />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-surface-700 mb-1">เบอร์โทร</label>
-            <Input value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} placeholder="08xxxxxxxx" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-surface-700 mb-1">บริการ *</label>
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 overflow-y-auto">
+          <div className="p-4 space-y-4">
+            {error && (
+              <div className="p-3 rounded-[8px] bg-red-50 border border-red-100 text-red-700 text-[13px] leading-[1.4]" role="alert">{error}</div>
+            )}
+            <section className="space-y-3" aria-labelledby="edit-customer-heading">
+              <h3 id="edit-customer-heading" className="text-[12px] font-medium text-[#6B7280] uppercase tracking-wide leading-[1.35]">ข้อมูลลูกค้า</h3>
+              <div>
+                <label className="block text-[13px] font-medium text-[#111827] mb-1 leading-[1.4]">ชื่อลูกค้า *</label>
+                <Input value={customerName} onChange={(e) => setCustomerName(e.target.value)} placeholder="ชื่อ-นามสกุล" required className="min-h-[36px]" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#111827] mb-1">เบอร์โทร</label>
+                <Input value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} placeholder="08xxxxxxxx" className="min-h-[36px]" />
+              </div>
+            </section>
+            <section className="space-y-3" aria-labelledby="edit-service-heading">
+              <h3 id="edit-service-heading" className="text-[12px] font-medium text-[#6B7280] uppercase tracking-wide leading-[1.35]">บริการ และเวลา</h3>
+              <div>
+                <label className="block text-sm font-medium text-[#111827] mb-1">บริการ *</label>
             {services.length > 0 ? (
-              <select value={service} onChange={(e) => setService(e.target.value)} className="w-full px-3 py-2 rounded-lg border border-surface-200" required>
+              <select value={service} onChange={(e) => setService(e.target.value)} className="w-full px-3 py-2 rounded-[8px] border border-[#E5E7EB] min-h-[36px] text-[#111827]" required>
                 <option value="">เลือกบริการ</option>
                 {services.map((s) => (
                   <option key={s.id} value={s.service_name}>{s.service_name}</option>
                 ))}
               </select>
             ) : (
-              <Input value={service} onChange={(e) => setService(e.target.value)} placeholder="ชื่อบริการ" required />
+              <Input value={service} onChange={(e) => setService(e.target.value)} placeholder="ชื่อบริการ" required className="min-h-[36px]" />
             )}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#111827] mb-1">หัตถการ/รายละเอียด</label>
+                <Input value={procedure} onChange={(e) => setProcedure(e.target.value)} placeholder="เช่น Botox, ฟิลเลอร์" className="min-h-[36px]" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#111827] mb-1">แพทย์ (ถ้ามี)</label>
+                <Input value={doctor} onChange={(e) => setDoctor(e.target.value)} placeholder="ชื่อแพทย์" className="min-h-[36px]" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#111827] mb-1">จำนวนเงิน (บาท)</label>
+                <Input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0" className="min-h-[36px]" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#111827] mb-1">วันที่-เวลา *</label>
+                <Input type="datetime-local" value={scheduledAt} onChange={(e) => setScheduledAt(e.target.value)} required className="min-h-[36px]" />
+              </div>
+            </section>
+            <section className="space-y-3" aria-labelledby="edit-status-heading">
+              <h3 id="edit-status-heading" className="text-[12px] font-medium text-[#6B7280] uppercase tracking-wide leading-[1.35]">สถานะ และช่องทาง</h3>
+              <div>
+                <label className="block text-sm font-medium text-[#111827] mb-1">สถานะ</label>
+                <select value={status} onChange={(e) => setStatus(e.target.value)} className="w-full px-3 py-2 rounded-[8px] border border-[#E5E7EB] min-h-[36px] text-[#111827]">
+                  {(["pending", "pending_admin_confirm", "confirmed", "in_progress", "reschedule_pending_admin", "cancel_requested", "completed", "no-show", "cancelled"] as const).map((s) => (
+                    <option key={s} value={s}>{STATUS_LABEL[s] ?? s}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#111827] mb-1">ช่องทางที่ลูกค้าจองเข้ามา</label>
+                <select value={channel} onChange={(e) => setChannel(e.target.value as BookingChannel)} className="w-full px-3 py-2 rounded-[8px] border border-[#E5E7EB] min-h-[36px] text-[#111827]">
+                  {BOOKING_CHANNELS.map((ch) => (
+                    <option key={ch} value={ch}>{CHANNEL_LABEL[ch] ?? ch}</option>
+                  ))}
+                </select>
+              </div>
+            </section>
+            <section className="space-y-3" aria-labelledby="edit-notes-heading">
+              <h3 id="edit-notes-heading" className="text-[12px] font-medium text-[#6B7280] uppercase tracking-wide leading-[1.35]">หมายเหตุ</h3>
+              <Input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="หมายเหตุ (ถ้ามี)" className="min-h-[36px]" />
+            </section>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-surface-700 mb-1">หัตถการ/รายละเอียด</label>
-            <Input value={procedure} onChange={(e) => setProcedure(e.target.value)} placeholder="เช่น Botox, ฟิลเลอร์" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-surface-700 mb-1">แพทย์ (ถ้ามี)</label>
-            <Input value={doctor} onChange={(e) => setDoctor(e.target.value)} placeholder="ชื่อแพทย์" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-surface-700 mb-1">จำนวนเงิน (บาท)</label>
-            <Input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-surface-700 mb-1">วันที่-เวลา *</label>
-            <Input type="datetime-local" value={scheduledAt} onChange={(e) => setScheduledAt(e.target.value)} required />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-surface-700 mb-1">สถานะ</label>
-            <select value={status} onChange={(e) => setStatus(e.target.value)} className="w-full px-3 py-2 rounded-lg border border-surface-200">
-              {(["pending", "pending_admin_confirm", "confirmed", "in_progress", "reschedule_pending_admin", "cancel_requested", "completed", "no-show", "cancelled"] as const).map((s) => (
-                <option key={s} value={s}>{STATUS_LABEL[s] ?? s}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-surface-700 mb-1">ช่องทางที่ลูกค้าจองเข้ามา</label>
-            <select value={channel} onChange={(e) => setChannel(e.target.value as BookingChannel)} className="w-full px-3 py-2 rounded-lg border border-surface-200">
-              {BOOKING_CHANNELS.map((ch) => (
-                <option key={ch} value={ch}>{CHANNEL_LABEL[ch] ?? ch}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-surface-700 mb-1">หมายเหตุ</label>
-            <Input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="หมายเหตุ (ถ้ามี)" />
-          </div>
-          <div className="flex gap-2 pt-4">
-            <Button type="button" variant="ghost" onClick={onClose}>ยกเลิก</Button>
-            <Button type="submit" disabled={sending}>{sending ? "กำลังบันทึก..." : "บันทึก"}</Button>
+          <div className="sticky bottom-0 p-4 border-t border-[#E5E7EB] bg-[#FFFFFF] flex gap-2 shrink-0">
+            <Button type="button" variant="ghost" onClick={onClose} className="min-h-[36px]">ยกเลิก</Button>
+            <Button type="submit" disabled={sending} className="min-h-[36px]">{sending ? "กำลังบันทึก..." : "บันทึก"}</Button>
           </div>
         </form>
       </div>
@@ -1291,155 +1514,128 @@ function CreateBookingModal({
       aria-labelledby="create-booking-title"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="bg-white rounded-2xl shadow-xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-        <div className="p-6 border-b border-surface-200">
-          <h2 id="create-booking-title" className="text-lg font-semibold text-surface-900">จองคิวใหม่</h2>
+      <div className="bg-[#FFFFFF] rounded-[8px] border border-[#E5E7EB] max-w-md w-full mx-4 max-h-[90vh] flex flex-col shadow-none" onClick={(e) => e.stopPropagation()}>
+        <div className="p-4 border-b border-[#E5E7EB] shrink-0">
+          <h2 id="create-booking-title" className="text-[16px] font-semibold text-[#111827] leading-[1.35]">จองคิวใหม่</h2>
         </div>
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {error && (
-            <div className="p-3 rounded-lg bg-red-50 text-red-700 text-sm">
-              {error}
-              {slotAlternatives.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {slotAlternatives.map((a) => (
-                    <button
-                      key={a.startISO}
-                      type="button"
-                      className="px-2 py-1 rounded bg-white border border-red-200 text-red-800 text-xs hover:bg-red-50"
-                      onClick={() => {
-                        const d = new Date(a.startISO);
-                        setScheduledAt(d.toISOString().slice(0, 16));
-                        setSlotAlternatives([]);
-                        setError(null);
-                      }}
-                    >
-                      {a.start}
-                    </button>
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 overflow-y-auto">
+          <div className="p-4 space-y-4">
+            {error && (
+              <div className="p-3 rounded-[8px] bg-red-50 border border-red-100 text-red-700 text-[13px] leading-[1.4]" role="alert">
+                {error}
+                {slotAlternatives.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {slotAlternatives.map((a) => (
+                      <button
+                        key={a.startISO}
+                        type="button"
+                        className="min-h-[36px] px-2 py-1 rounded-[8px] bg-white border border-red-200 text-red-800 text-[12px] font-medium hover:bg-red-50 focus:ring-2 focus:ring-red-300"
+                        onClick={() => {
+                          const d = new Date(a.startISO);
+                          setScheduledAt(d.toISOString().slice(0, 16));
+                          setSlotAlternatives([]);
+                          setError(null);
+                        }}
+                      >
+                        {a.start}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+            <section className="space-y-3" aria-labelledby="create-customer-heading">
+              <h3 id="create-customer-heading" className="text-[12px] font-medium text-[#6B7280] uppercase tracking-wide leading-[1.35]">ข้อมูลลูกค้า</h3>
+              <div>
+                <label className="block text-sm font-medium text-[#111827] mb-1">ชื่อลูกค้า *</label>
+                <Input
+                  value={customerName}
+                  onChange={(e) => setCustomerName(e.target.value)}
+                  placeholder="ชื่อ-นามสกุล"
+                  required
+                  className="min-h-[36px]"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#111827] mb-1">เบอร์โทร</label>
+                <Input
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  placeholder="08xxxxxxxx"
+                  className="min-h-[36px]"
+                />
+              </div>
+            </section>
+            <section className="space-y-3" aria-labelledby="create-service-heading">
+              <h3 id="create-service-heading" className="text-[12px] font-medium text-[#6B7280] uppercase tracking-wide leading-[1.35]">บริการ และเวลา</h3>
+              <div>
+                <label className="block text-sm font-medium text-[#111827] mb-1">บริการ *</label>
+                {services.length > 0 ? (
+                  <select value={service} onChange={(e) => setService(e.target.value)} className="w-full px-3 py-2 rounded-[8px] border border-[#E5E7EB] min-h-[36px] text-[#111827]" required>
+                    <option value="">เลือกบริการ</option>
+                    {services.map((s) => (
+                      <option key={s.id} value={s.service_name}>{s.service_name}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <Input value={service} onChange={(e) => setService(e.target.value)} placeholder="ชื่อบริการ" required className="min-h-[36px]" />
+                )}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#111827] mb-1">หัตถการ/รายละเอียด</label>
+                <Input value={procedure} onChange={(e) => setProcedure(e.target.value)} placeholder="เช่น Botox, ฟิลเลอร์" className="min-h-[36px]" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#111827] mb-1">แพทย์ (ถ้ามี)</label>
+                <Input value={doctor} onChange={(e) => setDoctor(e.target.value)} placeholder="ชื่อแพทย์" className="min-h-[36px]" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#111827] mb-1">จำนวนเงิน (บาท)</label>
+                <Input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0" className="min-h-[36px]" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#111827] mb-1">วันที่-เวลา *</label>
+                <Input type="datetime-local" value={scheduledAt} onChange={(e) => setScheduledAt(e.target.value)} required className="min-h-[36px]" />
+                {branchId && scheduledAt && (
+                  <SlotSelector
+                    branchId={branchId}
+                    dateStr={scheduledAt.slice(0, 10)}
+                    procedure={service || undefined}
+                    onSelect={(iso, doctorId, doctorName) => {
+                      setScheduledAt(new Date(iso).toISOString().slice(0, 16));
+                      if (doctorName) setDoctor(doctorName);
+                    }}
+                  />
+                )}
+              </div>
+            </section>
+            <section className="space-y-3" aria-labelledby="create-channel-heading">
+              <h3 id="create-channel-heading" className="text-[12px] font-medium text-[#6B7280] uppercase tracking-wide leading-[1.35]">ช่องทาง และสาขา</h3>
+              <div>
+                <label className="block text-sm font-medium text-[#111827] mb-1">ช่องทางที่ลูกค้าจองเข้ามา</label>
+                <select value={channel} onChange={(e) => setChannel(e.target.value as BookingChannel)} className="w-full px-3 py-2 rounded-[8px] border border-[#E5E7EB] min-h-[36px] text-[#111827]">
+                  {BOOKING_CHANNELS.map((ch) => (
+                    <option key={ch} value={ch}>{CHANNEL_LABEL[ch] ?? ch}</option>
                   ))}
-                </div>
-              )}
-            </div>
-          )}
-          <div>
-            <label className="block text-sm font-medium text-surface-700 mb-1">ชื่อลูกค้า *</label>
-            <Input
-              value={customerName}
-              onChange={(e) => setCustomerName(e.target.value)}
-              placeholder="ชื่อ-นามสกุล"
-              required
-            />
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#111827] mb-1">สาขา</label>
+                <select value={branchId} onChange={(e) => setBranchId(e.target.value)} className="w-full px-3 py-2 rounded-[8px] border border-[#E5E7EB] min-h-[36px] text-[#111827]">
+                  {branches.map((b) => (
+                    <option key={b.id} value={b.id}>{b.name}</option>
+                  ))}
+                </select>
+              </div>
+            </section>
+            <section className="space-y-3" aria-labelledby="create-notes-heading">
+              <h3 id="create-notes-heading" className="text-[12px] font-medium text-[#6B7280] uppercase tracking-wide leading-[1.35]">หมายเหตุ</h3>
+              <Input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="หมายเหตุ (ถ้ามี)" className="min-h-[36px]" />
+            </section>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-surface-700 mb-1">เบอร์โทร</label>
-            <Input
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              placeholder="08xxxxxxxx"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-surface-700 mb-1">บริการ *</label>
-            {services.length > 0 ? (
-              <select
-                value={service}
-                onChange={(e) => setService(e.target.value)}
-                className="w-full px-3 py-2 rounded-lg border border-surface-200"
-                required
-              >
-                <option value="">เลือกบริการ</option>
-                {services.map((s) => (
-                  <option key={s.id} value={s.service_name}>{s.service_name}</option>
-                ))}
-              </select>
-            ) : (
-              <Input
-                value={service}
-                onChange={(e) => setService(e.target.value)}
-                placeholder="ชื่อบริการ"
-                required
-              />
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-surface-700 mb-1">หัตถการ/รายละเอียด</label>
-            <Input
-              value={procedure}
-              onChange={(e) => setProcedure(e.target.value)}
-              placeholder="เช่น Botox, ฟิลเลอร์"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-surface-700 mb-1">แพทย์ (ถ้ามี)</label>
-            <Input value={doctor} onChange={(e) => setDoctor(e.target.value)} placeholder="ชื่อแพทย์" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-surface-700 mb-1">จำนวนเงิน (บาท)</label>
-            <Input
-              type="number"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              placeholder="0"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-surface-700 mb-1">วันที่-เวลา *</label>
-            <Input
-              type="datetime-local"
-              value={scheduledAt}
-              onChange={(e) => setScheduledAt(e.target.value)}
-              required
-            />
-            {branchId && scheduledAt && (
-              <SlotSelector
-                branchId={branchId}
-                dateStr={scheduledAt.slice(0, 10)}
-                procedure={service || undefined}
-                onSelect={(iso, doctorId, doctorName) => {
-                  setScheduledAt(new Date(iso).toISOString().slice(0, 16));
-                  if (doctorName) setDoctor(doctorName);
-                }}
-              />
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-surface-700 mb-1">ช่องทางที่ลูกค้าจองเข้ามา</label>
-            <select
-              value={channel}
-              onChange={(e) => setChannel(e.target.value as BookingChannel)}
-              className="w-full px-3 py-2 rounded-lg border border-surface-200"
-            >
-              {BOOKING_CHANNELS.map((ch) => (
-                <option key={ch} value={ch}>{CHANNEL_LABEL[ch] ?? ch}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-surface-700 mb-1">สาขา</label>
-            <select
-              value={branchId}
-              onChange={(e) => setBranchId(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg border border-surface-200"
-            >
-              {branches.map((b) => (
-                <option key={b.id} value={b.id}>{b.name}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-surface-700 mb-1">หมายเหตุ</label>
-            <Input
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="หมายเหตุ (ถ้ามี)"
-            />
-          </div>
-          <div className="flex gap-2 pt-4">
-            <Button type="button" variant="ghost" onClick={onClose}>
-              ยกเลิก
-            </Button>
-            <Button type="submit" disabled={sending}>
-              {sending ? "กำลังบันทึก..." : "จองคิว"}
-            </Button>
+          <div className="sticky bottom-0 p-4 border-t border-[#E5E7EB] bg-[#FFFFFF] flex gap-2 shrink-0">
+            <Button type="button" variant="ghost" onClick={onClose} className="min-h-[36px]">ยกเลิก</Button>
+            <Button type="submit" disabled={sending} className="min-h-[36px]">{sending ? "กำลังบันทึก..." : "จองคิว"}</Button>
           </div>
         </form>
       </div>
@@ -1449,7 +1645,19 @@ function CreateBookingModal({
 
 export default function BookingPage() {
   return (
-    <Suspense fallback={<div className="p-8 text-surface-500">กำลังโหลด...</div>}>
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#FFFFFF] p-6" aria-busy="true">
+          <div className="h-8 w-48 rounded bg-[#E5E7EB] animate-pulse mb-4" />
+          <div className="h-10 w-full max-w-md rounded bg-[#E5E7EB] animate-pulse mb-6" />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-32 rounded-[8px] bg-[#E5E7EB] animate-pulse" />
+            ))}
+          </div>
+        </div>
+      }
+    >
       <BookingPageContent />
     </Suspense>
   );

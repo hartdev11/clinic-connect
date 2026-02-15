@@ -67,9 +67,15 @@ const config: Config = {
         card: "0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04)",
         "card-hover":
           "0 20px 50px -15px rgba(192, 68, 98, 0.12), 0 4px 15px -4px rgba(0, 0, 0, 0.06)",
+        "elevation-1": "0 1px 3px rgba(0,0,0,0.05)",
+        "elevation-2": "0 4px 12px rgba(0,0,0,0.06), 0 2px 4px rgba(0,0,0,0.04)",
         glow: "0 0 40px -10px rgba(224, 92, 118, 0.3)",
         "glow-soft": "0 0 60px -20px rgba(224, 92, 118, 0.15)",
         "inner-soft": "inset 0 1px 0 0 rgba(255,255,255,0.08)",
+      },
+      transitionDuration: {
+        "250": "250ms",
+        "350": "350ms",
       },
       animation: {
         "fade-in": "fadeIn 0.35s ease-out forwards",
@@ -112,8 +118,11 @@ const config: Config = {
         },
       },
       animationDelay: {
+        50: "50ms",
         100: "100ms",
+        150: "150ms",
         200: "200ms",
+        250: "250ms",
         300: "300ms",
         400: "400ms",
         500: "500ms",

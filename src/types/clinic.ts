@@ -161,16 +161,56 @@ export interface Transaction {
   createdAt: string;
 }
 
+/** Promotion media item (image or video) — stored in Firebase Storage */
+export interface PromotionMedia {
+  type: "image" | "video";
+  url: string;
+  thumbnail?: string;
+}
+
+export type PromotionStatus = "draft" | "scheduled" | "active" | "expired" | "archived";
+export type PromotionTargetGroup = "new" | "existing" | "all";
+
+/** AI-extracted metadata from promotion image (Vision) */
+export interface PromotionExtracted {
+  extractedProcedures: string[];
+  extractedKeywords: string[];
+  extractedBenefits: string[];
+  extractedPrice?: number;
+  extractedDiscount?: number;
+  urgencyScore?: number;
+}
+
 export interface Promotion {
   id: string;
   org_id: string;
-  branch_id?: string;
+  /** Multi-branch: list of branch document ids */
+  branchIds: string[];
   name: string;
-  targetGroup: string;
-  agentId?: string;
-  status: "active" | "expired";
-  startAt: string;
-  endAt: string;
+  description?: string;
+  targetGroup: PromotionTargetGroup;
+  status: PromotionStatus;
+  startAt?: string;
+  endAt?: string;
+  autoArchiveAt?: string;
+  media: PromotionMedia[];
+  couponCode?: string;
+  stackable: boolean;
+  maxUsage?: number;
+  currentUsage?: number;
+  minimumSpend?: number;
+  aiSummary?: string;
+  aiTags?: string[];
+  visibleToAI: boolean;
+  /** AI intelligence layer — semantic search */
+  promotionEmbedding?: number[];
+  /** AI-extracted from image (Vision) */
+  extractedProcedures?: string[];
+  extractedKeywords?: string[];
+  extractedBenefits?: string[];
+  extractedPrice?: number;
+  extractedDiscount?: number;
+  urgencyScore?: number;
   createdAt: string;
   updatedAt: string;
 }

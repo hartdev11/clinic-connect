@@ -655,6 +655,33 @@
         { "fieldPath": "doctor_id", "order": "ASCENDING" },
         { "fieldPath": "scheduledAt", "order": "ASCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "invoices",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "org_id", "order": "ASCENDING" },
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "paid_at", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "invoices",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "org_id", "order": "ASCENDING" },
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "branch_id", "order": "ASCENDING" },
+        { "fieldPath": "paid_at", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "refunds",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "org_id", "order": "ASCENDING" },
+        { "fieldPath": "created_at", "order": "ASCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []

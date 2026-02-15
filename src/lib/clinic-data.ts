@@ -10,6 +10,9 @@ import type {
   Customer,
   Transaction,
   Promotion,
+  PromotionMedia,
+  PromotionStatus,
+  PromotionTargetGroup,
   ClinicProfile,
   OrgProfile,
   DashboardStats,
@@ -24,7 +27,12 @@ import type {
 } from "@/types/clinic";
 import type { User, UserRole, OrgPlan } from "@/types/organization";
 import type { Subscription, SubscriptionCreate } from "@/types/subscription";
-import type { Timestamp } from "firebase-admin/firestore";
+import type { Timestamp, DocumentSnapshot, DocumentData } from "firebase-admin/firestore";
+import { recordDashboardLatency } from "@/lib/observability";
+import {
+  getRevenueFromPaidInvoices,
+  getRevenueByDayFromPaidInvoices,
+} from "@/lib/financial-data";
 
 const COLLECTIONS = {
   clinics: "clinics",
@@ -733,18 +741,20 @@ export async function updateBooking(
 
 // ─── Dashboard stats ──────────────────────────────────────────────────────
 export async function getDashboardStats(orgId: string, branchId?: string): Promise<DashboardStats> {
-  const Firestore = await import("firebase-admin/firestore");
-  const now = new Date();
-  const todayStart = startOfDay(now);
-  const todayEnd = endOfDay(now);
-  const tomorrowStart = startOfDay(new Date(now.getTime() + 86400000));
-  const tomorrowEnd = endOfDay(new Date(now.getTime() + 86400000));
-  const thisMonthStart = startOfMonth(now);
-  const thisMonthEnd = endOfMonth(now);
-  const lastMonthStart = startOfMonth(new Date(now.getFullYear(), now.getMonth() - 1, 1));
-  const lastMonthEnd = endOfMonth(new Date(now.getFullYear(), now.getMonth() - 1, 1));
+  const t0 = Date.now();
+  try {
+    const Firestore = await import("firebase-admin/firestore");
+    const now = new Date();
+    const todayStart = startOfDay(now);
+    const todayEnd = endOfDay(now);
+    const tomorrowStart = startOfDay(new Date(now.getTime() + 86400000));
+    const tomorrowEnd = endOfDay(new Date(now.getTime() + 86400000));
+    const thisMonthStart = startOfMonth(now);
+    const thisMonthEnd = endOfMonth(now);
+    const lastMonthStart = startOfMonth(new Date(now.getFullYear(), now.getMonth() - 1, 1));
+    const lastMonthEnd = endOfMonth(new Date(now.getFullYear(), now.getMonth() - 1, 1));
 
-  const qChatsToday = db
+    const qChatsToday = db
     .collection(COLLECTIONS.conversation_feedback)
     .where("org_id", "==", orgId)
     .where("createdAt", ">=", Firestore.Timestamp.fromDate(todayStart))
@@ -755,8 +765,8 @@ export async function getDashboardStats(orgId: string, branchId?: string): Promi
     bookingsTodaySnap,
     bookingsTomorrowSnap,
     customersSnap,
-    revenueThisSnap,
-    revenueLastSnap,
+    revenueThisMonth,
+    revenueLastMonth,
     chatsTodaySnap,
   ] = await Promise.all([
     db
@@ -782,36 +792,30 @@ export async function getDashboardStats(orgId: string, branchId?: string): Promi
       .orderBy("createdAt", "asc")
       .limit(500)
       .get(),
-    db
-      .collection(COLLECTIONS.transactions)
-      .where("org_id", "==", orgId)
-      .where("createdAt", ">=", Firestore.Timestamp.fromDate(thisMonthStart))
-      .where("createdAt", "<=", Firestore.Timestamp.fromDate(thisMonthEnd))
-      .orderBy("createdAt", "asc")
-      .limit(500)
-      .get(),
-    db
-      .collection(COLLECTIONS.transactions)
-      .where("org_id", "==", orgId)
-      .where("createdAt", ">=", Firestore.Timestamp.fromDate(lastMonthStart))
-      .where("createdAt", "<=", Firestore.Timestamp.fromDate(lastMonthEnd))
-      .orderBy("createdAt", "asc")
-      .limit(500)
-      .get(),
+    getRevenueFromPaidInvoices(orgId, {
+      branchId: branchId ?? null,
+      from: thisMonthStart,
+      to: thisMonthEnd,
+    }),
+    getRevenueFromPaidInvoices(orgId, {
+      branchId: branchId ?? null,
+      from: lastMonthStart,
+      to: lastMonthEnd,
+    }),
     qChatsToday.get(),
   ]);
 
-  const revenueThisMonth = safeSumBaht(revenueThisSnap.docs.map((d) => d.data().amount));
-  const revenueLastMonth = safeSumBaht(revenueLastSnap.docs.map((d) => d.data().amount));
-
-  return {
-    chatsToday: chatsTodaySnap.size,
-    newCustomers: customersSnap.size,
-    bookingsToday: bookingsTodaySnap.size,
-    bookingsTomorrow: bookingsTomorrowSnap.size,
-    revenueThisMonth,
-    revenueLastMonth,
-  };
+    return {
+      chatsToday: chatsTodaySnap.size,
+      newCustomers: customersSnap.size,
+      bookingsToday: bookingsTodaySnap.size,
+      bookingsTomorrow: bookingsTomorrowSnap.size,
+      revenueThisMonth,
+      revenueLastMonth,
+    };
+  } finally {
+    recordDashboardLatency(Date.now() - t0);
+  }
 }
 
 // ─── Dashboard: bookings grouped by date ──────────────────────────────────
@@ -879,12 +883,6 @@ export async function getDashboardChartData(
   const sevenDaysAgo = new Date(now.getTime() - 7 * 86400000);
   sevenDaysAgo.setUTCHours(0, 0, 0, 0);
 
-  let qTx = db
-    .collection(COLLECTIONS.transactions)
-    .where("org_id", "==", orgId)
-    .where("createdAt", ">=", Firestore.Timestamp.fromDate(sevenDaysAgo))
-    .orderBy("createdAt", "asc")
-    .limit(500);
   let qBook = db
     .collection(COLLECTIONS.bookings)
     .where("org_id", "==", orgId)
@@ -898,34 +896,23 @@ export async function getDashboardChartData(
     .orderBy("createdAt", "asc")
     .limit(500);
   if (branchId) {
-    qTx = qTx.where("branch_id", "==", branchId) as typeof qTx;
     qBook = qBook.where("branch_id", "==", branchId) as typeof qBook;
   }
 
-  const [txSnap, bookingsSnap, chatsSnap] = await Promise.all([
-    qTx.get(),
+  const [revenueByDay, bookingsSnap, chatsSnap] = await Promise.all([
+    getRevenueByDayFromPaidInvoices(orgId, { branchId: branchId ?? null }),
     qBook.get(),
     qChats.get(),
   ]);
 
-  const revenueByDayMap = new Map<string, number>(); // key -> satang (integer)
   const bookingsByDayMap = new Map<string, number>();
   const chatsByDayMap = new Map<string, number>();
   for (let i = 0; i < 7; i++) {
     const d = new Date(now.getTime() - (6 - i) * 86400000);
     const key = d.toISOString().slice(0, 10);
-    revenueByDayMap.set(key, 0);
     bookingsByDayMap.set(key, 0);
     chatsByDayMap.set(key, 0);
   }
-  txSnap.docs.forEach((doc) => {
-    const d = doc.data();
-    const createdAt = toISO(d.createdAt).slice(0, 10);
-    if (revenueByDayMap.has(createdAt)) {
-      const prevSatang = revenueByDayMap.get(createdAt)!;
-      revenueByDayMap.set(createdAt, prevSatang + toSatang(d.amount));
-    }
-  });
   bookingsSnap.docs.forEach((doc) => {
     const d = doc.data();
     const scheduledAt = toISO(d.scheduledAt).slice(0, 10);
@@ -939,12 +926,6 @@ export async function getDashboardChartData(
       chatsByDayMap.set(createdAt, chatsByDayMap.get(createdAt)! + 1);
   });
 
-  const revenueByDay = Array.from(revenueByDayMap.entries())
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([dateStr, satang]) => ({
-      day: DAY_LABELS[new Date(dateStr).getUTCDay()],
-      revenue: satangToBaht(satang),
-    }));
   const activityByDay = Array.from(bookingsByDayMap.entries())
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([dateStr, bookings]) => ({
@@ -1169,19 +1150,22 @@ export async function getTransactions(
 export async function getActivePromotionsCount(orgId: string, branchId?: string): Promise<number> {
   const Firestore = await import("firebase-admin/firestore");
   const now = new Date();
-  const q = db
+  let q = db
     .collection(COLLECTIONS.promotions)
     .where("org_id", "==", orgId)
     .where("status", "==", "active")
-    .where("endAt", ">=", Firestore.Timestamp.fromDate(now))
-    .limit(100);
+    .limit(200);
   const snapshot = await q.get();
   const nowMs = now.getTime();
   return snapshot.docs.filter((doc) => {
     const d = doc.data();
-    if (branchId && d.branch_id !== branchId) return false;
-    const startAt = d.startAt?.toDate?.() ?? new Date(toISO(d.startAt));
-    return startAt.getTime() <= nowMs;
+    const branchIds = (d.branchIds ?? (d.branch_id ? [d.branch_id] : [])) as string[];
+    if (branchId && branchIds.length > 0 && !branchIds.includes(branchId)) return false;
+    const startAt = d.startAt?.toDate?.() ?? (d.startAt ? new Date(toISO(d.startAt)) : null);
+    const endAt = d.endAt?.toDate?.() ?? (d.endAt ? new Date(toISO(d.endAt)) : null);
+    if (startAt && startAt.getTime() > nowMs) return false;
+    if (endAt && endAt.getTime() < nowMs) return false;
+    return true;
   }).length;
 }
 
@@ -1266,6 +1250,51 @@ export async function getBookingsWoW(
   return { thisWeek: thisSnap.size, lastWeek: lastSnap.size };
 }
 
+/** Map Firestore doc to Promotion (supports legacy branch_id and new branchIds) */
+function mapPromotionDoc(doc: DocumentSnapshot<DocumentData>, orgId: string): Promotion {
+  const d = doc.data() ?? {};
+  const branchIds = Array.isArray(d.branchIds)
+    ? d.branchIds
+    : d.branch_id
+      ? [d.branch_id]
+      : [];
+  const media = (Array.isArray(d.media) ? d.media : []).map((m: { type?: string; url?: string; thumbnail?: string }) => ({
+    type: (m.type === "video" ? "video" : "image") as "image" | "video",
+    url: m.url ?? "",
+    thumbnail: m.thumbnail,
+  }));
+  return {
+    id: doc.id,
+    org_id: (d.org_id as string) ?? orgId,
+    branchIds,
+    name: (d.name as string) ?? "",
+    description: d.description as string | undefined,
+    targetGroup: (d.targetGroup as PromotionTargetGroup) ?? "all",
+    status: (d.status as PromotionStatus) ?? "draft",
+    startAt: d.startAt ? toISO(d.startAt) : undefined,
+    endAt: d.endAt ? toISO(d.endAt) : undefined,
+    autoArchiveAt: d.autoArchiveAt ? toISO(d.autoArchiveAt) : undefined,
+    media,
+    couponCode: d.couponCode as string | undefined,
+    stackable: Boolean(d.stackable),
+    maxUsage: typeof d.maxUsage === "number" ? d.maxUsage : undefined,
+    currentUsage: typeof d.currentUsage === "number" ? d.currentUsage : undefined,
+    minimumSpend: typeof d.minimumSpend === "number" ? d.minimumSpend : undefined,
+    aiSummary: d.aiSummary as string | undefined,
+    aiTags: Array.isArray(d.aiTags) ? d.aiTags : undefined,
+    visibleToAI: d.visibleToAI !== false,
+    promotionEmbedding: Array.isArray(d.promotionEmbedding) ? d.promotionEmbedding : undefined,
+    extractedProcedures: Array.isArray(d.extractedProcedures) ? d.extractedProcedures : undefined,
+    extractedKeywords: Array.isArray(d.extractedKeywords) ? d.extractedKeywords : undefined,
+    extractedBenefits: Array.isArray(d.extractedBenefits) ? d.extractedBenefits : undefined,
+    extractedPrice: typeof d.extractedPrice === "number" ? d.extractedPrice : undefined,
+    extractedDiscount: typeof d.extractedDiscount === "number" ? d.extractedDiscount : undefined,
+    urgencyScore: typeof d.urgencyScore === "number" ? d.urgencyScore : undefined,
+    createdAt: toISO(d.createdAt),
+    updatedAt: toISO(d.updatedAt),
+  };
+}
+
 export async function getPromotionsExpiringSoon(
   orgId: string,
   branchId: string | undefined,
@@ -1282,30 +1311,82 @@ export async function getPromotionsExpiringSoon(
     .where("endAt", "<=", Firestore.Timestamp.fromDate(deadline))
     .orderBy("endAt", "asc")
     .limit(20);
-  if (branchId) q = q.where("branch_id", "==", branchId) as typeof q;
   const snapshot = await q.get();
-  return snapshot.docs.map((doc) => {
+  return snapshot.docs
+    .map((doc) => mapPromotionDoc(doc, orgId))
+    .filter((p) => !branchId || p.branchIds.length === 0 || p.branchIds.includes(branchId));
+}
+
+/** Promotion intelligence overview: active, expiring soon (<3d), scheduled, expired */
+export async function getPromotionStats(
+  orgId: string,
+  branchId?: string
+): Promise<{ active: number; expiringSoon: number; scheduled: number; expired: number }> {
+  const Firestore = await import("firebase-admin/firestore");
+  const now = new Date();
+  const in3Days = new Date(now.getTime() + 3 * 86400000);
+
+  const [activeSnap, scheduledSnap, expiredSnap] = await Promise.all([
+    db
+      .collection(COLLECTIONS.promotions)
+      .where("org_id", "==", orgId)
+      .where("status", "==", "active")
+      .limit(500)
+      .get(),
+    db
+      .collection(COLLECTIONS.promotions)
+      .where("org_id", "==", orgId)
+      .where("status", "==", "scheduled")
+      .limit(500)
+      .get(),
+    db
+      .collection(COLLECTIONS.promotions)
+      .where("org_id", "==", orgId)
+      .where("status", "==", "expired")
+      .limit(500)
+      .get(),
+  ]);
+
+  const filterBranch = (d: DocumentData) => {
+    if (!branchId) return true;
+    const ids = (d.branchIds ?? (d.branch_id ? [d.branch_id] : [])) as string[];
+    return ids.length === 0 || ids.includes(branchId);
+  };
+
+  let active = 0;
+  let expiringSoon = 0;
+  activeSnap.docs.forEach((doc) => {
     const d = doc.data();
-    return {
-      id: doc.id,
-      org_id: d.org_id ?? orgId,
-      branch_id: d.branch_id,
-      name: d.name ?? "",
-      targetGroup: d.targetGroup ?? "",
-      agentId: d.agentId,
-      status: d.status ?? "active",
-      startAt: toISO(d.startAt),
-      endAt: toISO(d.endAt),
-      createdAt: toISO(d.createdAt),
-      updatedAt: toISO(d.updatedAt),
-    };
+    if (!filterBranch(d)) return;
+    const endAt = d.endAt?.toDate?.() ?? (d.endAt ? new Date(toISO(d.endAt)) : null);
+    const startAt = d.startAt?.toDate?.() ?? (d.startAt ? new Date(toISO(d.startAt)) : null);
+    if (startAt && startAt.getTime() > now.getTime()) return;
+    if (endAt && endAt.getTime() < now.getTime()) return;
+    active++;
+    if (endAt && endAt.getTime() <= in3Days.getTime()) expiringSoon++;
   });
+
+  const scheduled = branchId
+    ? scheduledSnap.docs.filter((doc) => filterBranch(doc.data())).length
+    : scheduledSnap.size;
+  const expired = branchId
+    ? expiredSnap.docs.filter((doc) => filterBranch(doc.data())).length
+    : expiredSnap.size;
+
+  return { active, expiringSoon, scheduled, expired };
+}
+
+export async function getPromotionById(orgId: string, promotionId: string): Promise<Promotion | null> {
+  const ref = db.collection(COLLECTIONS.promotions).doc(promotionId);
+  const doc = await ref.get();
+  if (!doc.exists || doc.data()?.org_id !== orgId) return null;
+  return mapPromotionDoc(doc, orgId);
 }
 
 // ─── Promotions ───────────────────────────────────────────────────────────
 export async function getPromotions(
   orgId: string,
-  opts: { branchId?: string; limit?: number } = {}
+  opts: { branchId?: string; status?: PromotionStatus | "all"; targetGroup?: PromotionTargetGroup | "all"; limit?: number } = {}
 ): Promise<Promotion[]> {
   const limit = Math.min(opts.limit ?? DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE);
   let q = db
@@ -1313,44 +1394,101 @@ export async function getPromotions(
     .where("org_id", "==", orgId)
     .orderBy("status", "asc")
     .orderBy("endAt", "asc")
-    .limit(limit);
-  if (opts.branchId) q = q.where("branch_id", "==", opts.branchId) as typeof q;
+    .limit(limit * 3);
   const snapshot = await q.get();
 
-  return snapshot.docs.map((doc) => {
-    const d = doc.data();
-    return {
-      id: doc.id,
-      org_id: d.org_id ?? orgId,
-      branch_id: d.branch_id,
-      name: d.name ?? "",
-      targetGroup: d.targetGroup ?? "",
-      agentId: d.agentId,
-      status: d.status ?? "active",
-      startAt: toISO(d.startAt),
-      endAt: toISO(d.endAt),
-      createdAt: toISO(d.createdAt),
-      updatedAt: toISO(d.updatedAt),
-    };
-  });
+  let list = snapshot.docs.map((doc) => mapPromotionDoc(doc, orgId));
+  if (opts.branchId) list = list.filter((p) => p.branchIds.length === 0 || p.branchIds.includes(opts.branchId!));
+  if (opts.status && opts.status !== "all") list = list.filter((p) => p.status === opts.status);
+  if (opts.targetGroup && opts.targetGroup !== "all") list = list.filter((p) => p.targetGroup === opts.targetGroup);
+  return list.slice(0, limit);
 }
 
-/** Enterprise: สร้างโปรโมชัน — invalidate AI cache ทันที */
+/** Enterprise: active promotions for AI — status=active, visibleToAI, filter by branch + targetGroup. No manual agent. */
+export async function getActivePromotionsForAI(
+  orgId: string,
+  opts: { branchId?: string | null; isNewCustomer?: boolean; limit?: number } = {}
+): Promise<Promotion[]> {
+  const limit = Math.min(opts.limit ?? 15, 30);
+  const snapshot = await db
+    .collection(COLLECTIONS.promotions)
+    .where("org_id", "==", orgId)
+    .where("status", "==", "active")
+    .limit(limit * 2)
+    .get();
+
+  const now = Date.now();
+  let list = snapshot.docs.map((doc) => mapPromotionDoc(doc, orgId));
+  list = list.filter((p) => p.visibleToAI !== false);
+  if (opts.branchId) list = list.filter((p) => p.branchIds.length === 0 || p.branchIds.includes(opts.branchId!));
+  if (opts.isNewCustomer === true) list = list.filter((p) => p.targetGroup === "new" || p.targetGroup === "all");
+  else if (opts.isNewCustomer === false) list = list.filter((p) => p.targetGroup === "existing" || p.targetGroup === "all");
+  list = list.filter((p) => {
+    if (p.startAt && new Date(p.startAt).getTime() > now) return false;
+    if (p.endAt && new Date(p.endAt).getTime() < now) return false;
+    return true;
+  });
+  return list.slice(0, limit);
+}
+
+/** Enterprise: สร้างโปรโมชัน — full schema, invalidate AI cache */
 export async function createPromotion(
   orgId: string,
-  data: { name: string; targetGroup: string; agentId?: string; branch_id?: string; startAt: string; endAt: string }
+  data: {
+    name: string;
+    description?: string;
+    targetGroup?: PromotionTargetGroup;
+    branchIds?: string[];
+    status?: PromotionStatus;
+    startAt?: string;
+    endAt?: string;
+    autoArchiveAt?: string;
+    media?: PromotionMedia[];
+    couponCode?: string;
+    stackable?: boolean;
+    maxUsage?: number;
+    minimumSpend?: number;
+    aiSummary?: string;
+    aiTags?: string[];
+    visibleToAI?: boolean;
+    promotionEmbedding?: number[];
+    extractedProcedures?: string[];
+    extractedKeywords?: string[];
+    extractedBenefits?: string[];
+    extractedPrice?: number;
+    extractedDiscount?: number;
+    urgencyScore?: number;
+  }
 ): Promise<string> {
   const Firestore = await import("firebase-admin/firestore");
   const now = Firestore.Timestamp.now();
+  const status = data.status ?? "draft";
   const ref = await db.collection(COLLECTIONS.promotions).add({
     org_id: orgId,
-    branch_id: data.branch_id ?? null,
+    branchIds: data.branchIds ?? [],
     name: data.name,
-    targetGroup: data.targetGroup,
-    agentId: data.agentId ?? null,
-    status: "active",
-    startAt: Firestore.Timestamp.fromDate(new Date(data.startAt)),
-    endAt: Firestore.Timestamp.fromDate(new Date(data.endAt)),
+    description: data.description ?? null,
+    targetGroup: data.targetGroup ?? "all",
+    status,
+    startAt: data.startAt ? Firestore.Timestamp.fromDate(new Date(data.startAt)) : null,
+    endAt: data.endAt ? Firestore.Timestamp.fromDate(new Date(data.endAt)) : null,
+    autoArchiveAt: data.autoArchiveAt ? Firestore.Timestamp.fromDate(new Date(data.autoArchiveAt)) : null,
+    media: data.media ?? [],
+    couponCode: data.couponCode ?? null,
+    stackable: data.stackable ?? false,
+    maxUsage: data.maxUsage ?? null,
+    currentUsage: 0,
+    minimumSpend: data.minimumSpend ?? null,
+    aiSummary: data.aiSummary ?? null,
+    aiTags: data.aiTags ?? null,
+    visibleToAI: data.visibleToAI !== false,
+    promotionEmbedding: data.promotionEmbedding ?? null,
+    extractedProcedures: data.extractedProcedures ?? null,
+    extractedKeywords: data.extractedKeywords ?? null,
+    extractedBenefits: data.extractedBenefits ?? null,
+    extractedPrice: data.extractedPrice ?? null,
+    extractedDiscount: data.extractedDiscount ?? null,
+    urgencyScore: data.urgencyScore ?? null,
     createdAt: now,
     updatedAt: now,
   });
@@ -1359,11 +1497,34 @@ export async function createPromotion(
   return ref.id;
 }
 
-/** Enterprise: อัปเดตโปรโมชัน — invalidate AI cache ทันที */
+/** Enterprise: อัปเดตโปรโมชัน — full partial, invalidate AI cache */
 export async function updatePromotion(
   orgId: string,
   promotionId: string,
-  updates: Partial<{ name: string; targetGroup: string; agentId: string; status: string; startAt: string; endAt: string }>
+  updates: Partial<{
+    name: string;
+    description: string;
+    targetGroup: PromotionTargetGroup;
+    status: PromotionStatus;
+    startAt: string;
+    endAt: string;
+    autoArchiveAt: string;
+    media: PromotionMedia[];
+    couponCode: string;
+    stackable: boolean;
+    maxUsage: number;
+    minimumSpend: number;
+    aiSummary: string;
+    aiTags: string[];
+    visibleToAI: boolean;
+    promotionEmbedding: number[];
+    extractedProcedures: string[];
+    extractedKeywords: string[];
+    extractedBenefits: string[];
+    extractedPrice: number;
+    extractedDiscount: number;
+    urgencyScore: number;
+  }>
 ): Promise<boolean> {
   const Firestore = await import("firebase-admin/firestore");
   const ref = db.collection(COLLECTIONS.promotions).doc(promotionId);
@@ -1371,15 +1532,35 @@ export async function updatePromotion(
   if (!doc.exists || doc.data()?.org_id !== orgId) return false;
   const data: Record<string, unknown> = { updatedAt: Firestore.Timestamp.now() };
   if (updates.name !== undefined) data.name = updates.name;
+  if (updates.description !== undefined) data.description = updates.description;
   if (updates.targetGroup !== undefined) data.targetGroup = updates.targetGroup;
-  if (updates.agentId !== undefined) data.agentId = updates.agentId;
   if (updates.status !== undefined) data.status = updates.status;
-  if (updates.startAt !== undefined) data.startAt = Firestore.Timestamp.fromDate(new Date(updates.startAt));
-  if (updates.endAt !== undefined) data.endAt = Firestore.Timestamp.fromDate(new Date(updates.endAt));
+  if (updates.startAt !== undefined) data.startAt = updates.startAt ? Firestore.Timestamp.fromDate(new Date(updates.startAt)) : null;
+  if (updates.endAt !== undefined) data.endAt = updates.endAt ? Firestore.Timestamp.fromDate(new Date(updates.endAt)) : null;
+  if (updates.autoArchiveAt !== undefined) data.autoArchiveAt = updates.autoArchiveAt ? Firestore.Timestamp.fromDate(new Date(updates.autoArchiveAt)) : null;
+  if (updates.media !== undefined) data.media = updates.media;
+  if (updates.couponCode !== undefined) data.couponCode = updates.couponCode;
+  if (updates.stackable !== undefined) data.stackable = updates.stackable;
+  if (updates.maxUsage !== undefined) data.maxUsage = updates.maxUsage;
+  if (updates.minimumSpend !== undefined) data.minimumSpend = updates.minimumSpend;
+  if (updates.aiSummary !== undefined) data.aiSummary = updates.aiSummary;
+  if (updates.aiTags !== undefined) data.aiTags = updates.aiTags;
+  if (updates.visibleToAI !== undefined) data.visibleToAI = updates.visibleToAI;
+  if (updates.promotionEmbedding !== undefined) data.promotionEmbedding = updates.promotionEmbedding;
+  if (updates.extractedProcedures !== undefined) data.extractedProcedures = updates.extractedProcedures;
+  if (updates.extractedKeywords !== undefined) data.extractedKeywords = updates.extractedKeywords;
+  if (updates.extractedBenefits !== undefined) data.extractedBenefits = updates.extractedBenefits;
+  if (updates.extractedPrice !== undefined) data.extractedPrice = updates.extractedPrice;
+  if (updates.extractedDiscount !== undefined) data.extractedDiscount = updates.extractedDiscount;
+  if (updates.urgencyScore !== undefined) data.urgencyScore = updates.urgencyScore;
   await ref.update(data);
   const { invalidateAICache } = await import("@/lib/ai/ai-feedback-loop");
   void invalidateAICache({ org_id: orgId, scope: "promo" });
   return true;
+}
+
+export async function archivePromotion(orgId: string, promotionId: string): Promise<boolean> {
+  return updatePromotion(orgId, promotionId, { status: "archived" });
 }
 
 /** Enterprise: ลบโปรโมชัน — invalidate AI cache ทันที */

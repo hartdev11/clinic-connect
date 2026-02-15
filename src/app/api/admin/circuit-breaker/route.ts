@@ -10,6 +10,7 @@ import {
   resetProviderCircuit,
   type ProviderId,
 } from "@/lib/provider-circuit-breaker";
+import { resetCircuit, OPENAI_CIRCUIT_KEY } from "@/lib/circuit-breaker";
 
 export const dynamic = "force-dynamic";
 
@@ -39,6 +40,7 @@ export async function POST(request: NextRequest) {
       );
     }
     await resetProviderCircuit(provider);
+    if (provider === "openai") await resetCircuit(OPENAI_CIRCUIT_KEY);
     return NextResponse.json({ ok: true, provider, message: "Circuit reset" });
   } catch (err) {
     console.error("POST /api/admin/circuit-breaker:", err);

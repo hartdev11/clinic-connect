@@ -34,6 +34,14 @@ import {
   checkAndMaybeOpenCircuit,
 } from "@/lib/org-circuit-breaker";
 import { recordLLMLatency } from "@/lib/llm-latency-metrics";
+import {
+  enqueueChatLlmJob,
+  pollJobResult,
+  getChatLlmQueue,
+} from "@/lib/chat-llm-queue";
+import { composeSafeFallbackMessage } from "@/lib/agents/safe-fallback";
+
+const QUEUE_POLL_TIMEOUT_MS = 25000;
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 15;
@@ -136,8 +144,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    reservedSatang = MAX_ESTIMATED_COST_SATANG;
-    await reserveLLMBudget(org_id, reservedSatang, correlationId);
+    const queue = getChatLlmQueue();
+    if (!queue) {
+      reservedSatang = MAX_ESTIMATED_COST_SATANG;
+      await reserveLLMBudget(org_id, reservedSatang, correlationId);
+    }
 
     const body = await request.json();
     const message = body?.message;
@@ -155,33 +166,70 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const result = await chatOrchestrate({
+    const jobPayload = {
       message,
       org_id,
       branch_id,
       userId,
       correlationId,
-      channel: "web",
-    });
+      channel: "web" as const,
+    };
+
+    let result;
+    if (queue) {
+      const jobId = await enqueueChatLlmJob(jobPayload);
+      if (jobId) {
+        result = await pollJobResult(jobId, QUEUE_POLL_TIMEOUT_MS);
+        if (!result) {
+          if (reservedSatang > 0) {
+            await reconcileLLMUsage(
+              org_id,
+              reservedSatang,
+              { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
+              correlationId
+            ).catch(() => {});
+          }
+          const latency = Date.now() - start;
+          logger.withLatency(latency, 200).warn("Chat queue timeout", {
+            org_id,
+            jobId,
+            correlationId,
+          });
+          return NextResponse.json({
+            reply: composeSafeFallbackMessage(),
+            success: false,
+            meta: { timeout: true },
+          });
+        }
+      } else {
+        result = await chatOrchestrate(jobPayload);
+      }
+    } else {
+      result = await chatOrchestrate(jobPayload);
+    }
 
     if (result.success && result.usage) {
       await recordLLMSuccess(org_id).catch(() => {});
-      await reconcileLLMUsage(org_id, reservedSatang, result.usage, correlationId).catch(
-        (err) =>
-          logger.warn("Failed to reconcile LLM usage", {
-            err: (err as Error).message,
-            correlationId,
-          })
-      );
+      if (reservedSatang > 0) {
+        await reconcileLLMUsage(org_id, reservedSatang, result.usage, correlationId).catch(
+          (err) =>
+            logger.warn("Failed to reconcile LLM usage", {
+              err: (err as Error).message,
+              correlationId,
+            })
+        );
+      }
       const roleMs = result.roleManagerMs ?? 0;
       await recordLLMLatency(org_id, roleMs, true).catch(() => {});
     } else if (result.error) {
-      await reconcileLLMUsage(
-        org_id,
-        reservedSatang,
-        { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
-        correlationId
-      ).catch(() => {});
+      if (reservedSatang > 0) {
+        await reconcileLLMUsage(
+          org_id,
+          reservedSatang,
+          { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 },
+          correlationId
+        ).catch(() => {});
+      }
       await recordLLMError(org_id).catch(() => {});
       await recordLLMLatency(org_id, result.totalMs ?? 0, false).catch(() => {});
       await checkAndMaybeOpenCircuit(org_id).catch(() => {});
