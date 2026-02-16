@@ -7,10 +7,12 @@ import { getSessionFromCookies } from "@/lib/auth-session";
 import { getOrgIdFromClinicId } from "@/lib/clinic-data";
 import { getEffectiveUser, requireBranchAccess } from "@/lib/rbac";
 import { getDayTimeline } from "@/lib/slot-engine";
+import { runWithObservability } from "@/lib/observability/run-with-observability";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
+  return runWithObservability("/api/clinic/bookings/day-timeline", request, async () => {
   const session = await getSessionFromCookies();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
@@ -28,7 +30,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "date and branchId required" }, { status: 400 });
     }
     const result = await getDayTimeline(orgId, branchId, dateStr, { doctorId });
-    return NextResponse.json(result);
+    return { response: NextResponse.json(result), orgId, branchId };
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Unknown error";
     console.error("GET /api/clinic/bookings/day-timeline:", err);
@@ -38,4 +40,5 @@ export async function GET(request: NextRequest) {
       { status }
     );
   }
+  });
 }

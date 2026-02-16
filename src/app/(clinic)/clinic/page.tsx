@@ -28,14 +28,16 @@ import { apiFetcher } from "@/lib/api-fetcher";
 import { AnimatedCounter } from "@/components/dashboard/AnimatedCounter";
 import { KpiPanelSkeleton, ChartSkeleton, PieSkeleton } from "@/components/dashboard/DashboardSkeleton";
 
+/* สีกราฟตามคู่มือ: ฟ้าอ่อน, เขียวมิ้นต์, ส้มพีช, เหลืองอ่อน, เทาอ่อน */
 const CHART = {
-  primary: "#475569",
-  secondary: "#64748b",
-  accent: "#0f766e",
-  grid: "#e2e8f0",
-  text: "#64748b",
+  primary: "#a1c6ea",       /* Light Blue — เส้นหลัก (Line/Area) */
+  secondary: "#a3d9c7",     /* Mint Green — เส้นรอง */
+  barPrimary: "#ffb6a2",    /* Peach Orange — แท่งเน้น */
+  barSecondary: "#f9d342",  /* Soft Yellow — แท่งรอง */
+  grid: "#d1d1d1",          /* Light Gray — กริด / ไม่เน้น */
+  text: "#534e4a",
 };
-const PIE_COLORS = ["#475569", "#64748b", "#0f766e", "#0d9488", "#94a3b8"];
+const PIE_COLORS = ["#a1c6ea", "#a3d9c7", "#ffb6a2", "#f9d342", "#d1d1d1"];
 
 type DashboardResponse = {
   stats: {
@@ -395,8 +397,8 @@ export default function ClinicDashboardPage() {
                       <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: CHART.text }} />
                       <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v, n) => [v ?? 0, n === "chats" ? "แชท" : "การจอง"]} labelFormatter={(l) => `วัน${l}`} />
                       <Legend formatter={(v) => (v === "chats" ? "แชท" : "การจอง")} wrapperStyle={{ fontSize: 11 }} iconType="circle" iconSize={6} />
-                      <Bar dataKey="chats" name="chats" fill={CHART.primary} radius={[4, 4, 0, 0]} isAnimationActive animationDuration={800} animationEasing="ease-out" />
-                      <Bar dataKey="bookings" name="bookings" fill={CHART.accent} radius={[4, 4, 0, 0]} isAnimationActive animationDuration={800} animationEasing="ease-out" animationBegin={150} />
+                      <Bar dataKey="chats" name="chats" fill={CHART.barPrimary} radius={[4, 4, 0, 0]} isAnimationActive animationDuration={800} animationEasing="ease-out" />
+                      <Bar dataKey="bookings" name="bookings" fill={CHART.barSecondary} radius={[4, 4, 0, 0]} isAnimationActive animationDuration={800} animationEasing="ease-out" animationBegin={150} />
                     </BarChart>
                   </ResponsiveContainer>
                 )}
@@ -580,11 +582,6 @@ export default function ClinicDashboardPage() {
             <Link href="/clinic/booking" className="rounded-xl border border-surface-200 bg-white p-5 shadow-elevation-1 card-hover-elevation focus:outline-none focus-visible:ring-2 focus-visible:ring-surface-400 focus-visible:ring-offset-2">
               <h3 className="text-sm font-medium text-surface-800">Booking</h3>
               <p className="mt-1 text-[11px] text-surface-500">ปฏิทินการจอง · นัด · บริการ · สถานะ</p>
-              <span className="mt-2 inline-flex items-center gap-1 text-[11px] font-medium text-surface-600">เปิด</span>
-            </Link>
-            <Link href="/clinic/ai-agents" className="rounded-xl border border-surface-200 bg-white p-5 shadow-elevation-1 card-hover-elevation focus:outline-none focus-visible:ring-2 focus-visible:ring-surface-400 focus-visible:ring-offset-2">
-              <h3 className="text-sm font-medium text-surface-800">AI Agents</h3>
-              <p className="mt-1 text-[11px] text-surface-500">ควบคุม 6 Agents · Prompt · Activity Log</p>
               <span className="mt-2 inline-flex items-center gap-1 text-[11px] font-medium text-surface-600">เปิด</span>
             </Link>
             <RequireRole allowed={["owner", "manager"]}>

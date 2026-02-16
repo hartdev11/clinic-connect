@@ -8,12 +8,14 @@ import { getSessionFromCookies } from "@/lib/auth-session";
 import { getOrgIdFromClinicId, getBranchesByOrgId } from "@/lib/clinic-data";
 import { getEffectiveUser, requireBranchAccess } from "@/lib/rbac";
 import { getDayTimeline } from "@/lib/slot-engine";
+import { runWithObservability } from "@/lib/observability/run-with-observability";
 
 export const dynamic = "force-dynamic";
 
 const CACHE_MAX_AGE = 30;
 
 export async function GET(request: NextRequest) {
+  return runWithObservability("/api/clinic/bookings/timeline", request, async () => {
   const session = await getSessionFromCookies();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
@@ -46,7 +48,7 @@ export async function GET(request: NextRequest) {
     const headers = new Headers();
     headers.set("Cache-Control", `private, max-age=${CACHE_MAX_AGE}`);
 
-    return NextResponse.json(result, { headers });
+    return { response: NextResponse.json(result, { headers }), orgId, branchId };
   } catch (err) {
     console.error("GET /api/clinic/bookings/timeline:", err);
     return NextResponse.json(
@@ -57,4 +59,5 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
+  });
 }

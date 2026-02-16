@@ -72,6 +72,8 @@ export async function runPipeline(
   intent?: IntentResult | null;
   state?: ConversationState;
   memory?: { interest?: string[]; customer_stage?: string; sentiment?: string; follow_up_needed?: boolean } | null;
+  /** Enterprise: รูปโปรโมชั่น (public HTTPS เท่านั้น) — ส่งแชท LINE เมื่อ promotion_inquiry */
+  media?: string[];
 }> {
   const orgId = pipelineOptions?.org_id ?? "";
   const channel = pipelineOptions?.channel ?? "default";
@@ -697,6 +699,80 @@ export async function runPipeline(
       intent: intentResult,
       state: updatedState,
     };
+  }
+
+  // Enterprise: promotion_inquiry — ดึงโปรที่เกี่ยวข้อง + รูปส่งแชท
+  if (intentResult.intent === "promotion_inquiry" && orgId) {
+    try {
+      const { getActivePromotionsForAI, getPromotions } = await import("@/lib/clinic-data");
+      const { searchPromotionsBySemantic } = await import("@/lib/promotion-embedding");
+      const branchId = pipelineOptions?.branch_id ?? undefined;
+      const query = text.trim().length >= 2 ? text.trim() : "";
+      let list: Array<{ promotion: import("@/types/clinic").Promotion; score?: number }>;
+      if (query.length >= 2) {
+        const hits = await searchPromotionsBySemantic(orgId, query, { branchId, topK: 5 });
+        list = hits.map((h) => ({ promotion: h.promotion, score: h.score }));
+        if (list.length === 0) {
+          const fallback = await getActivePromotionsForAI(orgId, { branchId, limit: 5 });
+          list = fallback.map((p) => ({ promotion: p }));
+        }
+      } else {
+        const fallback = await getActivePromotionsForAI(orgId, { branchId, limit: 5 });
+        list = fallback.map((p) => ({ promotion: p }));
+      }
+      if (process.env.NODE_ENV === "development") {
+        console.log("[Pipeline promotion_inquiry] orgId=%s listLength=%d", orgId, list.length);
+      }
+      const mediaUrls: string[] = [];
+      if (list.length === 0) {
+        // Enterprise: ข้อความชัดเจน — แยกกรณีไม่มีโปรเลย vs มีแต่ยังไม่เปิดใช้
+        let emptyReply: string;
+        try {
+          const anyPromos = await getPromotions(orgId, { status: "all", limit: 5 });
+          if (anyPromos.length > 0) {
+            emptyReply =
+              "ตอนนี้ยังไม่มีโปรที่เปิดใช้อยู่ค่ะ ลองไปที่เมนูโปรโมชันแล้วกดเปิดใช้ (สถานะ 'เปิดใช้') ให้โปรที่ต้องการแสดงนะคะ หรือโทรมาถามได้เลยค่ะ 😊";
+            if (process.env.NODE_ENV === "development") {
+              console.log("[Pipeline promotion_inquiry] org has promotions but none active/suitable — statuses:", anyPromos.map((p) => p.status));
+            }
+          } else {
+            emptyReply = "ตอนนี้ยังไม่มีโปรโมชันในระบบค่ะ เดี๋ยวแอดมินเช็กให้หรือโทรมาถามได้เลยนะคะ 😊";
+            if (process.env.NODE_ENV === "development") {
+              console.log("[Pipeline promotion_inquiry] org has no promotions — check LINE_ORG_ID matches the org in app");
+            }
+          }
+        } catch {
+          emptyReply = "ตอนนี้ยังไม่มีโปรที่เหมาะกับที่ถามค่ะ เดี๋ยวแอดมินเช็กให้หรือโทรมาถามได้เลยนะคะ 😊";
+        }
+        if (userId) saveSessionState(orgId, channel, userId, updatedState);
+        return {
+          reply: emptyReply,
+          intent: intentResult,
+          state: updatedState,
+          memory: null,
+        };
+      }
+      const lines: string[] = [];
+      for (const { promotion: p } of list.slice(0, 4)) {
+        const pricePart = p.extractedPrice != null ? ` — ฿${Number(p.extractedPrice).toLocaleString()}` : "";
+        lines.push(`• ${p.name}${pricePart}`);
+        const firstImage = p.media?.find((m) => m.type === "image" && typeof m.url === "string" && m.url.startsWith("https://"));
+        if (firstImage?.url) mediaUrls.push(firstImage.url);
+      }
+      const reply = "มีโปรแบบนี้ค่ะ\n\n" + lines.join("\n") + "\n\nสนใจโปรไหนบอกได้เลยนะคะ 💕";
+      if (userId) saveSessionState(orgId, channel, userId, updatedState);
+      return {
+        reply,
+        intent: intentResult,
+        state: updatedState,
+        memory: null,
+        media: mediaUrls.length > 0 ? mediaUrls.slice(0, 4) : undefined,
+      };
+    } catch (err) {
+      if (process.env.NODE_ENV === "development") {
+        console.warn("[Pipeline promotion_inquiry] error:", (err as Error)?.message?.slice(0, 60));
+      }
+    }
   }
 
   // 🔧 Fallback rule (กันตอบมั่วขั้นสุด)

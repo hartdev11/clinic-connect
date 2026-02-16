@@ -12,6 +12,7 @@ import {
   sendBookingConfirmation,
 } from "@/lib/booking-notification";
 import type { BookingChannel } from "@/types/clinic";
+import { runWithObservability } from "@/lib/observability/run-with-observability";
 
 const VALID_CHANNELS = ["line", "facebook", "instagram", "tiktok", "web", "web_chat", "walk_in", "phone", "referral", "other"] as const;
 const VALID_STATUSES = ["pending", "confirmed", "in_progress", "completed", "no-show", "cancelled", "pending_admin_confirm", "reschedule_pending_admin", "cancel_requested"] as const;
@@ -22,6 +23,7 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  return runWithObservability("/api/clinic/bookings/[id]", request, async () => {
   const session = await getSessionFromCookies();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
@@ -87,7 +89,7 @@ export async function PATCH(
       }
     }
 
-    return NextResponse.json({ success: true });
+    return { response: NextResponse.json({ success: true }), orgId, branchId: booking.branch_id ?? null };
   } catch (err) {
     console.error("PATCH /api/clinic/bookings/[id]:", err);
     return NextResponse.json(
@@ -95,4 +97,5 @@ export async function PATCH(
       { status: 500 }
     );
   }
+  });
 }

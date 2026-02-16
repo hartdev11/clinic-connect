@@ -16,9 +16,12 @@ import {
 import { checkOrSetIdempotency, setLineEventReply } from "@/lib/idempotency";
 import { usePipeline, use7AgentChat } from "@/lib/feature-flags";
 import { chatOrchestrate } from "@/lib/ai/orchestrator";
+import { toSignedUrlsForLine } from "@/lib/promotion-storage";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
+/** ใช้ Node.js runtime เพื่อให้อ่าน request body ได้ถูกต้อง (LINE ส่ง JSON body) */
+export const runtime = "nodejs";
 
 const LINE_REPLY_URL = "https://api.line.me/v2/bot/message/reply";
 /** LINE จำกัดข้อความต่อ 1 message ไม่เกิน 5,000 ตัวอักษร */
@@ -29,12 +32,26 @@ function truncateForLine(text: string): string {
   return text.slice(0, LINE_MAX_TEXT_LENGTH - 3) + "...";
 }
 
+type LineMessage = { type: "text"; text: string } | { type: "image"; originalContentUrl: string; previewImageUrl: string } | { type: "video"; originalContentUrl: string; previewImageUrl: string };
+
 async function sendLineReply(
   replyToken: string,
   text: string,
-  accessToken: string
+  accessToken: string,
+  mediaUrls?: string[]
 ): Promise<boolean> {
   const safeText = truncateForLine(text);
+  const messages: LineMessage[] = [{ type: "text", text: safeText }];
+  if (mediaUrls && mediaUrls.length > 0) {
+    for (const url of mediaUrls.slice(0, 4)) {
+      const isVideo = /\.(mp4|mov|webm)(\?|$)/i.test(url) || /video/i.test(url);
+      if (isVideo) {
+        messages.push({ type: "video", originalContentUrl: url, previewImageUrl: url });
+      } else {
+        messages.push({ type: "image", originalContentUrl: url, previewImageUrl: url });
+      }
+    }
+  }
   try {
     const res = await fetch(LINE_REPLY_URL, {
       method: "POST",
@@ -42,10 +59,7 @@ async function sendLineReply(
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,
       },
-      body: JSON.stringify({
-        replyToken,
-        messages: [{ type: "text", text: safeText }],
-      }),
+      body: JSON.stringify({ replyToken, messages }),
     });
     if (!res.ok) {
       const err = await res.text();
@@ -59,19 +73,50 @@ async function sendLineReply(
   }
 }
 
-export async function POST(request: NextRequest) {
-  console.log("[LINE Webhook] POST received");
-  const channelSecret = process.env.LINE_CHANNEL_SECRET?.trim();
-  const channelToken = process.env.LINE_CHANNEL_ACCESS_TOKEN?.trim();
-  const signature = request.headers.get("x-line-signature") ?? "";
-  const isDevelopment = process.env.NODE_ENV === "development";
+/** อ่าน body จาก stream — ใน Next.js บาง env request.text() คืนว่างแม้มี Content-Length */
+async function readRequestBody(request: NextRequest): Promise<string> {
+  const stream = request.body;
+  if (!stream) return await request.text();
+  const reader = stream.getReader();
+  const chunks: Uint8Array[] = [];
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    if (value) chunks.push(value);
+  }
+  const totalLength = chunks.reduce((sum, c) => sum + c.length, 0);
+  const combined = new Uint8Array(totalLength);
+  let offset = 0;
+  for (const c of chunks) {
+    combined.set(c, offset);
+    offset += c.length;
+  }
+  return new TextDecoder().decode(combined);
+}
 
+export async function POST(request: NextRequest) {
+  // อ่าน body ก่อนสิ่งอื่นใด — อ่านจาก clone แล้วใช้ stream (ลดโอกาส body ถูก consume ไปก่อน)
   let body: string;
   try {
-    body = await request.text();
+    const toRead = request.clone();
+    body = await readRequestBody(toRead);
   } catch (err) {
     console.error("[LINE Webhook] Read body error:", err);
     return new NextResponse("Error", { status: 500 });
+  }
+
+  const isDevelopment = process.env.NODE_ENV === "development";
+  const contentLength = request.headers.get("content-length");
+  const channelSecret = process.env.LINE_CHANNEL_SECRET?.trim();
+  const channelToken = process.env.LINE_CHANNEL_ACCESS_TOKEN?.trim();
+  const signature = request.headers.get("x-line-signature") ?? "";
+  console.log("[LINE Webhook] POST received", { contentLength: contentLength ?? "none", bodyLength: body.length });
+
+  if (!body || body.length === 0) {
+    console.warn(
+      "[LINE Webhook] Empty body (Content-Length=" + contentLength + ") — แนะนำใช้ Webhook แบบมี orgId: ไปที่ Settings → LINE Connection ในแอป แล้วใช้ URL ที่แสดง (เช่น https://your-domain/api/webhooks/line/xxxx) ไปตั้งใน LINE Developers. ดู docs/SETUP-WEBHOOK-URL.md"
+    );
+    return new NextResponse("OK", { status: 200 });
   }
 
   // Debug logging ใน development mode
@@ -146,6 +191,7 @@ export async function POST(request: NextRequest) {
       try {
         let replyText: string;
         let intent: { intent?: string; service?: string; area?: string } | undefined;
+        let mediaUrls: string[] | undefined;
 
         if (shouldUse7Agent && lineOrgId) {
           // 7-Agent System: 1 Role Manager + 6 Analytics (1 LLM call)
@@ -179,12 +225,14 @@ export async function POST(request: NextRequest) {
           });
           replyText = result.reply?.trim() || "";
           intent = result.intent ?? undefined;
+          mediaUrls = result.media && result.media.length > 0 ? result.media : undefined;
         } else {
           replyText = (await chatAgentReply(userText))?.trim() || "";
         }
         const finalText = replyText || composeSafeFallbackMessage();
         if (token) {
-          const ok = await sendLineReply(replyToken, finalText, token);
+          const lineMediaUrls = mediaUrls && mediaUrls.length > 0 ? await toSignedUrlsForLine(mediaUrls) : undefined;
+          const ok = await sendLineReply(replyToken, finalText, token, lineMediaUrls);
           console.log("[LINE Webhook] Reply sent:", ok ? "OK" : "FAIL");
           setLineEventReply(replyToken, JSON.stringify({ text: finalText })).catch(() => {});
         } else if (process.env.NODE_ENV === "development") {

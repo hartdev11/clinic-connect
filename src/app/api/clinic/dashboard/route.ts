@@ -13,6 +13,7 @@ import {
 } from "@/lib/clinic-data";
 import { getEffectiveUser, requireBranchAccess } from "@/lib/rbac";
 import { isOrgCircuitOpen } from "@/lib/org-circuit-breaker";
+import { runWithObservability } from "@/lib/observability/run-with-observability";
 
 /** ข้อมูล Dashboard — ข้อมูลจริงจาก Firestore ไม่ใช้ mock */
 export const dynamic = "force-dynamic";
@@ -27,24 +28,25 @@ export type DashboardAlert = {
 };
 
 export async function GET(request: NextRequest) {
-  const session = await getSessionFromCookies();
-  if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-  try {
-    const orgId = session.org_id ?? (await getOrgIdFromClinicId(session.clinicId));
-    if (!orgId) {
-      return NextResponse.json({ error: "Organization not found" }, { status: 404 });
+  return runWithObservability("/api/clinic/dashboard", request, async () => {
+    const session = await getSessionFromCookies();
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const user = await getEffectiveUser(session);
-    const branchId = request.nextUrl.searchParams.get("branchId") ?? session.branch_id ?? null;
-    if (!requireBranchAccess(user.role, user.branch_ids, user.branch_roles, branchId)) {
-      return NextResponse.json(
-        { error: "จำกัดสิทธิ์: คุณไม่มีสิทธิ์เข้าถึงสาขานี้" },
-        { status: 403 }
-      );
-    }
-    const [
+    try {
+      const orgId = session.org_id ?? (await getOrgIdFromClinicId(session.clinicId));
+      if (!orgId) {
+        return NextResponse.json({ error: "Organization not found" }, { status: 404 });
+      }
+      const user = await getEffectiveUser(session);
+      const branchId = request.nextUrl.searchParams.get("branchId") ?? session.branch_id ?? null;
+      if (!requireBranchAccess(user.role, user.branch_ids, user.branch_roles, branchId)) {
+        return NextResponse.json(
+          { error: "จำกัดสิทธิ์: คุณไม่มีสิทธิ์เข้าถึงสาขานี้" },
+          { status: 403 }
+        );
+      }
+      const [
       stats,
       bookingsByDate,
       chartData,
@@ -93,18 +95,22 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    return NextResponse.json({
-      stats,
-      bookingsByDate,
-      chartData,
-      aiAlerts,
-      fetchedAt: new Date().toISOString(),
-      activePromotionsCount,
-      pendingBookingsCount,
-      unlabeledFeedbackCount,
-      chatsWoW,
-      bookingsWoW,
-    });
+    return {
+      response: NextResponse.json({
+        stats,
+        bookingsByDate,
+        chartData,
+        aiAlerts,
+        fetchedAt: new Date().toISOString(),
+        activePromotionsCount,
+        pendingBookingsCount,
+        unlabeledFeedbackCount,
+        chatsWoW,
+        bookingsWoW,
+      }),
+      orgId,
+      branchId,
+    };
   } catch (err) {
     console.error("GET /api/clinic/dashboard:", err);
     return NextResponse.json(
@@ -112,4 +118,5 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
+  });
 }

@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSessionFromCookies } from "@/lib/auth-session";
 import { getOrgIdFromClinicId, getBookingsForCalendar } from "@/lib/clinic-data";
 import { getEffectiveUser, requireBranchAccess } from "@/lib/rbac";
+import { runWithObservability } from "@/lib/observability/run-with-observability";
 
 export const dynamic = "force-dynamic";
 
@@ -28,6 +29,7 @@ function checkCalendarRateLimit(orgId: string): boolean {
 }
 
 export async function GET(request: NextRequest) {
+  return runWithObservability("/api/clinic/bookings/calendar", request, async () => {
   const session = await getSessionFromCookies();
   if (!session) return NextResponse.json({ error: "Unauthorized", code: "UNAUTHORIZED" }, { status: 401 });
   try {
@@ -53,7 +55,7 @@ export async function GET(request: NextRequest) {
     });
     const headers = new Headers();
     headers.set("Cache-Control", `private, max-age=${CACHE_MAX_AGE}, stale-while-revalidate=10`);
-    return NextResponse.json({ datesWithCount, datesWithStatus, items }, { headers });
+    return { response: NextResponse.json({ datesWithCount, datesWithStatus, items }, { headers }), orgId, branchId: branchId ?? null };
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Unknown error";
     console.error("GET /api/clinic/bookings/calendar:", err);
@@ -63,4 +65,5 @@ export async function GET(request: NextRequest) {
       { status }
     );
   }
+  });
 }

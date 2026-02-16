@@ -8,11 +8,13 @@ import { getSessionFromCookies } from "@/lib/auth-session";
 import { getOrgIdFromClinicId } from "@/lib/clinic-data";
 import { db } from "@/lib/firebase-admin";
 import { getEffectiveUser, requireRole } from "@/lib/rbac";
+import { runWithObservability } from "@/lib/observability/run-with-observability";
 
 export const dynamic = "force-dynamic";
 
 /** PATCH — อัปเดต organization (owner only) */
 export async function PATCH(request: NextRequest) {
+  return runWithObservability("/api/clinic/organization", request, async () => {
   const session = await getSessionFromCookies();
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -42,7 +44,7 @@ export async function PATCH(request: NextRequest) {
 
     await db.collection("organizations").doc(orgId).update(updates);
 
-    return NextResponse.json({ success: true });
+    return { response: NextResponse.json({ success: true }), orgId };
   } catch (err) {
     console.error("PATCH /api/clinic/organization:", err);
     return NextResponse.json(
@@ -50,4 +52,5 @@ export async function PATCH(request: NextRequest) {
       { status: 500 }
     );
   }
+  });
 }

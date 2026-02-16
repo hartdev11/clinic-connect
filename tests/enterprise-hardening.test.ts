@@ -62,4 +62,29 @@ describe("Enterprise Hardening", () => {
       expect(typeof mod.purgeOldStripeEvents).toBe("function");
     });
   });
+
+  describe("Data isolation / RBAC — manager cannot see other branch", () => {
+    it("requireBranchAccess: manager with branch_ids [A] requesting branch B is denied", async () => {
+      const { requireBranchAccess } = await import("../src/lib/rbac");
+      expect(
+        requireBranchAccess("manager", ["branch-a"], null, "branch-b")
+      ).toBe(false);
+    });
+    it("requireBranchAccess: manager with branch_ids [A] requesting branch A is allowed", async () => {
+      const { requireBranchAccess } = await import("../src/lib/rbac");
+      expect(
+        requireBranchAccess("manager", ["branch-a"], null, "branch-a")
+      ).toBe(true);
+    });
+    it("requireBranchAccess: manager with branch_roles only for A requesting B is denied", async () => {
+      const { requireBranchAccess } = await import("../src/lib/rbac");
+      expect(
+        requireBranchAccess("manager", [], { "branch-a": "manager" }, "branch-b")
+      ).toBe(false);
+    });
+    it("requireBranchAccess: owner requesting any branch is allowed", async () => {
+      const { requireBranchAccess } = await import("../src/lib/rbac");
+      expect(requireBranchAccess("owner", [], null, "any-branch")).toBe(true);
+    });
+  });
 });

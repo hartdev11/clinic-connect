@@ -3,11 +3,13 @@ import { getSessionFromCookies } from "@/lib/auth-session";
 import { getOrgIdFromClinicId } from "@/lib/clinic-data";
 import { getEffectiveUser, requireBranchAccess } from "@/lib/rbac";
 import { getAvailableSlots } from "@/lib/slot-engine";
+import { runWithObservability } from "@/lib/observability/run-with-observability";
 
 export const dynamic = "force-dynamic";
 
 /** GET /api/clinic/bookings/slots?branchId=xxx&date=YYYY-MM-DD&doctorId=xxx (optional) */
 export async function GET(request: NextRequest) {
+  return runWithObservability("/api/clinic/bookings/slots", request, async () => {
   const session = await getSessionFromCookies();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
@@ -31,7 +33,7 @@ export async function GET(request: NextRequest) {
       procedure,
       durationMinutes: duration,
     });
-    return NextResponse.json(result);
+    return { response: NextResponse.json(result), orgId, branchId };
   } catch (err) {
     console.error("GET /api/clinic/bookings/slots:", err);
     return NextResponse.json(
@@ -39,4 +41,5 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
+  });
 }

@@ -11,11 +11,13 @@ import {
   upsertLineChannel,
 } from "@/lib/line-channel-data";
 import { getLineBotInfo } from "@/lib/line-api";
+import { runWithObservability } from "@/lib/observability/run-with-observability";
 
 export const dynamic = "force-dynamic";
 
 /** GET — สถานะ LINE (owner/manager เท่านั้น) */
 export async function GET(request: NextRequest) {
+  return runWithObservability("/api/clinic/line", request, async () => {
   try {
     const session = await getSessionFromRequest(request);
     if (!session?.org_id) {
@@ -33,7 +35,7 @@ export async function GET(request: NextRequest) {
     }
 
     const status = await getLineChannelStatus(session.org_id);
-    return NextResponse.json(status);
+    return { response: NextResponse.json(status), orgId: session.org_id };
   } catch (err) {
     console.error("[API /api/clinic/line] GET:", err);
     return NextResponse.json(
@@ -41,10 +43,12 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
+  });
 }
 
 /** PUT — บันทึก LINE credentials (owner/manager เท่านั้น) */
 export async function PUT(request: NextRequest) {
+  return runWithObservability("/api/clinic/line", request, async () => {
   try {
     const session = await getSessionFromRequest(request);
     if (!session?.org_id) {
@@ -94,7 +98,7 @@ export async function PUT(request: NextRequest) {
     );
 
     const status = await getLineChannelStatus(session.org_id);
-    return NextResponse.json(status);
+    return { response: NextResponse.json(status), orgId: session.org_id };
   } catch (err) {
     console.error("[API /api/clinic/line] PUT:", err);
     return NextResponse.json(
@@ -102,4 +106,5 @@ export async function PUT(request: NextRequest) {
       { status: 500 }
     );
   }
+  });
 }

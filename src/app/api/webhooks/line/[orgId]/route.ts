@@ -17,6 +17,7 @@ import {
 import { getLineChannelByOrgId } from "@/lib/line-channel-data";
 import { usePipeline, use7AgentChat } from "@/lib/feature-flags";
 import { chatOrchestrate } from "@/lib/ai/orchestrator";
+import { toSignedUrlsForLine } from "@/lib/promotion-storage";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
@@ -165,12 +166,14 @@ export async function POST(
           });
           replyText = result.reply?.trim() || "";
           intent = result.intent ?? undefined;
+          if (result.media && result.media.length > 0) mediaUrls = result.media;
         } else {
           replyText = (await chatAgentReply(userText))?.trim() || "";
         }
 
         const finalText = replyText || composeSafeFallbackMessage();
-        const ok = await sendLineReply(replyToken, finalText, channelToken, mediaUrls);
+        const lineMediaUrls = mediaUrls && mediaUrls.length > 0 ? await toSignedUrlsForLine(mediaUrls) : undefined;
+        const ok = await sendLineReply(replyToken, finalText, channelToken, lineMediaUrls);
         if (isDevelopment) {
           console.log("[LINE Webhook]", orgId, "Reply sent:", ok ? "OK" : "FAIL");
         }

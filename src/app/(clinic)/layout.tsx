@@ -9,9 +9,9 @@ export default function ClinicLayout({
 }) {
   return (
     <ClinicContextProvider>
-      <div className="min-h-screen flex bg-surface-50">
+      <div className="min-h-screen flex bg-[var(--bg-cream)]">
         <ClinicSidebar />
-        <div className="flex-1 flex flex-col min-w-0">
+        <div className="flex-1 flex flex-col min-w-0 bg-gradient-to-b from-primary-50/20 to-transparent">
           <ClinicTopbar />
           <main className="flex-1 p-6 md:p-8 overflow-auto max-w-[1600px]">{children}</main>
         </div>

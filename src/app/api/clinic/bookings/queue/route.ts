@@ -6,10 +6,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSessionFromCookies } from "@/lib/auth-session";
 import { getOrgIdFromClinicId, getBookingsQueue } from "@/lib/clinic-data";
 import { getEffectiveUser, requireBranchAccess } from "@/lib/rbac";
+import { runWithObservability } from "@/lib/observability/run-with-observability";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
+  return runWithObservability("/api/clinic/bookings/queue", request, async () => {
   const session = await getSessionFromCookies();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
@@ -34,12 +36,16 @@ export async function GET(request: NextRequest) {
       groupByDoctor,
     });
 
-    return NextResponse.json({
-      date: dateStr,
-      branchId: branchId ?? null,
-      items,
-      total: items.length,
-    });
+    return {
+      response: NextResponse.json({
+        date: dateStr,
+        branchId: branchId ?? null,
+        items,
+        total: items.length,
+      }),
+      orgId,
+      branchId,
+    };
   } catch (err) {
     console.error("GET /api/clinic/bookings/queue:", err);
     return NextResponse.json(
@@ -47,4 +53,5 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
+  });
 }

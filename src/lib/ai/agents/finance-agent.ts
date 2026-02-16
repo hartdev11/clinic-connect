@@ -71,5 +71,6 @@ async function executeFinanceAnalytics(
     keyFindings,
     recommendation,
     riskFlags,
+    dataClassification: "INTERNAL_FINANCE_ONLY" as const,
   };
 }

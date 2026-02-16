@@ -10,11 +10,13 @@ import type { UserRole } from "@/types/organization";
 import { getEffectiveUser, requireRole } from "@/lib/rbac";
 import { hashPassword } from "@/lib/auth";
 import crypto from "crypto";
+import { runWithObservability } from "@/lib/observability/run-with-observability";
 
 export const dynamic = "force-dynamic";
 
 /** GET — รายชื่อ users ใน org */
-export async function GET() {
+export async function GET(request: NextRequest) {
+  return runWithObservability("/api/clinic/users", request, async () => {
   const session = await getSessionFromCookies();
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -32,7 +34,7 @@ export async function GET() {
       );
     }
     const users = await getUsersByOrgId(orgId);
-    return NextResponse.json({ items: users });
+    return { response: NextResponse.json({ items: users }), orgId };
   } catch (err) {
     console.error("GET /api/clinic/users:", err);
     return NextResponse.json(
@@ -40,10 +42,12 @@ export async function GET() {
       { status: 500 }
     );
   }
+  });
 }
 
 /** POST — invite user */
 export async function POST(request: NextRequest) {
+  return runWithObservability("/api/clinic/users", request, async () => {
   const session = await getSessionFromCookies();
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -116,12 +120,12 @@ export async function POST(request: NextRequest) {
         sanitizedBranchRoles ? Object.keys(sanitizedBranchRoles)[0] ?? null : sanitizedBranchIds?.[0] ?? null,
     });
 
-    return NextResponse.json({
+    return { response: NextResponse.json({
       success: true,
       userId,
       tempPassword,
       message: "กรุณาแจ้งรหัสชั่วคราวให้ผู้ใช้ (แสดงครั้งเดียว)",
-    });
+    }), orgId };
   } catch (err) {
     console.error("POST /api/clinic/users:", err);
     return NextResponse.json(
@@ -129,4 +133,5 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
+  });
 }

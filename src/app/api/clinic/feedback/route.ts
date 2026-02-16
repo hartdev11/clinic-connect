@@ -8,6 +8,7 @@ import { getOrgIdFromClinicId, listConversationFeedback, getUnlabeledFeedbackCou
 import { requireRole } from "@/lib/rbac";
 import { getEffectiveUser } from "@/lib/rbac";
 import { checkDistributedRateLimit } from "@/lib/distributed-rate-limit";
+import { runWithObservability } from "@/lib/observability/run-with-observability";
 
 export const dynamic = "force-dynamic";
 
@@ -15,6 +16,7 @@ export const dynamic = "force-dynamic";
 const FEEDBACK_GET_LIMIT = { windowSeconds: 60, max: 60 };
 
 export async function GET(request: NextRequest) {
+  return runWithObservability("/api/clinic/feedback", request, async () => {
   const session = await getSessionFromCookies();
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -52,7 +54,7 @@ export async function GET(request: NextRequest) {
       listConversationFeedback(orgId, { limit, startAfterId, unlabeledOnly }),
       getUnlabeledFeedbackCount(orgId),
     ]);
-    return NextResponse.json({ items, lastId, unlabeledCount });
+    return { response: NextResponse.json({ items, lastId, unlabeledCount }), orgId };
   } catch (err) {
     console.error("GET /api/clinic/feedback:", err);
     return NextResponse.json(
@@ -60,4 +62,5 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
+  });
 }

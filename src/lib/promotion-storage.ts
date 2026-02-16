@@ -90,3 +90,34 @@ export async function downloadStorageUrlToBuffer(
     return null;
   }
 }
+
+/**
+ * Convert Firebase Storage URL to a signed URL (valid 1 hour).
+ * LINE (and other external clients) can fetch the image without bucket public access.
+ * Returns original URL if not our Firebase Storage URL or on error.
+ */
+export async function toSignedUrlIfFirebaseStorage(url: string): Promise<string> {
+  const match = url.match(FIREBASE_STORAGE_URL_RE);
+  if (!match) return url;
+  const [, bucketName, encodedPath] = match;
+  const path = decodeURIComponent(encodedPath);
+  try {
+    const bucket = storage.bucket(bucketName);
+    const file = bucket.file(path);
+    const [signedUrl] = await file.getSignedUrl({
+      version: "v4",
+      action: "read",
+      expires: Date.now() + 60 * 60 * 1000, // 1 hour
+    });
+    return signedUrl;
+  } catch {
+    return url;
+  }
+}
+
+/**
+ * Convert an array of URLs: Firebase Storage URLs become signed URLs so LINE can load images.
+ */
+export async function toSignedUrlsForLine(urls: string[]): Promise<string[]> {
+  return Promise.all(urls.map(toSignedUrlIfFirebaseStorage));
+}

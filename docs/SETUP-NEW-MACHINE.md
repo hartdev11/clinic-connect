@@ -48,19 +48,46 @@ npm install
 
 ---
 
-## 3. ตั้งค่า Environment
+## 3. ตั้งค่า Keys และ Environment
 
-### 3.1 สร้างไฟล์ `.env.local`
-- คัดลอกจากเครื่องเก่า: copy ไฟล์ `.env.local` มาใส่โฟลเดอร์โปรเจกต์
-- หรือสร้างใหม่จาก template:
-  ```bash
-  copy .env.local.example .env.local
-  ```
-  จากนั้นแก้ไข `.env.local` ใส่ค่าจริง (ดู `.env.local.example` และ `docs/FIREBASE-SETUP.md`)
+### 3.1 ไฟล์ `.env.local` (จำเป็น)
 
-### 3.2 ไฟล์ Firebase Service Account (ถ้าใช้)
-- คัดลอก `firebase-service-account.json` จากเครื่องเก่า
-- วางในโฟลเดอร์โปรเจกต์ ( root ) หรือ path ที่อ้างอิงใน `.env.local`
+ไฟล์นี้เก็บ API keys และค่า config — **ต้องมี** จึงจะรันได้
+
+**วิธีที่ 1:** คัดลอกจากเครื่องเก่า (ง่ายสุด)
+```
+ copy .env.local ไปวางที่ root โฟลเดอร์โปรเจกต์
+```
+
+**วิธีที่ 2:** สร้างใหม่จาก template แล้วใส่ค่าจริง
+```bash
+copy .env.local.example .env.local
+```
+จากนั้นแก้ไข `.env.local` — ตัวแปรที่ต้องใส่อย่างน้อย:
+
+| ตัวแปร | ที่มา | หมายเหตุ |
+|--------|-------|----------|
+| `SESSION_SECRET` | สร้างเอง (อย่างน้อย 32 ตัวอักษร) | สำหรับ JWT session |
+| `FIREBASE_SERVICE_ACCOUNT_PATH` | ใส่ path เช่น `firebase-service-account.json` | ถ้าใช้วิธีไฟล์ |
+| `FIREBASE_PROJECT_ID` | Firebase Console | ถ้าไม่ใช้ path ไปยังไฟล์ |
+| `FIREBASE_CLIENT_EMAIL` | Firebase Console → Service Account | ถ้าไม่ใช้ path |
+| `FIREBASE_PRIVATE_KEY` | Firebase Console → Service Account | ถ้าไม่ใช้ path |
+| `OPENAI_API_KEY` | https://platform.openai.com/api-keys | สำหรับ AI Chat |
+| `GEMINI_API_KEY` | https://aistudio.google.com/apikey | ทางเลือกแทน OpenAI |
+| `LINE_CHANNEL_SECRET` | LINE Developers Console | ถ้าใช้ LINE |
+| `LINE_CHANNEL_ACCESS_TOKEN` | LINE Developers Console | ถ้าใช้ LINE |
+| `NEXT_PUBLIC_APP_URL` | โดเมนเว็บ เช่น `http://localhost:3000` | สำหรับ Webhook URL |
+
+รายละเอียดเต็ม: ดู `.env.local.example` และ `docs/FIREBASE-SETUP.md`
+
+### 3.2 ไฟล์ `firebase-service-account.json` (จำเป็น ถ้าใช้ Firebase ด้วยไฟล์)
+
+- **ที่มา:** Firebase Console → Project Settings → Service accounts → Generate new private key
+- **วิธีได้:** ดาวน์โหลดไฟล์ JSON แล้วเปลี่ยนชื่อเป็น `firebase-service-account.json`
+- **วางไว้ที่:** root โฟลเดอร์โปรเจกต์ (เดียวกับ `package.json`)
+- **หรือ:** คัดลอกจากเครื่องเก่าที่มีอยู่แล้ว
+
+⚠️ ไฟล์นี้เป็นความลับ — อย่าอัปโหลดขึ้น GitHub
 
 ---
 
@@ -85,7 +112,8 @@ npm start
 - [ ] Node.js ติดตั้งแล้ว (`node -v`, `npm -v`)
 - [ ] โปรเจกต์อยู่ในเครื่อง (`cd` ไปโฟลเดอร์ได้)
 - [ ] `npm install` รันเสร็จ (มีโฟลเดอร์ `node_modules`)
-- [ ] มีไฟล์ `.env.local` และใส่ค่า SESSION_SECRET, Firebase ฯลฯ
+- [ ] มีไฟล์ `.env.local` พร้อมใส่ค่า SESSION_SECRET, Firebase, OPENAI_API_KEY (หรือ GEMINI_API_KEY)
+- [ ] มีไฟล์ `firebase-service-account.json` วางที่ root (ถ้าใช้วิธี path)
 - [ ] `npm run build` ผ่าน (ไม่มี error)
 
 ---

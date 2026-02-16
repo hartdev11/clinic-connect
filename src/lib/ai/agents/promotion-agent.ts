@@ -84,11 +84,15 @@ async function executePromotionAnalytics(
     keyFindings.push(`promo:${p.name}|target:${p.targetGroup}${score != null ? `|score:${score.toFixed(2)}` : ""}`);
     const endAtMs = p.endAt ? new Date(p.endAt).getTime() : 0;
     const urgency = p.endAt && endAtMs > 0 && endAtMs <= expiringThreshold;
+    const mediaUrls = p.media
+      .map((m) => m.url)
+      .filter((url): url is string => typeof url === "string" && url.startsWith("https://"));
     promotionDetails.push({
       name: p.name,
       aiSummary: p.aiSummary,
       endAt: p.endAt,
-      media: p.media.map((m) => m.url).filter(Boolean),
+      media: mediaUrls,
+      price: p.extractedPrice != null ? String(p.extractedPrice) : undefined,
       urgency: urgency || undefined,
     });
   }

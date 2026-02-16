@@ -9,11 +9,13 @@ import { requireRole } from "@/lib/rbac";
 import { getEffectiveUser } from "@/lib/rbac";
 import { detectDuplicates, processKnowledgeInput } from "@/lib/knowledge-input";
 import type { KnowledgeDocumentCreate, ConflictResolution } from "@/types/knowledge";
+import { runWithObservability } from "@/lib/observability/run-with-observability";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60; // Embedding + Pinecone อาจใช้เวลา
 
 export async function POST(request: NextRequest) {
+  return runWithObservability("/api/clinic/knowledge", request, async () => {
   const session = await getSessionFromCookies();
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -72,18 +74,21 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    return NextResponse.json({
-      status: result.status,
-      id: result.id,
-      message:
-        result.status === "saved"
-          ? "บันทึกและ embed สำเร็จ"
-          : result.status === "replaced"
-            ? "แทนที่เอกสารเดิมสำเร็จ"
-            : result.status === "kept"
-              ? "ไม่บันทึก (Keep)"
-              : "ยกเลิก (Cancel)",
-    });
+    return {
+      response: NextResponse.json({
+        status: result.status,
+        id: result.id,
+        message:
+          result.status === "saved"
+            ? "บันทึกและ embed สำเร็จ"
+            : result.status === "replaced"
+              ? "แทนที่เอกสารเดิมสำเร็จ"
+              : result.status === "kept"
+                ? "ไม่บันทึก (Keep)"
+                : "ยกเลิก (Cancel)",
+      }),
+      orgId,
+    };
   } catch (err) {
     console.error("POST /api/clinic/knowledge:", err);
     return NextResponse.json(
@@ -91,4 +96,5 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
+  });
 }

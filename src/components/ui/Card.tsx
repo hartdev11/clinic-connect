@@ -16,8 +16,8 @@ export function Card({ children, padding = "md", hover, className = "", ...props
   return (
     <div
       className={`
-        bg-white rounded-2xl border border-primary-100/80 shadow-card
-        ${hover ? "transition-all duration-300 hover:shadow-card-hover hover:border-primary-200/60" : ""}
+        bg-[var(--bg-cream-card)] rounded-2xl border border-primary-200/60 shadow-card
+        ${hover ? "transition-all duration-300 hover:shadow-card-hover hover:border-primary-300/70" : ""}
         ${paddings[padding]} ${className}
       `}
       {...props}
@@ -35,10 +35,10 @@ interface CardHeaderProps {
 
 export function CardHeader({ title, subtitle, action }: CardHeaderProps) {
   return (
-    <div className="flex items-start justify-between gap-4 mb-5">
+    <div className="flex items-start justify-between gap-4 mb-5 pb-3 border-b border-primary-100/80">
       <div>
         <h3 className="text-lg font-semibold text-surface-800">{title}</h3>
-        {subtitle && <p className="text-sm text-surface-500 mt-1">{subtitle}</p>}
+        {subtitle && <p className="text-sm text-primary-700/80 mt-1">{subtitle}</p>}
       </div>
       {action}
     </div>

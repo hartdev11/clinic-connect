@@ -64,6 +64,50 @@ export async function upsertKnowledgeDoc(doc: KnowledgeDocument): Promise<void> 
   });
 }
 
+/** Enterprise redesign — upsert topic version to Pinecone (async worker). Same namespace + metadata shape as RAG. */
+export interface KnowledgeVersionForVector {
+  topic: string;
+  category: string;
+  content: string;
+  summary?: string[];
+}
+
+export async function upsertKnowledgeVersionToVector(
+  orgId: string,
+  topicId: string,
+  version: KnowledgeVersionForVector
+): Promise<void> {
+  const text = [version.content]
+    .concat((version.summary ?? []).filter(Boolean))
+    .join("\n")
+    .slice(0, 8191);
+  const embedding = await embedText(text);
+  const index = getKnowledgeIndex();
+  const ns = index.namespace(getEmbeddingNamespace());
+  const id = `${orgId}_${topicId}`;
+  const metadata: Record<string, string | number | boolean> = {
+    level: "org",
+    org_id: orgId,
+    topic: version.topic,
+    category: version.category,
+    content: version.content.slice(0, 2000),
+    is_active: true,
+    source: "knowledge_topics",
+    embedding_version: EMBEDDING_VERSION,
+  };
+  await ns.upsert({
+    records: [{ id, values: embedding, metadata }],
+  });
+}
+
+/** Remove topic vector when topic is deleted (multi-tenant safe). */
+export async function deleteKnowledgeVectorById(orgId: string, topicId: string): Promise<void> {
+  const index = getKnowledgeIndex();
+  const ns = index.namespace(getEmbeddingNamespace());
+  const id = `${orgId}_${topicId}`;
+  await ns.deleteOne(id);
+}
+
 /** E4.1 — context สำหรับ pyramid filter */
 export interface KnowledgeSearchContext {
   level: KnowledgeLevel;

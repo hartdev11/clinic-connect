@@ -11,11 +11,11 @@ export function Badge({
   ...props
 }: BadgeProps) {
   const variants = {
-    default: "bg-surface-100 text-surface-700",
+    default: "bg-primary-50 text-primary-800 border border-primary-200/50",
     success: "bg-primary-100 text-primary-700",
     warning: "bg-amber-100 text-amber-700",
     error: "bg-red-100 text-red-700",
-    info: "bg-sky-100 text-sky-700",
+    info: "bg-primary-100/80 text-primary-700 border border-primary-200/50",
     ai: "bg-primary-100 text-primary-700 border border-primary-200/60",
   };
 

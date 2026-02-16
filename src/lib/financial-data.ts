@@ -178,6 +178,117 @@ export async function getRevenueByDayFromPaidInvoices(
     }));
 }
 
+/**
+ * Revenue by day for a custom date range (for Insights).
+ * Returns array of { date, dayLabel, revenue } in baht.
+ */
+export async function getRevenueByDayFromPaidInvoicesRange(
+  orgId: string,
+  options: { branchId?: string | null; from: Date; to: Date }
+): Promise<Array<{ date: string; dayLabel: string; revenue: number }>> {
+  const DAY_LABELS = ["อา.", "จ.", "อ.", "พ.", "พฤ.", "ศ.", "ส."];
+  const Firestore = await import("firebase-admin/firestore");
+  const from = new Date(options.from);
+  const to = new Date(options.to);
+  from.setUTCHours(0, 0, 0, 0);
+  to.setUTCHours(23, 59, 59, 999);
+  const dayMap = new Map<string, number>();
+  for (let t = from.getTime(); t <= to.getTime(); t += 86400000) {
+    const d = new Date(t);
+    dayMap.set(d.toISOString().slice(0, 10), 0);
+  }
+  let qInv = db
+    .collection(COLLECTIONS.invoices)
+    .where("org_id", "==", orgId)
+    .where("status", "==", "PAID")
+    .where("paid_at", ">=", Firestore.Timestamp.fromDate(from))
+    .where("paid_at", "<=", Firestore.Timestamp.fromDate(to))
+    .orderBy("paid_at", "asc")
+    .limit(2000);
+  if (options.branchId != null) {
+    qInv = qInv.where("branch_id", "==", options.branchId) as typeof qInv;
+  }
+  const snap = await qInv.get();
+  for (const doc of snap.docs) {
+    const data = doc.data();
+    const paidAt = data.paid_at;
+    if (!paidAt) continue;
+    const t = paidAt.toDate ? paidAt.toDate() : new Date(paidAt);
+    const key = t.toISOString().slice(0, 10);
+    if (dayMap.has(key)) {
+      const satang = readSatang(data, "grand_total_satang", "grand_total");
+      dayMap.set(key, dayMap.get(key)! + satang);
+    }
+  }
+  const refundSnap = await db
+    .collection(COLLECTIONS.refunds)
+    .where("org_id", "==", orgId)
+    .where("created_at", ">=", Firestore.Timestamp.fromDate(from))
+    .where("created_at", "<=", Firestore.Timestamp.fromDate(to))
+    .orderBy("created_at", "asc")
+    .limit(2000)
+    .get();
+  for (const doc of refundSnap.docs) {
+    const data = doc.data();
+    const createdAt = data.created_at?.toDate ? data.created_at.toDate() : new Date(data.created_at);
+    const key = createdAt.toISOString().slice(0, 10);
+    if (dayMap.has(key)) {
+      const satang = readSatang(data, "amount_satang", "amount");
+      dayMap.set(key, Math.max(0, dayMap.get(key)! - satang));
+    }
+  }
+  return Array.from(dayMap.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([dateStr, satang]) => ({
+      date: dateStr,
+      dayLabel: DAY_LABELS[new Date(dateStr).getUTCDay()],
+      revenue: satangToBaht(satang),
+    }));
+}
+
+/**
+ * Revenue by service (treatment_name) from PAID invoices in range. For Insights.
+ */
+export async function getRevenueByServiceFromPaidInvoices(
+  orgId: string,
+  options: { branchId?: string | null; from: Date; to: Date }
+): Promise<Array<{ serviceName: string; revenue: number; count: number }>> {
+  const Firestore = await import("firebase-admin/firestore");
+  const from = new Date(options.from);
+  const to = new Date(options.to);
+  from.setUTCHours(0, 0, 0, 0);
+  to.setUTCHours(23, 59, 59, 999);
+  let q = db
+    .collection(COLLECTIONS.invoices)
+    .where("org_id", "==", orgId)
+    .where("status", "==", "PAID")
+    .where("paid_at", ">=", Firestore.Timestamp.fromDate(from))
+    .where("paid_at", "<=", Firestore.Timestamp.fromDate(to))
+    .limit(2000);
+  if (options.branchId != null) {
+    q = q.where("branch_id", "==", options.branchId) as typeof q;
+  }
+  const snap = await q.get();
+  const byService = new Map<string, { revenue: number; count: number }>();
+  for (const doc of snap.docs) {
+    const data = doc.data();
+    const items = Array.isArray(data.line_items) ? data.line_items : [];
+    for (const item of items) {
+      const name = String(item.treatment_name ?? "อื่นๆ").trim() || "อื่นๆ";
+      const satang = readSatang(item, "final_line_total_satang", "final_line_total");
+      const qty = Number(item.quantity) || 1;
+      if (!byService.has(name)) byService.set(name, { revenue: 0, count: 0 });
+      const cur = byService.get(name)!;
+      cur.revenue += satangToBaht(satang);
+      cur.count += qty;
+    }
+  }
+  return Array.from(byService.entries())
+    .map(([serviceName, v]) => ({ serviceName, revenue: v.revenue, count: v.count }))
+    .sort((a, b) => b.revenue - a.revenue)
+    .slice(0, 15);
+}
+
 async function getTotalRefundSatang(
   orgId: string,
   options: { branchId?: string | null; from?: Date; to?: Date } = {}

@@ -11,7 +11,6 @@ const pageTitles: Record<string, string> = {
   "/clinic/promotions": "Promotions",
   "/clinic/insights": "Insights",
   "/clinic/finance": "Finance",
-  "/clinic/ai-agents": "AI Agents",
   "/clinic/settings": "Clinic Settings",
   "/clinic/slot-settings": "การตั้งค่าคิว",
   "/clinic/queue-display": "หน้าจอคิว",
@@ -31,10 +30,10 @@ export function ClinicTopbar() {
   const hasMultipleBranches = branches.length > 1;
 
   return (
-    <header className="h-14 flex-shrink-0 bg-white border-b border-surface-100 flex items-center justify-between px-6 print:hidden">
+    <header className="h-14 flex-shrink-0 bg-white/90 backdrop-blur-sm border-b border-primary-200/50 flex items-center justify-between px-6 print:hidden">
       <div>
         <h1 className="text-base font-semibold text-surface-800">{title}</h1>
-        <p className="text-xs text-surface-500 mt-0.5 flex items-center gap-1 flex-wrap">
+        <p className="text-xs text-primary-700/70 mt-0.5 flex items-center gap-1 flex-wrap">
           <span>{clinicName}</span>
           {currentBranch && (
             <>
@@ -61,13 +60,13 @@ export function ClinicTopbar() {
       </div>
 
       <div className="flex items-center gap-3">
-        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-primary-50 text-primary-700 rounded-lg text-xs font-medium border border-primary-100">
+        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-primary-50 text-primary-700 rounded-xl text-xs font-medium border border-primary-200/60 shadow-sm">
           <span className="w-1.5 h-1.5 rounded-full bg-primary-500 animate-pulse" />
           AI ตอบแชท 24 ชม.
         </div>
         <NotificationBell />
         <div
-          className="w-9 h-9 rounded-lg bg-surface-100 flex items-center justify-center text-surface-600 font-semibold text-sm border border-surface-200/80"
+          className="w-9 h-9 rounded-xl bg-primary-100 flex items-center justify-center text-primary-700 font-semibold text-sm border border-primary-200/60"
           title="Admin"
         >
           A

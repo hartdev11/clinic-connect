@@ -21,6 +21,7 @@ import { generatePromotionAISummary } from "@/lib/promotion-ai-summary";
 import { buildPromotionEmbeddableText, embedPromotionText } from "@/lib/promotion-embedding";
 import { getEffectiveUser, requireBranchAccess } from "@/lib/rbac";
 import type { PromotionStatus, PromotionTargetGroup } from "@/types/clinic";
+import { runWithObservability } from "@/lib/observability/run-with-observability";
 
 async function ensurePromotionEmbedding(orgId: string, promotionId: string): Promise<void> {
   const p = await getPromotionById(orgId, promotionId);
@@ -51,6 +52,7 @@ async function getAuthContext(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
+  return runWithObservability("/api/clinic/promotions", request, async () => {
   const ctx = await getAuthContext(request);
   if ("error" in ctx) return ctx.error;
 
@@ -58,7 +60,7 @@ export async function GET(request: NextRequest) {
   if (statsOnly) {
     try {
       const stats = await getPromotionStats(ctx.orgId, ctx.branchId ?? undefined);
-      return NextResponse.json(stats);
+      return { response: NextResponse.json(stats), orgId: ctx.orgId, branchId: ctx.branchId };
     } catch (err) {
       console.error("GET /api/clinic/promotions?stats=1:", err);
       return NextResponse.json(
@@ -73,7 +75,7 @@ export async function GET(request: NextRequest) {
     try {
       const item = await getPromotionById(ctx.orgId, id);
       if (!item) return NextResponse.json({ error: "Not found" }, { status: 404 });
-      return NextResponse.json(item);
+      return { response: NextResponse.json(item), orgId: ctx.orgId, branchId: ctx.branchId };
     } catch (err) {
       console.error("GET /api/clinic/promotions?id=:", err);
       return NextResponse.json(
@@ -93,7 +95,7 @@ export async function GET(request: NextRequest) {
       targetGroup: targetGroup === "all" ? undefined : targetGroup,
       limit,
     });
-    return NextResponse.json({ items });
+    return { response: NextResponse.json({ items }), orgId: ctx.orgId, branchId: ctx.branchId };
   } catch (err) {
     console.error("GET /api/clinic/promotions:", err);
     return NextResponse.json(
@@ -101,9 +103,11 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
+  });
 }
 
 export async function POST(request: NextRequest) {
+  return runWithObservability("/api/clinic/promotions", request, async () => {
   const ctx = await getAuthContext(request);
   if ("error" in ctx) return ctx.error;
   try {
@@ -146,7 +150,7 @@ export async function POST(request: NextRequest) {
     const generated = await generatePromotionAISummary(String(name), description != null ? String(description) : undefined);
     if (generated) await updatePromotion(ctx.orgId, id, { aiSummary: generated.aiSummary, aiTags: generated.aiTags });
     await ensurePromotionEmbedding(ctx.orgId, id);
-    return NextResponse.json({ id, success: true });
+    return { response: NextResponse.json({ id, success: true }), orgId: ctx.orgId, branchId: ctx.branchId };
   } catch (err) {
     console.error("POST /api/clinic/promotions:", err);
     return NextResponse.json(
@@ -154,9 +158,11 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
+  });
 }
 
 export async function PATCH(request: NextRequest) {
+  return runWithObservability("/api/clinic/promotions", request, async () => {
   const ctx = await getAuthContext(request);
   if ("error" in ctx) return ctx.error;
   try {
@@ -213,7 +219,7 @@ export async function PATCH(request: NextRequest) {
     if (ok && (needsSummary || safe.media !== undefined || safe.extractedProcedures !== undefined || safe.aiSummary !== undefined)) {
       await ensurePromotionEmbedding(ctx.orgId, String(id));
     }
-    return NextResponse.json({ success: ok });
+    return { response: NextResponse.json({ success: ok }), orgId: ctx.orgId, branchId: ctx.branchId };
   } catch (err) {
     console.error("PATCH /api/clinic/promotions:", err);
     return NextResponse.json(
@@ -221,9 +227,11 @@ export async function PATCH(request: NextRequest) {
       { status: 500 }
     );
   }
+  });
 }
 
 export async function DELETE(request: NextRequest) {
+  return runWithObservability("/api/clinic/promotions", request, async () => {
   const ctx = await getAuthContext(request);
   if ("error" in ctx) return ctx.error;
   const id = request.nextUrl.searchParams.get("id");
@@ -231,7 +239,7 @@ export async function DELETE(request: NextRequest) {
   try {
     await deletePromotionMedia(ctx.orgId, id);
     const ok = await deletePromotion(ctx.orgId, id);
-    return NextResponse.json({ success: ok });
+    return { response: NextResponse.json({ success: ok }), orgId: ctx.orgId, branchId: ctx.branchId };
   } catch (err) {
     console.error("DELETE /api/clinic/promotions:", err);
     return NextResponse.json(
@@ -239,4 +247,5 @@ export async function DELETE(request: NextRequest) {
       { status: 500 }
     );
   }
+  });
 }

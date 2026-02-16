@@ -5,10 +5,10 @@ interface SectionHeaderProps {
 
 export function SectionHeader({ title, description }: SectionHeaderProps) {
   return (
-    <div className="mb-4">
+    <div className="mb-4 pl-3 border-l-2 border-primary-300/70">
       <h2 className="text-base font-semibold text-surface-800">{title}</h2>
       {description && (
-        <p className="mt-1 text-sm text-surface-500 max-w-xl">{description}</p>
+        <p className="mt-1 text-sm text-primary-700/80 max-w-xl">{description}</p>
       )}
     </div>
   );

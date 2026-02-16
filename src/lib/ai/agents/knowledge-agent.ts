@@ -157,13 +157,10 @@ async function executeKnowledgeAnalytics(
     }
   }
 
-  if (useVectorRAG && keyFindings.length === 0) {
+  if (useVectorRAG && keyFindings.length === 0 && org_id) {
     try {
-      const ragResults = await searchKnowledgeWithPyramid(
-        userMessage!.trim(),
-        pyramidCtx,
-        { topK: RAG_TOP_K, is_active: true }
-      );
+      const { retrieveKnowledgeContext } = await import("@/lib/knowledge-retrieval");
+      const ragResults = await retrieveKnowledgeContext(org_id, userMessage!.trim());
 
       for (const r of ragResults) {
         const topic = (r.metadata?.topic as string) ?? "";
@@ -180,7 +177,27 @@ async function executeKnowledgeAnalytics(
       recommendation = ragResults.length >= 2 ? "RAG_MATCH" : ragResults.length === 1 ? "RAG_SINGLE" : "RAG_NO_MATCH";
       if (ragResults.length === 0) riskFlags.push("RAG_EMPTY");
     } catch {
-      riskFlags.push("RAG_UNAVAILABLE");
+      try {
+        const ragResults = await searchKnowledgeWithPyramid(
+          userMessage!.trim(),
+          pyramidCtx,
+          { topK: RAG_TOP_K, is_active: true }
+        );
+        for (const r of ragResults) {
+          const topic = (r.metadata?.topic as string) ?? "";
+          const category = (r.metadata?.category as string) ?? "";
+          const content = (r.metadata?.content as string) ?? "";
+          if (topic) keyFindings.push(`topic:${topic}`);
+          if (category) keyFindings.push(`category:${category}`);
+          if (content) keyFindings.push(`rag_snippet:${content.slice(0, 150)}`);
+        }
+        const unique = [...new Set(keyFindings)];
+        keyFindings.length = 0;
+        keyFindings.push(...unique.slice(0, 15));
+        recommendation = ragResults.length >= 2 ? "RAG_MATCH" : ragResults.length === 1 ? "RAG_SINGLE" : "RAG_NO_MATCH";
+      } catch {
+        riskFlags.push("RAG_UNAVAILABLE");
+      }
     }
   }
 

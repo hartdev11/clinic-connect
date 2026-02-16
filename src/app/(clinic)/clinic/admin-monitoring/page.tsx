@@ -125,6 +125,11 @@ export default function AdminMonitoringPage() {
         <h2 className="text-lg font-semibold text-surface-800 mb-4">Quick Links</h2>
         <ul className="space-y-2 text-sm">
           <li>
+            <a href="/clinic/admin-monitoring/ai-cost-monitor" className="text-primary-600 hover:underline">
+              AI Cost Monitor — ต้นทุน AI ต่อคลินิก (7 วัน)
+            </a>
+          </li>
+          <li>
             <a href="/api/health" target="_blank" rel="noopener noreferrer" className="text-primary-600 hover:underline">
               GET /api/health
             </a>

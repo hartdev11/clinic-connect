@@ -4,12 +4,14 @@ import { getOrgIdFromClinicId, getBookings, createBookingAtomic, getBranchesByOr
 import { getEffectiveUser, requireBranchAccess, requireRole } from "@/lib/rbac";
 import { isSlotAvailable } from "@/lib/slot-engine";
 import type { BookingCreate, BookingSource, BookingChannel } from "@/types/clinic";
+import { runWithObservability } from "@/lib/observability/run-with-observability";
 
 const VALID_CHANNELS = ["line", "facebook", "instagram", "tiktok", "web", "walk_in", "phone", "referral", "other"] as const;
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
+  return runWithObservability("/api/clinic/bookings", request, async () => {
   const session = await getSessionFromCookies();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
@@ -69,7 +71,7 @@ export async function POST(request: NextRequest) {
     if ("error" in result) {
       return NextResponse.json({ error: "ช่วงเวลานี้ไม่ว่าง", code: "SLOT_TAKEN" }, { status: 409 });
     }
-    return NextResponse.json({ id: result.id, success: true });
+    return { response: NextResponse.json({ id: result.id, success: true }), orgId, branchId: branchId ?? branch?.id ?? null };
   } catch (err) {
     console.error("POST /api/clinic/bookings:", err);
     return NextResponse.json(
@@ -77,9 +79,11 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
+  });
 }
 
 export async function GET(request: NextRequest) {
+  return runWithObservability("/api/clinic/bookings", request, async () => {
   const session = await getSessionFromCookies();
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -109,7 +113,7 @@ export async function GET(request: NextRequest) {
       status: status || undefined,
       channel: channel && VALID_CHANNELS.includes(channel as (typeof VALID_CHANNELS)[number]) ? channel : undefined,
     });
-    return NextResponse.json({ items, lastId, hasMore: !!lastId });
+    return { response: NextResponse.json({ items, lastId, hasMore: !!lastId }), orgId, branchId };
   } catch (err) {
     console.error("GET /api/clinic/bookings:", err);
     return NextResponse.json(
@@ -117,4 +121,5 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
+  });
 }

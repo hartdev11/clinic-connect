@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export function PublicHeader() {
   return (
-    <header className="sticky top-0 z-50 bg-[#fefbfb]/95 backdrop-blur-xl border-b border-primary-100/80 shadow-sm">
+    <header className="sticky top-0 z-50 bg-[var(--bg-cream)]/95 backdrop-blur-xl border-b border-primary-200/60 shadow-sm">
       <div className="max-w-6xl mx-auto px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <Link

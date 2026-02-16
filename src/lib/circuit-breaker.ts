@@ -20,6 +20,8 @@ const DEFAULT_OPTIONS: CircuitBreakerOptions = {
 };
 
 export const OPENAI_CIRCUIT_KEY = "provider:openai:state";
+/** Internal workload (e.g. executive brief) — แยกจาก customer chat ไม่ให้ circuit ของแชทลูกค้าทำให้ brief ล้ม */
+export const OPENAI_CIRCUIT_KEY_EXECUTIVE = "provider:openai:executive:state";
 
 interface StoredState {
   state: CircuitState;

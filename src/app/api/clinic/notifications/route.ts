@@ -14,6 +14,7 @@ import {
 import { isOrgCircuitOpen } from "@/lib/org-circuit-breaker";
 import { getDailyLLMCost } from "@/lib/llm-metrics";
 import { getEffectiveUser, requireBranchAccess } from "@/lib/rbac";
+import { runWithObservability } from "@/lib/observability/run-with-observability";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -32,6 +33,7 @@ export type Notification = {
 };
 
 export async function GET(request: NextRequest) {
+  return runWithObservability("/api/clinic/notifications", request, async () => {
   const session = await getSessionFromCookies();
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -153,12 +155,16 @@ export async function GET(request: NextRequest) {
     const warning = notifications.filter((n) => n.severity === "warning");
     const info = notifications.filter((n) => n.severity === "info");
 
-    return NextResponse.json({
-      notifications,
-      grouped: { urgent, warning, info },
-      totalCount: notifications.length,
-      fetchedAt: now,
-    });
+    return {
+      response: NextResponse.json({
+        notifications,
+        grouped: { urgent, warning, info },
+        totalCount: notifications.length,
+        fetchedAt: now,
+      }),
+      orgId,
+      branchId,
+    };
   } catch (err) {
     console.error("GET /api/clinic/notifications:", err);
     return NextResponse.json(
@@ -166,4 +172,5 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
+  });
 }

@@ -13,11 +13,11 @@ export function PageHeader({
   return (
     <header className="mb-8">
       <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
+        <div className="border-l-4 border-primary-400 pl-4">
           <h1 className="text-2xl font-bold text-surface-800 tracking-tight">
             {title}
           </h1>
-          <p className="mt-1.5 text-sm text-surface-600 max-w-2xl leading-relaxed">
+          <p className="mt-1.5 text-sm text-primary-800/80 max-w-2xl leading-relaxed">
             {description}
           </p>
         </div>

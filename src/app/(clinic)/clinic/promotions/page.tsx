@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import useSWR from "swr";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { useClinicContext } from "@/contexts/ClinicContext";
@@ -60,6 +60,7 @@ function PromotionRow({
   onMutate: () => void;
 }) {
   const [loading, setLoading] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
   const hasCover = item.media?.[0]?.type === "image";
   const coverUrl = hasCover ? `/api/clinic/promotions/${item.id}/cover` : null;
   const dotColor = STATUS_DOT_COLOR[item.status] ?? "#94A3B8";
@@ -70,19 +71,22 @@ function PromotionRow({
 
   const handleDelete = async () => {
     if (!confirm("ลบโปรโมชั่นนี้?")) return;
+    setActionError(null);
     setLoading(true);
     try {
       const res = await fetch(`/api/clinic/promotions?id=${item.id}`, { method: "DELETE", credentials: "include" });
+      const data = await res.json().catch(() => ({}));
       if (res.ok) onMutate();
-      else throw new Error((await res.json()).error);
+      else throw new Error(data.error ?? "ลบไม่สำเร็จ");
     } catch (e) {
-      alert((e as Error).message);
+      setActionError((e as Error).message);
     } finally {
       setLoading(false);
     }
   };
 
   const handleArchive = async () => {
+    setActionError(null);
     setLoading(true);
     try {
       const res = await fetch("/api/clinic/promotions", {
@@ -91,10 +95,11 @@ function PromotionRow({
         body: JSON.stringify({ id: item.id, status: "archived" }),
         credentials: "include",
       });
+      const data = await res.json().catch(() => ({}));
       if (res.ok) onMutate();
-      else throw new Error((await res.json()).error);
+      else throw new Error(data.error ?? "เก็บถาวรไม่สำเร็จ");
     } catch (e) {
-      alert((e as Error).message);
+      setActionError((e as Error).message);
     } finally {
       setLoading(false);
     }
@@ -102,9 +107,10 @@ function PromotionRow({
 
   return (
     <div
-      className="relative flex items-center gap-4 py-3 px-4 rounded-[10px] bg-white hover:bg-[#F2F2F7] transition-all duration-[90ms] ease-out hover:scale-[1.01] min-h-0 leading-[1.4]"
+      className="relative flex flex-col gap-0 py-3 px-4 rounded-[10px] bg-white hover:bg-[#F2F2F7] transition-all duration-[90ms] ease-out hover:scale-[1.01] min-h-0 leading-[1.4]"
       style={{ transitionTimingFunction: "cubic-bezier(0.2, 0.8, 0.2, 1)" }}
     >
+      <div className="flex items-center gap-4 w-full min-w-0">
       <div className="shrink-0 w-16 h-16 rounded-[10px] bg-neutral-100 overflow-hidden">
         {coverUrl ? (
           <img src={coverUrl} alt="" className="w-full h-full object-cover" />
@@ -114,7 +120,7 @@ function PromotionRow({
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
-          <p className="font-semibold text-neutral-800 text-[15px] truncate">{item.name}</p>
+          <p className="font-semibold text-neutral-800 text-[15px] truncate">{item.name || "—"}</p>
           {item.extractedPrice != null && (
             <span className="text-[12px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">฿{item.extractedPrice.toLocaleString()}</span>
           )}
@@ -173,6 +179,13 @@ function PromotionRow({
           ลบ
         </button>
       </div>
+      </div>
+      {actionError && (
+        <div className="mt-2 p-2 rounded-[8px] bg-red-50 border border-red-100 text-[12px] text-red-700 flex items-center justify-between gap-2">
+          <span>{actionError}</span>
+          <button type="button" onClick={() => setActionError(null)} className="text-red-600 hover:underline shrink-0">ปิด</button>
+        </div>
+      )}
     </div>
   );
 }
@@ -180,10 +193,12 @@ function PromotionRow({
 /** AI-first creation: upload image -> scan -> editable preview -> save (from-scan API) */
 function CreateFromImageModal({
   branches,
+  branchesLoading = false,
   onClose,
   onSuccess,
 }: {
   branches: Array<{ id: string; name: string }>;
+  branchesLoading?: boolean;
   onClose: () => void;
   onSuccess: () => void;
 }) {
@@ -328,6 +343,14 @@ function CreateFromImageModal({
     }
   };
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40" onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="create-from-image-title">
       <div className="bg-white rounded-[16px] shadow-xl max-w-[640px] w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
@@ -337,7 +360,10 @@ function CreateFromImageModal({
         </div>
         <div className="p-6 space-y-5">
           {error && (
-            <div className="p-3 rounded-[10px] bg-red-50 border border-red-100 text-red-700 text-[13px]" role="alert">{error}</div>
+            <div className="p-3 rounded-[10px] bg-red-50 border border-red-100 text-red-700 text-[13px] flex flex-wrap items-center justify-between gap-2" role="alert">
+              <span>{error}</span>
+              <button type="button" onClick={() => setError(null)} className="text-[12px] font-medium text-red-600 hover:underline shrink-0">ลองอีกครั้ง</button>
+            </div>
           )}
 
           {step === "upload" && (
@@ -377,7 +403,7 @@ function CreateFromImageModal({
           )}
 
           {step === "preview" && (
-            <>
+            <form onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="space-y-5">
               {(imageDataUrl || previewUrl) && (
                 <div className="w-full rounded-[12px] overflow-hidden bg-neutral-100 flex justify-center">
                   <img src={imageDataUrl ?? previewUrl ?? ""} alt="" className="max-w-full max-h-[400px] w-auto h-auto object-contain" />
@@ -445,14 +471,20 @@ function CreateFromImageModal({
               </div>
               <div>
                 <label className="block text-[12px] font-medium text-neutral-500 uppercase tracking-wide mb-1.5">สาขา</label>
-                <div className="flex flex-wrap gap-2">
-                  {branches.map((b) => (
-                    <label key={b.id} className="inline-flex items-center gap-2 cursor-pointer">
-                      <input type="checkbox" checked={branchIds.includes(b.id)} onChange={() => toggleBranch(b.id)} className="rounded border-[#E5E7EB]" />
-                      <span className="text-[14px] text-neutral-800">{b.name}</span>
-                    </label>
-                  ))}
-                </div>
+                {branchesLoading ? (
+                  <p className="text-[13px] text-neutral-500 py-2">กำลังโหลดสาขา...</p>
+                ) : branches.length === 0 ? (
+                  <p className="text-[13px] text-neutral-500 py-2">ยังไม่มีสาขา — สามารถบันทึกได้และกำหนดสาขาทีหลัง</p>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {branches.map((b) => (
+                      <label key={b.id} className="inline-flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" checked={branchIds.includes(b.id)} onChange={() => toggleBranch(b.id)} className="rounded border-[#E5E7EB]" />
+                        <span className="text-[14px] text-neutral-800">{b.name}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -474,9 +506,9 @@ function CreateFromImageModal({
               </label>
               <div className="flex gap-2 pt-2">
                 <button type="button" onClick={onClose} className="min-h-[40px] px-4 rounded-[10px] text-[14px] font-medium bg-transparent text-neutral-800 hover:bg-[#F2F2F7]">ยกเลิก</button>
-                <button type="button" onClick={handleSave} disabled={saving} className="min-h-[40px] px-4 rounded-[10px] text-[14px] font-medium bg-black text-white hover:bg-neutral-800 disabled:opacity-50">{saving ? "กำลังบันทึก..." : "บันทึกโปรโมชั่น"}</button>
+                <button type="submit" disabled={saving} className="min-h-[40px] px-4 rounded-[10px] text-[14px] font-medium bg-black text-white hover:bg-neutral-800 disabled:opacity-50">{saving ? "กำลังบันทึก..." : "บันทึกโปรโมชั่น"}</button>
               </div>
-            </>
+            </form>
           )}
         </div>
       </div>
@@ -488,11 +520,13 @@ function CreateFromImageModal({
 function PromotionForm({
   promotion,
   branches,
+  branchesLoading = false,
   onSuccess,
   onCancel,
 }: {
   promotion: Promotion | null;
   branches: Array<{ id: string; name: string }>;
+  branchesLoading?: boolean;
   onSuccess: () => void;
   onCancel: () => void;
 }) {
@@ -621,8 +655,9 @@ function PromotionForm({
       </h2>
       <form onSubmit={handleSubmit} className="space-y-5">
         {error && (
-          <div className="p-3 rounded-[10px] bg-red-50 border border-red-100 text-red-700 text-[13px]" role="alert">
-            {error}
+          <div className="p-3 rounded-[10px] bg-red-50 border border-red-100 text-red-700 text-[13px] flex flex-wrap items-center justify-between gap-2" role="alert">
+            <span>{error}</span>
+            <button type="button" onClick={() => setError(null)} className="text-[12px] font-medium text-red-600 hover:underline shrink-0">ลองอีกครั้ง</button>
           </div>
         )}
         <div>
@@ -648,19 +683,25 @@ function PromotionForm({
         </div>
         <div>
           <label className="block text-[12px] font-medium text-neutral-500 uppercase tracking-wide mb-1.5">สาขา (เลือกได้หลายสาขา)</label>
-          <div className="flex flex-wrap gap-2">
-            {branches.map((b) => (
-              <label key={b.id} className="inline-flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={branchIds.includes(b.id)}
-                  onChange={() => toggleBranch(b.id)}
-                  className="rounded border-[#E5E7EB]"
-                />
-                <span className="text-[14px] text-neutral-800">{b.name}</span>
-              </label>
-            ))}
-          </div>
+          {branchesLoading ? (
+            <p className="text-[13px] text-neutral-500 py-2">กำลังโหลดสาขา...</p>
+          ) : branches.length === 0 ? (
+            <p className="text-[13px] text-neutral-500 py-2">ยังไม่มีสาขา — กรุณาสร้างสาขาก่อนหรือเลือกสาขาจากเมนูคลินิก</p>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {branches.map((b) => (
+                <label key={b.id} className="inline-flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={branchIds.includes(b.id)}
+                    onChange={() => toggleBranch(b.id)}
+                    className="rounded border-[#E5E7EB]"
+                  />
+                  <span className="text-[14px] text-neutral-800">{b.name}</span>
+                </label>
+              ))}
+            </div>
+          )}
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
@@ -794,26 +835,39 @@ export default function PromotionsPage() {
   const [editingItem, setEditingItem] = useState<Promotion | null>(null);
 
   const statsUrl = `/api/clinic/promotions?stats=1${branch_id ? `&branchId=${encodeURIComponent(branch_id)}` : ""}`;
+  const [listLimit, setListLimit] = useState(50);
+  const [searchQuery, setSearchQuery] = useState("");
   const listParams = new URLSearchParams();
   if (statusFilter !== "all") listParams.set("status", statusFilter);
   if (targetGroupFilter) listParams.set("targetGroup", targetGroupFilter);
   if (branchFilter !== "all") listParams.set("branchId", branchFilter);
   else if (branch_id) listParams.set("branchId", branch_id);
+  listParams.set("limit", String(listLimit));
   const listUrl = `/api/clinic/promotions?${listParams}`;
 
-  const { data: stats, mutate: mutateStats } = useSWR<{ active: number; expiringSoon: number; scheduled: number; expired: number }>(
+  const { data: stats, error: statsError, mutate: mutateStats } = useSWR<{ active: number; expiringSoon: number; scheduled: number; expired: number }>(
     statsUrl,
     apiFetcher,
     { revalidateOnFocus: false }
   );
-  const { data: listData, mutate: mutateList } = useSWR<{ items: Promotion[] }>(listUrl, apiFetcher, {
+  const statsLoading = !stats && !statsError;
+  const statsFailed = !!statsError;
+  const { data: listData, error: listError, mutate: mutateList } = useSWR<{ items: Promotion[] }>(listUrl, apiFetcher, {
     revalidateOnFocus: false,
     dedupingInterval: 30_000,
   });
   const { data: branchesData } = useSWR<{ items: Array<{ id: string; name: string }> }>("/api/clinic/branches", apiFetcher);
   const branches = branchesData?.items ?? [];
+  const branchesLoading = branchesData === undefined;
 
   const items = listData?.items ?? [];
+  const displayedItems = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return items;
+    return items.filter((p) => (p.name ?? "").toLowerCase().includes(q));
+  }, [items, searchQuery]);
+  const listFailed = !!listError;
+  const canLoadMore = items.length >= listLimit && listLimit < 100;
   const mutate = useCallback(() => {
     mutateStats();
     mutateList();
@@ -829,7 +883,23 @@ export default function PromotionsPage() {
           aiAnalyze
         />
 
-        <PromotionOverview stats={stats ?? { active: 0, expiringSoon: 0, scheduled: 0, expired: 0 }} />
+        {statsLoading && (
+          <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8" aria-busy="true">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="bg-[#FAFAFA] rounded-[12px] p-6 h-[120px] animate-pulse" />
+            ))}
+          </section>
+        )}
+        {statsFailed && (
+          <section className="mb-8 p-6 rounded-[12px] bg-red-50 border border-red-100">
+            <p className="text-[14px] font-medium text-red-800">โหลดสถิติไม่สำเร็จ</p>
+            <p className="text-[13px] text-red-600 mt-1">{statsError?.message ?? "เกิดข้อผิดพลาด"}</p>
+            <button type="button" onClick={() => mutateStats()} className="mt-3 min-h-[36px] px-3 rounded-[10px] text-[13px] font-medium bg-red-600 text-white hover:bg-red-700">ลองใหม่</button>
+          </section>
+        )}
+        {!statsLoading && !statsFailed && (
+          <PromotionOverview stats={stats ?? { active: 0, expiringSoon: 0, scheduled: 0, expired: 0 }} />
+        )}
 
         <section className="bg-[#FAFAFA] rounded-[12px] p-6 mb-8">
           <div className="bg-white rounded-[12px] p-6">
@@ -839,6 +909,14 @@ export default function PromotionsPage() {
                 <h2 className="text-[17px] font-medium text-neutral-800 leading-[1.4] mt-0.5">รายการโปรโมชั่น</h2>
               </div>
               <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => mutate()}
+                  className="min-h-[36px] px-3 py-2 rounded-[10px] text-[13px] font-medium bg-transparent text-neutral-600 border border-neutral-200 hover:bg-[#F2F2F7] transition-colors"
+                  title="โหลดใหม่"
+                >
+                  โหลดใหม่
+                </button>
                 <button
                   type="button"
                   onClick={() => setShowCreateFromImage(true)}
@@ -888,20 +966,44 @@ export default function PromotionsPage() {
                 <option value="existing">ลูกค้าปัจจุบัน</option>
                 <option value="all">ทุกคน</option>
               </select>
+              <input
+                type="search"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="ค้นชื่อโปรโมชั่น..."
+                className="min-h-[36px] px-3 py-2 rounded-[10px] border border-[#E5E7EB] text-[13px] text-neutral-800 bg-white focus:outline-none focus:ring-2 focus:ring-black/10 w-full min-w-[180px] max-w-[240px]"
+                aria-label="ค้นชื่อโปรโมชั่น"
+              />
             </div>
-            {!listData && (
+            {listFailed && (
+              <div className="py-8 px-4 rounded-[12px] bg-red-50 border border-red-100 text-center">
+                <p className="text-[14px] font-medium text-red-800">โหลดรายการไม่สำเร็จ</p>
+                <p className="text-[13px] text-red-600 mt-1">{listError?.message ?? "เกิดข้อผิดพลาด กรุณาลองใหม่"}</p>
+                <button
+                  type="button"
+                  onClick={() => mutateList()}
+                  className="mt-4 min-h-[40px] px-4 rounded-[10px] text-[14px] font-medium bg-red-600 text-white hover:bg-red-700 transition-colors"
+                >
+                  ลองใหม่
+                </button>
+              </div>
+            )}
+            {!listData && !listFailed && (
               <div className="space-y-3 py-8" aria-busy="true">
                 {[1, 2, 3].map((i) => (
                   <div key={i} className="h-20 rounded-[10px] bg-[#F5F5F7] animate-pulse" />
                 ))}
               </div>
             )}
-            {listData && items.length === 0 && (
+            {listData && items.length === 0 && !listFailed && (
               <p className="text-[14px] text-neutral-500 py-8 text-center">ยังไม่มีโปรโมชั่น</p>
             )}
-            {listData && items.length > 0 && (
+            {listData && items.length > 0 && displayedItems.length === 0 && !listFailed && (
+              <p className="text-[14px] text-neutral-500 py-8 text-center">ไม่พบโปรโมชั่นที่ตรงกับคำค้น</p>
+            )}
+            {listData && items.length > 0 && displayedItems.length > 0 && (
               <div className="space-y-3">
-                {items.map((p) => (
+                {displayedItems.map((p) => (
                   <PromotionRow
                     key={p.id}
                     item={p}
@@ -910,6 +1012,17 @@ export default function PromotionsPage() {
                     onMutate={mutate}
                   />
                 ))}
+                {canLoadMore && (
+                  <div className="pt-4 flex justify-center">
+                    <button
+                      type="button"
+                      onClick={() => setListLimit(100)}
+                      className="min-h-[40px] px-4 rounded-[10px] text-[14px] font-medium bg-transparent text-neutral-700 border border-neutral-300 hover:bg-[#F2F2F7] transition-colors"
+                    >
+                      โหลดเพิ่ม
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -918,6 +1031,7 @@ export default function PromotionsPage() {
         {showCreateFromImage && (
           <CreateFromImageModal
             branches={branches}
+            branchesLoading={branchesLoading}
             onClose={() => setShowCreateFromImage(false)}
             onSuccess={() => { setShowCreateFromImage(false); mutate(); }}
           />
@@ -928,6 +1042,7 @@ export default function PromotionsPage() {
             <PromotionForm
               promotion={editingItem}
               branches={branches}
+              branchesLoading={branchesLoading}
               onSuccess={() => { setShowForm(false); setEditingItem(null); mutate(); }}
               onCancel={() => { setShowForm(false); setEditingItem(null); }}
             />

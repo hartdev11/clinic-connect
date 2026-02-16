@@ -3,7 +3,7 @@
  * คืนค่า currentOrg, currentBranch, currentUser, subscriptionPlan
  * org_id, branch_id มาจาก session/token (ไม่ hardcode)
  */
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getSessionFromCookies } from "@/lib/auth-session";
 import {
   getOrgIdFromClinicId,
@@ -12,10 +12,12 @@ import {
   getSubscriptionByOrgId,
 } from "@/lib/clinic-data";
 import { getEffectiveUser } from "@/lib/rbac";
+import { runWithObservability } from "@/lib/observability/run-with-observability";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  return runWithObservability("/api/clinic/context", request, async () => {
   const session = await getSessionFromCookies();
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -44,7 +46,8 @@ export async function GET() {
     const currentBranch =
       branchId ? branches.find((b) => b.id === branchId) ?? null : null;
 
-    return NextResponse.json({
+    return {
+      response: NextResponse.json({
       org_id: orgId,
       branch_id: branchId,
 
@@ -78,7 +81,10 @@ export async function GET() {
             maxBranches: subscription.max_branches,
           }
         : null,
-    });
+    }),
+      orgId,
+      branchId,
+    };
   } catch (err) {
     console.error("GET /api/clinic/context:", err);
     return NextResponse.json(
@@ -86,4 +92,5 @@ export async function GET() {
       { status: 500 }
     );
   }
+  });
 }

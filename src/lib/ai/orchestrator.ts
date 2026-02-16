@@ -203,6 +203,7 @@ export async function chatOrchestrate(
       org_id: input.org_id,
       customerMemorySummary: memory?.summary,
       knowledgeCategory: enrichedContext._knowledgeCategory ?? null,
+      channel: input.channel ?? null,
     });
 
     const totalMs = Date.now() - start;
@@ -220,9 +221,16 @@ export async function chatOrchestrate(
       }
     }
 
-    // AI Observability — log activity
+    // 🚨 DO NOT EXPOSE FINANCE DATA TO CUSTOMER CHAT
+    // (1) Zero-leak: Role Manager strip internal (finance) ก่อนเข้า LLM เมื่อ channel = line/web
+    // (2) Explicit guard: ถ้าเป็น customer + มี INTERNAL_FINANCE_ONLY แต่ไม่ได้ strip (เช่น channel ไม่ถูกส่ง) → block ทันที ไม่รอ policyViolation
     const policyViolation = checkPolicyViolation(rmResult.reply);
     const hallucination = checkHallucination(rmResult.reply);
+    const isCustomerChannel = input.channel === "line" || input.channel === "web";
+    const hasInternalFinance =
+      (analyticsContext.finance as { dataClassification?: string })?.dataClassification === "INTERNAL_FINANCE_ONLY";
+    const blockDueToFinanceClassification =
+      isCustomerChannel && hasInternalFinance && !rmResult.internalStrippedForCustomer;
     if (policyViolation || hallucination) {
       void tagFailure({
         org_id: input.org_id,
@@ -232,6 +240,10 @@ export async function chatOrchestrate(
         user_message: trimmed,
       });
     }
+    const replyToCustomer =
+      blockDueToFinanceClassification || policyViolation || hallucination
+        ? "ช่วยตอบเรื่องนี้ไม่ได้ตอนนี้ค่ะ โทรมาคลินิกได้เลยนะคะ"
+        : rmResult.reply;
 
     // Enterprise: Cache high-confidence responses
     const analyticsRich =
@@ -286,8 +298,15 @@ export async function chatOrchestrate(
       performance_breach: performanceBreach,
     });
 
+    if (input.org_id && rmResult.usage) {
+      const { recordLLMUsage } = await import("@/lib/llm-metrics");
+      void recordLLMUsage(input.org_id, rmResult.usage, { workloadType: "customer_chat" }).catch((e) =>
+        console.error("[orchestrator] recordLLMUsage:", e)
+      );
+    }
+
     return {
-      reply: rmResult.reply,
+      reply: replyToCustomer,
       success: rmResult.success,
       analyticsMs: analyticsContext.totalAnalyticsMs,
       roleManagerMs: rmResult.totalMs,

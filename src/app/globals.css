@@ -7,11 +7,16 @@
   --topbar-height: 4rem;
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --transition-smooth: 0.3s var(--ease-out-expo);
+  /* โทนคลินิก: ครีม + ชมพูอ่อน */
+  --bg-cream: #fef9f8;
+  --bg-cream-sidebar: #fdf7f6;
+  --bg-cream-card: #fffcfa;
 }
 
 @layer base {
   body {
-    @apply bg-[#fefbfb] text-surface-800 antialiased;
+    @apply text-surface-800 antialiased;
+    background: var(--bg-cream);
   }
   h1,
   h2,
@@ -46,13 +51,13 @@ html {
 .animate-delay-700 { animation-delay: 700ms; }
 .animate-delay-800 { animation-delay: 800ms; }
 
-/* Enterprise card hover elevation (200–400ms ease-out) */
+/* Enterprise card hover elevation — โทน primary เบา */
 .card-hover-elevation {
   @apply transition-all duration-300 ease-out;
 }
 .card-hover-elevation:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06), 0 2px 4px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 12px rgba(224, 92, 118, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
 }
 @media (prefers-reduced-motion: reduce) {
   .card-hover-elevation:hover {
@@ -93,14 +98,19 @@ html {
     @apply w-full;
   }
 
-  /* Card hover lift */
+  /* Card hover lift — โทน primary เบา */
   .card-hover-lift {
     @apply transition-all duration-300 ease-out;
   }
   .card-hover-lift:hover {
     transform: translateY(-4px);
-    box-shadow: 0 20px 50px -15px rgba(0, 0, 0, 0.12),
+    box-shadow: 0 20px 50px -15px rgba(224, 92, 118, 0.12),
       0 4px 15px -4px rgba(0, 0, 0, 0.06);
+  }
+
+  /* Section / บล็อกเนื้อหา — ครีมอุ่น */
+  .section-cream {
+    background: linear-gradient(135deg, rgba(254, 247, 248, 0.6) 0%, rgba(253, 248, 243, 0.5) 100%);
   }
 
   /* Subtle gradient border on focus/hover */

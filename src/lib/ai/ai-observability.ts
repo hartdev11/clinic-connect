@@ -85,10 +85,10 @@ export async function logAIActivity(input: LogAIActivityInput): Promise<void> {
   }
 }
 
-/** Policy violation check — rule-based หลังได้ reply */
+/** Policy violation check — rule-based หลังได้ reply (ห้ามส่งข้อมูล finance ให้ลูกค้า) */
 export function checkPolicyViolation(reply: string): boolean {
   const forbidden = [
-    /รายได้.*บาท|ยอดขาย.*บาท|revenue|กำไร.*บาท/i,
+    /รายได้|ยอดขาย|revenue|กำไร.*บาท|ขาดทุน|ข้อมูลการเงิน|financial\s*(data|internal)/i,
     /วินิจฉัยว่า|diagnos.*as|เป็นโรค/i,
     /รับประกัน.*ผล|100%\s*ปลอดภัย/i,
   ];

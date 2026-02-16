@@ -8,11 +8,13 @@ import {
 import { enforceLimits } from "@/lib/subscription";
 import { requireRole } from "@/lib/rbac";
 import { getEffectiveUser } from "@/lib/rbac";
+import { runWithObservability } from "@/lib/observability/run-with-observability";
 
 export const dynamic = "force-dynamic";
 
 /** GET — รายชื่อ branches ใน org */
-export async function GET() {
+export async function GET(request: NextRequest) {
+  return runWithObservability("/api/clinic/branches", request, async () => {
   const session = await getSessionFromCookies();
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -23,7 +25,7 @@ export async function GET() {
       return NextResponse.json({ error: "Organization not found" }, { status: 404 });
     }
     const branches = await getBranchesByOrgId(orgId);
-    return NextResponse.json({ items: branches });
+    return { response: NextResponse.json({ items: branches }), orgId };
   } catch (err) {
     console.error("GET /api/clinic/branches:", err);
     return NextResponse.json(
@@ -31,10 +33,12 @@ export async function GET() {
       { status: 500 }
     );
   }
+  });
 }
 
 /** POST — E6.4 เพิ่มสาขา (ตรวจ enforceLimits ก่อน) */
 export async function POST(request: NextRequest) {
+  return runWithObservability("/api/clinic/branches", request, async () => {
   const session = await getSessionFromCookies();
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -71,12 +75,15 @@ export async function POST(request: NextRequest) {
       name,
       address: body.address?.trim(),
     });
-    return NextResponse.json({
-      id: branchId,
-      name,
-      warning: limitCheck.warning ?? undefined,
-      usagePercent: limitCheck.usagePercent,
-    });
+    return {
+      response: NextResponse.json({
+        id: branchId,
+        name,
+        warning: limitCheck.warning ?? undefined,
+        usagePercent: limitCheck.usagePercent,
+      }),
+      orgId,
+    };
   } catch (err) {
     console.error("POST /api/clinic/branches:", err);
     return NextResponse.json(
@@ -84,4 +91,5 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
+  });
 }

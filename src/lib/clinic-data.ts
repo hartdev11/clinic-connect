@@ -1404,17 +1404,18 @@ export async function getPromotions(
   return list.slice(0, limit);
 }
 
-/** Enterprise: active promotions for AI — status=active, visibleToAI, filter by branch + targetGroup. No manual agent. */
+/** Enterprise: active promotions for AI — status=active หรือ scheduled ที่ startAt ผ่านแล้ว, visibleToAI, filter by branch + targetGroup. */
 export async function getActivePromotionsForAI(
   orgId: string,
   opts: { branchId?: string | null; isNewCustomer?: boolean; limit?: number } = {}
 ): Promise<Promotion[]> {
   const limit = Math.min(opts.limit ?? 15, 30);
+  // ดึงทั้ง active และ scheduled (scheduled ที่ startAt ผ่านแล้วจะถือว่า "เปิดใช้แล้ว")
   const snapshot = await db
     .collection(COLLECTIONS.promotions)
     .where("org_id", "==", orgId)
-    .where("status", "==", "active")
-    .limit(limit * 2)
+    .where("status", "in", ["active", "scheduled"])
+    .limit(limit * 3)
     .get();
 
   const now = Date.now();
@@ -1424,8 +1425,8 @@ export async function getActivePromotionsForAI(
   if (opts.isNewCustomer === true) list = list.filter((p) => p.targetGroup === "new" || p.targetGroup === "all");
   else if (opts.isNewCustomer === false) list = list.filter((p) => p.targetGroup === "existing" || p.targetGroup === "all");
   list = list.filter((p) => {
-    if (p.startAt && new Date(p.startAt).getTime() > now) return false;
-    if (p.endAt && new Date(p.endAt).getTime() < now) return false;
+    if (p.startAt && new Date(p.startAt).getTime() > now) return false; // ยังไม่ถึงเวลาเริ่ม
+    if (p.endAt && new Date(p.endAt).getTime() < now) return false; // หมดอายุแล้ว
     return true;
   });
   return list.slice(0, limit);
@@ -1646,6 +1647,62 @@ export async function listConversationFeedback(
   });
   const lastId = snapshot.docs.length > limit ? snapshot.docs[limit - 1].id : null;
   return { items, lastId };
+}
+
+/** Insights: ดึง conversation_feedback ในช่วงวันที่ (สำหรับ analytics) — filter branch_id ใน memory */
+export async function getConversationFeedbackInRange(
+  orgId: string,
+  opts: { branchId?: string | null; from: Date; to: Date; limit?: number }
+): Promise<ConversationFeedback[]> {
+  const { trackFirestoreQuery } = await import("@/lib/observability/firestore");
+  const t0 = Date.now();
+  const Firestore = await import("firebase-admin/firestore");
+  const limit = Math.min(opts.limit ?? 2000, 3000);
+  const from = new Date(opts.from);
+  const to = new Date(opts.to);
+  from.setUTCHours(0, 0, 0, 0);
+  to.setUTCHours(23, 59, 59, 999);
+  let q = db
+    .collection(COLLECTIONS.conversation_feedback)
+    .where("org_id", "==", orgId)
+    .where("createdAt", ">=", Firestore.Timestamp.fromDate(from))
+    .where("createdAt", "<=", Firestore.Timestamp.fromDate(to))
+    .orderBy("createdAt", "asc")
+    .limit(limit) as ReturnType<typeof db.collection>["where"];
+  const snapshot = await q.get();
+  trackFirestoreQuery({
+    collection: COLLECTIONS.conversation_feedback,
+    operation: "get",
+    orgId,
+    durationMs: Date.now() - t0,
+    docCount: snapshot.size,
+  });
+  let items: ConversationFeedback[] = snapshot.docs.map((doc) => {
+    const d = doc.data();
+    return {
+      id: doc.id,
+      org_id: d.org_id ?? null,
+      branch_id: d.branch_id ?? null,
+      user_id: d.user_id ?? null,
+      userMessage: d.userMessage ?? "",
+      botReply: d.botReply ?? "",
+      intent: d.intent ?? null,
+      service: d.service ?? null,
+      area: d.area ?? null,
+      source: d.source ?? "line",
+      adminSentBy: d.adminSentBy ?? null,
+      adminLabel: d.adminLabel ?? null,
+      adminLabeledAt: d.adminLabeledAt ? toISO(d.adminLabeledAt) : null,
+      adminLabeledBy: d.adminLabeledBy ?? null,
+      createdAt: toISO(d.createdAt),
+      updatedAt: toISO(d.updatedAt),
+      correlation_id: d.correlation_id ?? null,
+    };
+  });
+  if (opts.branchId != null) {
+    items = items.filter((f) => f.branch_id == null || f.branch_id === opts.branchId);
+  }
+  return items;
 }
 
 /** แชทของลูกค้าตาม user_id (LINE userId) — เรียงจากเก่าไปใหม่ */

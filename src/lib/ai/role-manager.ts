@@ -110,10 +110,20 @@ function buildPublicContext(ctx: AggregatedAnalyticsContext): {
 
 /**
  * สร้าง internal context — สำหรับ Role Manager เท่านั้น ห้ามเอ่ยกับลูกค้า
+ * 🚨 DO NOT EXPOSE FINANCE DATA TO CUSTOMER CHAT — Executive AI context only
+ * เมื่อ isCustomerChannel = true จะไม่ส่ง finance เข้า LLM เลย (strip layer) = zero-leak guarantee
  */
-function buildInternalContext(ctx: AggregatedAnalyticsContext): Record<string, unknown> {
+function buildInternalContext(
+  ctx: AggregatedAnalyticsContext,
+  isCustomerChannel: boolean
+): Record<string, unknown> {
+  if (isCustomerChannel) {
+    return {
+      _note: "Internal omitted for customer channel — INTERNAL_FINANCE_ONLY never sent to LLM (zero-leak).",
+    };
+  }
   return {
-    finance: ctx.finance,
+    finance: { ...ctx.finance, dataClassification: "INTERNAL_FINANCE_ONLY" as const },
     _note: "INTERNAL_ONLY — ห้ามพูดตัวเลขรายได้/ยอดขายกับลูกค้า ใช้แค่เข้าใจแนวโน้ม",
   };
 }
@@ -130,6 +140,8 @@ export interface RoleManagerInput {
   org_id?: string;
   /** Phase 2 #16: category สำหรับ append disclaimer ถ้า surgery */
   knowledgeCategory?: string | null;
+  /** Customer channel → ไม่ส่ง internal (finance) ให้ LLM = zero-leak guarantee */
+  channel?: "line" | "web" | null;
 }
 
 export interface RoleManagerOutput {
@@ -142,6 +154,8 @@ export interface RoleManagerOutput {
   prompt_variant?: string;
   /** When promotion/media exists — channel adapters send images/videos to LINE, FB, IG, TikTok */
   media?: string[];
+  /** true เมื่อเป็น customer channel และเรา strip internal (finance) ออกจาก prompt แล้ว = LLM ไม่เห็น finance */
+  internalStrippedForCustomer?: boolean;
 }
 
 export async function runRoleManager(
@@ -195,15 +209,23 @@ export async function runRoleManager(
   const systemPrompt = `${basePrompt}\n\n[CRITICAL] ${RESPONSE_CONTRACT}`;
 
   const { out: publicCtx, knowledgeSummary } = buildPublicContext(input.analyticsContext);
-  const internalCtx = buildInternalContext(input.analyticsContext);
+  const isCustomerChannel = input.channel === "line" || input.channel === "web";
+  const internalCtx = buildInternalContext(input.analyticsContext, isCustomerChannel);
 
-  const promotionDetails = (input.analyticsContext.promotion as { promotionDetails?: Array<{ media?: string[] }> })?.promotionDetails;
+  const promotionDetails = (input.analyticsContext.promotion as {
+    promotionDetails?: Array<{ media?: string[] }>;
+  })?.promotionDetails;
   const mediaUrls: string[] = [];
   if (Array.isArray(promotionDetails)) {
     for (const p of promotionDetails) {
-      if (Array.isArray(p.media)) mediaUrls.push(...p.media);
+      if (Array.isArray(p.media)) {
+        for (const url of p.media) {
+          if (typeof url === "string" && url.startsWith("https://")) mediaUrls.push(url);
+        }
+      }
     }
   }
+  const hasPromotionContext = Array.isArray(promotionDetails) && promotionDetails.length > 0;
 
   const contextStr = JSON.stringify(
     {
@@ -225,10 +247,17 @@ export async function runRoleManager(
     : "";
 
   const sanitizedMessage = sanitizeForLLM(input.userMessage);
-  const userContent = `ข้อความลูกค้า: "${sanitizedMessage}"
+  const promotionInstruction =
+    hasPromotionContext &&
+    /โปร|promotion|มีโปร|สนใจโปร|โปรโมชั่น|โปรอะไร|โปรจมูก|โปรฟิลเลอร์|โปรเลเซอร์/i.test(sanitizedMessage)
+      ? "\n[สำคัญ] ลูกค้าถามเรื่องโปร — ตอบเฉพาะจาก promotion/promotionDetails ใน Context เท่านั้น: ระบุชื่อโปรและสรุปสั้น ๆ (ราคาถ้ามี). ห้ามวกไปเรื่องอื่น. รูปโปรจะส่งแยกให้ลูกค้า.\n\n"
+      : "";
+  const userContent = `ข้อความลูกค้า: "${sanitizedMessage}"${promotionInstruction}
 
 Context จาก Analytics:
 ${truncated}${restrictedNote}
+
+[ห้าม] อย่าเอ่ยหรืออ้างอิงข้อมูลจาก internal (รวม finance/รายได้/ยอดขาย) กับลูกค้า — internal ใช้เพื่อเข้าใจแนวโน้มเท่านั้น
 
 ตอบลูกค้าแบบมนุษย์จริง — คิดเอง แก้ปัญหาเอง ได้ใจความ ไม่อัตโนมัติ (สั้น 2–4 ประโยค ไม่มีคำนำ):`;
 
@@ -313,6 +342,7 @@ ${truncated}${restrictedNote}
       prompt_version: promptVersion,
       prompt_variant: promptVariant,
       media: mediaUrls.length > 0 ? [...new Set(mediaUrls)].slice(0, 5) : undefined,
+      internalStrippedForCustomer: isCustomerChannel,
     };
   } catch (err) {
     await recordCircuitFailure(OPENAI_CIRCUIT_KEY);

@@ -3,6 +3,7 @@ import { getSessionFromCookies } from "@/lib/auth-session";
 import { getOrgIdFromClinicId, getCustomers } from "@/lib/clinic-data";
 import { getEffectiveUser, requireBranchAccess } from "@/lib/rbac";
 import { checkDistributedRateLimit } from "@/lib/distributed-rate-limit";
+import { runWithObservability } from "@/lib/observability/run-with-observability";
 
 export const dynamic = "force-dynamic";
 
@@ -10,6 +11,7 @@ export const dynamic = "force-dynamic";
 const CUSTOMERS_LIMIT = { windowSeconds: 60, max: 60 };
 
 export async function GET(request: NextRequest) {
+  return runWithObservability("/api/clinic/customers", request, async () => {
   const session = await getSessionFromCookies();
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -52,7 +54,7 @@ export async function GET(request: NextRequest) {
       startAfterId: startAfter,
       source: validSource,
     });
-    return NextResponse.json({ items, lastId });
+    return { response: NextResponse.json({ items, lastId }), orgId, branchId };
   } catch (err) {
     console.error("GET /api/clinic/customers:", err);
     return NextResponse.json(
@@ -60,4 +62,5 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
+  });
 }

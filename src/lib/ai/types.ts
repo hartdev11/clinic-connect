@@ -3,12 +3,14 @@
  * Production-ready type definitions
  */
 
-/** Promotion detail for Role Manager — name, summary, endAt, media URLs, urgency */
+/** Promotion detail for Role Manager — name, summary, endAt, media URLs, price, urgency */
 export interface PromotionDetailForAI {
   name: string;
   aiSummary?: string;
   endAt?: string;
   media: string[];
+  /** ราคา (บาท) — สำหรับให้ AI กล่าวในแชท */
+  price?: string;
   urgency?: boolean;
 }
 
@@ -19,6 +21,8 @@ export interface AnalyticsAgentOutput {
   riskFlags: string[];
   /** Promotion agent: active promotions with media for Role Manager */
   promotionDetails?: PromotionDetailForAI[];
+  /** Finance agent only: 🚨 INTERNAL_FINANCE_ONLY — output guard for customer channel */
+  dataClassification?: "INTERNAL_FINANCE_ONLY";
 }
 
 /** Context สำหรับ query — ต้อง validate ก่อนใช้ */

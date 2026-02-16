@@ -6,12 +6,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSessionFromCookies } from "@/lib/auth-session";
 import { getOrgIdFromClinicId, getBookingsByDateRange } from "@/lib/clinic-data";
 import { getEffectiveUser, requireBranchAccess } from "@/lib/rbac";
+import { runWithObservability } from "@/lib/observability/run-with-observability";
 
 const VALID_CHANNELS = ["line", "facebook", "instagram", "tiktok", "web", "walk_in", "phone", "referral", "other"] as const;
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
+  return runWithObservability("/api/clinic/bookings/reports", request, async () => {
   const session = await getSessionFromCookies();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
@@ -61,7 +63,8 @@ export async function GET(request: NextRequest) {
       byDate[d] = (byDate[d] ?? 0) + 1;
     }
 
-    return NextResponse.json({
+    return {
+      response: NextResponse.json({
       from: from.toISOString(),
       to: to.toISOString(),
       totalCount,
@@ -84,7 +87,10 @@ export async function GET(request: NextRequest) {
         status: b.status,
         branchName: b.branchName,
       })),
-    });
+    }),
+      orgId,
+      branchId: branchId ?? null,
+    };
   } catch (err) {
     console.error("GET /api/clinic/bookings/reports:", err);
     return NextResponse.json(
@@ -92,4 +98,5 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
+  });
 }

@@ -22,6 +22,18 @@ export function getTodayKeyBangkok(): string {
 }
 
 /**
+ * คืนค่า YYYY-MM-DD ของวันนี้ลบ n วัน ในกรุงเทพ (สำหรับ 7-day trend)
+ */
+export function getDateKeyBangkokDaysAgo(daysAgo: number): string {
+  const d = toBangkokDate();
+  d.setDate(d.getDate() - daysAgo);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+/**
  * คืนค่า start of day (00:00:00) และ end of day (23:59:59) ใน Bangkok
  */
 export function getBangkokDayRange(date?: Date): { start: Date; end: Date } {
