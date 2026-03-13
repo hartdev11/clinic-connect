@@ -41,7 +41,10 @@ export function isRefinementMessage(message: string): boolean {
     "หวาน",
     "คม",
     "ปลาย",
-    "สาย"
+    "สาย",
+    "กลัว",
+    "กังวล",
+    "เจ็บ"
   ];
 
   // ❌ ห้ามมีคำถาม / ห้ามมี intent อื่นปน

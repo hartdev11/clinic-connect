@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAnalyticsContext } from "../shared";
 import { getAnalyticsOverview } from "@/lib/analytics-data";
+import { getDashboardRevenueKpis } from "@/lib/analytics-phase21";
 import { analyticsCacheKey, getAnalyticsCached, setAnalyticsCached } from "@/lib/analytics-cache";
 import { runWithObservability } from "@/lib/observability/run-with-observability";
 
@@ -33,13 +34,17 @@ export async function GET(request: NextRequest) {
           branchId: context.branchId,
         };
       }
-      const data = await getAnalyticsOverview(context.orgId, {
-        branchId: context.branchId,
-        from: context.range.from,
-        to: context.range.to,
-      });
-      const payload = { ...data, from: fromIso, to: toIso, preset: context.range.preset };
-      await setAnalyticsCached(cacheKey, data);
+      const [data, revenueKpis] = await Promise.all([
+        getAnalyticsOverview(context.orgId, {
+          branchId: context.branchId,
+          from: context.range.from,
+          to: context.range.to,
+        }),
+        getDashboardRevenueKpis(context.orgId, context.branchId),
+      ]);
+      const merged = { ...data, ...revenueKpis };
+      const payload = { ...merged, from: fromIso, to: toIso, preset: context.range.preset };
+      await setAnalyticsCached(cacheKey, merged);
       return {
         response: NextResponse.json(payload),
         orgId: context.orgId,

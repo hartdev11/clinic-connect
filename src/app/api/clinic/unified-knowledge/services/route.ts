@@ -11,6 +11,7 @@ import { listClinicServices, createClinicService } from "@/lib/unified-knowledge
 import { logUnifiedKnowledgeAudit } from "@/lib/unified-knowledge/audit";
 import { enqueueUnifiedServiceEmbed } from "@/lib/knowledge-brain/embedding-queue";
 import type { ClinicServiceCreate } from "@/types/unified-knowledge";
+import type { OrgPlan } from "@/types/organization";
 
 const MAX_TITLE = 200;
 const MAX_HIGHLIGHT = 500;
@@ -89,7 +90,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "clinic_id must match your organization" }, { status: 403 });
     }
     const orgProfile = await getOrgProfile(auth.orgId);
-    if (isPlatformManagedMode(orgProfile?.plan) && !data.global_service_id) {
+    if (isPlatformManagedMode(orgProfile?.plan as OrgPlan | undefined) && !data.global_service_id) {
       return NextResponse.json(
         { error: "โหมดจัดการโดยแพลตฟอร์ม: ต้องเลือกเทมเพลตจากแพลตฟอร์ม" },
         { status: 403 }

@@ -64,6 +64,19 @@ export async function POST(request: NextRequest) {
     if (!orgSnap.empty) {
       const orgDoc = orgSnap.docs[0];
       const orgId = orgDoc.id;
+      const orgStatus = (orgDoc.data()?.status as string) ?? "active";
+      if (orgStatus === "suspended") {
+        writeAuditLog({
+          event: "failed_auth",
+          org_id: orgId,
+          email: normalizedEmail,
+          details: { reason: "org_suspended" },
+        }).catch(() => {});
+        return NextResponse.json(
+          { error: "บัญชีองค์กรถูกระงับชั่วคราว กรุณาติดต่อฝ่ายสนับสนุน" },
+          { status: 403 }
+        );
+      }
 
       const userSnap = await db
         .collection(COLLECTIONS.users)
@@ -89,6 +102,7 @@ export async function POST(request: NextRequest) {
             org_id: orgId,
             branch_id: branchId ?? null,
             user_id: userId,
+            role: (userData.role as "owner" | "manager" | "staff") ?? "owner",
           });
 
           writeAuditLog({
@@ -160,6 +174,22 @@ export async function POST(request: NextRequest) {
     }
 
     const orgId = await getOrgIdFromClinicId(clinicId);
+    if (orgId) {
+      const orgDoc = await db.collection(COLLECTIONS.organizations).doc(orgId).get();
+      const orgStatus = (orgDoc.data()?.status as string) ?? "active";
+      if (orgStatus === "suspended") {
+        writeAuditLog({
+          event: "failed_auth",
+          org_id: orgId,
+          email: normalizedEmail,
+          details: { reason: "org_suspended", source: "legacy_clinic" },
+        }).catch(() => {});
+        return NextResponse.json(
+          { error: "บัญชีองค์กรถูกระงับชั่วคราว กรุณาติดต่อฝ่ายสนับสนุน" },
+          { status: 403 }
+        );
+      }
+    }
     const branchId = orgId ? await getDefaultBranchId(orgId) : null;
 
     const token = await createToken({
@@ -168,6 +198,7 @@ export async function POST(request: NextRequest) {
       org_id: orgId ?? null,
       branch_id: branchId ?? null,
       user_id: null,
+      role: "owner",
     });
 
     writeAuditLog({

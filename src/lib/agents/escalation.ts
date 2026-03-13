@@ -1,19 +1,29 @@
 /**
  * Agent E — Escalation & Human Handoff
- * หน้าที่: ตัดสินใจส่งต่อคนจริง (admin / doctor / support)
- * Rule-based (ไม่ใช้ AI)
+ * Phase 7: รองรับ trigger types (angry_customer, explicit_request, loop_detected, medical)
  */
 import type { EscalationResult } from "./types";
 import type { IntentType } from "./types";
 
 /**
  * Rule-based Escalation Check
- * ส่งต่อเฉพาะกรณี complaint หรือ medical_question (ถ้ายังไม่ถูก B จัดการ)
+ * Phase 7: คืนค่า triggerType สำหรับ handoff_session
  */
-export function checkEscalation(intent: IntentType): EscalationResult {
+export function checkEscalation(intent: IntentType, userMessage?: string): EscalationResult {
+  const msg = (userMessage ?? "").toLowerCase();
   if (intent === "complaint") {
-    return { handoff: true, target: "admin" };
+    return { handoff: true, target: "admin", triggerType: "angry_customer" };
   }
-  // medical_question ถูกจัดการโดย Agent B แล้ว
+  if (intent === "medical_question") {
+    return { handoff: true, target: "doctor", triggerType: "medical" };
+  }
+  if (/คุยกับคน|คุยคนจริง|ส่งต่อ|แอดมิน|พนักงาน|พูดกับคน|ขอคน/i.test(msg)) {
+    return { handoff: true, target: "admin", triggerType: "explicit_request" };
+  }
   return { handoff: false };
+}
+
+/** Phase 7: ตรวจสอบ loop detected (ส่งให้ pipeline เรียกเพิ่ม) */
+export function checkLoopDetected(_recentMessages: string[]): boolean {
+  return false;
 }

@@ -38,7 +38,7 @@ export async function GET(
     return NextResponse.json({ error: "Could not load image" }, { status: 502 });
   }
 
-  return new NextResponse(result.buffer, {
+  return new NextResponse(new Uint8Array(result.buffer), {
     headers: {
       "Content-Type": result.contentType,
       "Cache-Control": "private, max-age=300",

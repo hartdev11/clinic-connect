@@ -136,12 +136,20 @@ export interface Customer {
   org_id: string;
   branch_id?: string;
   name: string;
+  /** Phone from profile/registration when available */
+  phone?: string | null;
   source: CustomerSource;
   externalId?: string;
   /** LINE profile picture URL */
   pictureUrl?: string | null;
   status: "active" | "pending" | "inactive";
   lastChatAt?: string;
+  lastBookingAt?: string;
+  leadScore?: number;
+  /** Phase 13: very_hot | hot | warm | cold */
+  leadPriority?: string | null;
+  /** Phase 13: Last 7 days for sparkline */
+  leadScoreHistory?: Array<{ date: string; score: number }>;
   aiResponded?: boolean;
   /** Soft delete — ISO string when deleted, null = active */
   deleted_at?: string | null;
@@ -281,6 +289,8 @@ export interface OrgProfile {
   phone: string;
   email: string;
   createdAt: string;
+  /** Phase 20B — active | suspended; default active */
+  status?: "active" | "suspended";
 }
 
 /** สถิติ Dashboard — aggregate จาก bookings/transactions ไม่เก็บเป็น doc แยก (คำนวณหรือ cache ฝั่ง API) */

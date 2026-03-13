@@ -32,12 +32,13 @@ export async function getEffectiveUser(session: SessionPayload): Promise<Effecti
   };
 }
 
-/** ตรวจว่า user มี role ที่อนุญาต (org-level) */
+/** ตรวจว่า user มี role ที่อนุญาต (org-level) — super_admin bypass ทุกอย่าง */
 export function requireRole(
   userRole: UserRole | null | undefined,
   allowed: AllowedRole[]
 ): boolean {
   if (!userRole) return false;
+  if (userRole === "super_admin") return true;
   return allowed.includes(userRole);
 }
 
@@ -53,6 +54,7 @@ export function getEffectiveRoleAtBranch(
   branchId: string | null
 ): UserRole | null {
   if (!branchId) return user.role;
+  if (user.role === "super_admin") return "super_admin";
   if (user.role === "owner") return "owner";
   if (user.branch_roles?.[branchId]) return user.branch_roles[branchId];
   if (user.branch_ids && user.branch_ids.length > 0) {
@@ -76,6 +78,7 @@ export function requireBranchAccess(
   requestedBranchId: string | null
 ): boolean {
   if (!requestedBranchId) return true;
+  if (userRole === "super_admin") return true;
   if (userRole === "owner") return true;
   if (userBranchRoles?.[requestedBranchId]) return true;
   const hasBranchRoles = userBranchRoles && Object.keys(userBranchRoles).length > 0;

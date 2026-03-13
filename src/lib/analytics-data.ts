@@ -283,6 +283,8 @@ export async function getAnalyticsOperational(
 ): Promise<{
   chatPeakHeatmap: PeakHeatmapCell[];
   bookingPeakByHour: Array<{ hour: number; count: number }>;
+  bookingHeatmap?: PeakHeatmapCell[];
+  escalationHeatmap?: PeakHeatmapCell[];
   totalChats: number;
   totalBookings: number;
 }> {
@@ -352,7 +354,7 @@ export async function getAnalyticsOperational(
 async function getBookingsSnapInRange(
   orgId: string,
   opts: { branchId?: string | null; from: Date; to: Date }
-): Promise<{ docs: { data: () => Record<string, unknown> }[] }> {
+): Promise<{ docs: { data: () => Record<string, unknown> }[]; size: number }> {
   const Firestore = await import("firebase-admin/firestore");
   let q = db
     .collection(COLLECTIONS.bookings)
@@ -363,7 +365,7 @@ async function getBookingsSnapInRange(
     q = q.where("branch_id", "==", opts.branchId) as typeof q;
   }
   const snap = await q.limit(3000).get();
-  return { docs: snap.docs };
+  return { docs: snap.docs, size: snap.size };
 }
 
 // ─── Knowledge ────────────────────────────────────────────────────────────

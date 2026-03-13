@@ -35,6 +35,10 @@ export interface UserInfo {
   branch_ids: string[] | null;
   branch_roles: Record<string, string> | null;
   permissions: { role: UserRole };
+  /** ชื่อแสดง (จาก name ใน Firestore หรือ derive จาก email) */
+  displayName?: string | null;
+  /** อีเมลผู้ใช้ */
+  email?: string | null;
 }
 
 export interface SubscriptionPlanInfo {
@@ -55,11 +59,20 @@ export interface ClinicContextValue {
   isLoading: boolean;
   error: Error | null;
   mutate: () => void;
+  /** Redirect to /onboarding when true */
+  needsOnboarding: boolean;
 }
 
 const fetcher = (url: string) =>
-  fetch(url, { credentials: "include" }).then((r) => {
-    if (!r.ok) throw new Error("Unauthorized");
+  fetch(url, { credentials: "include" }).then(async (r) => {
+    if (!r.ok) {
+      const body = await r.json().catch(() => ({}));
+      if (r.status === 403 && body?.suspended === true) {
+        window.location.href = "/suspended";
+        throw new Error("Organization suspended");
+      }
+      throw new Error("Unauthorized");
+    }
     return r.json();
   });
 
@@ -105,6 +118,7 @@ export function ClinicContextProvider({ children }: { children: ReactNode }) {
       isLoading,
       error: error ?? null,
       mutate,
+      needsOnboarding: data?.needsOnboarding ?? false,
     }),
     [data, effectiveBranchId, currentBranch, selectedBranchId, isLoading, error, mutate, setSelectedBranchId]
   );

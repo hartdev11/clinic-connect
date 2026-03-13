@@ -7,6 +7,7 @@
 import { getOpenAI } from "@/lib/agents/clients";
 import { log } from "@/lib/logger";
 import { getPromptContent, DEFAULT_ROLE_MANAGER_PROMPT } from "./prompt-registry";
+import { formatClinicKnowledgeForPrompt } from "./clinic-knowledge-base";
 import {
   freezeAndValidateContext,
   buildDeterministicContext,
@@ -95,15 +96,20 @@ function buildPublicContext(ctx: AggregatedAnalyticsContext): {
     ? { _structured: constrained.content }
     : ctx.knowledge;
 
+  const out: Record<string, unknown> = {
+    booking: ctx.booking,
+    promotion: ctx.promotion,
+    customer: ctx.customer,
+    knowledge: knowledgeForContext,
+    feedback: ctx.feedback,
+    _meta: { analyticsMs: ctx.totalAnalyticsMs },
+  };
+  if (ctx.sales && ctx.sales.keyFindings?.length > 0) out.sales = ctx.sales;
+  if (ctx.followup && ctx.followup.keyFindings?.length > 0) out.followup = ctx.followup;
+  if (ctx.objection && ctx.objection.keyFindings?.length > 0) out.objection = ctx.objection;
+  if (ctx.referral && ctx.referral.keyFindings?.length > 0) out.referral = ctx.referral;
   return {
-    out: {
-      booking: ctx.booking,
-      promotion: ctx.promotion,
-      customer: ctx.customer,
-      knowledge: knowledgeForContext,
-      feedback: ctx.feedback,
-      _meta: { analyticsMs: ctx.totalAnalyticsMs },
-    },
+    out,
     knowledgeSummary: constrained?.summary ?? null,
   };
 }
@@ -142,6 +148,17 @@ export interface RoleManagerInput {
   knowledgeCategory?: string | null;
   /** Customer channel → ไม่ส่ง internal (finance) ให้ LLM = zero-leak guarantee */
   channel?: "line" | "web" | null;
+  /** Phase 6: Customer persona for tone adaptation */
+  personaType?: string | null;
+  personaToneInstructions?: string | null;
+  /** Phase 6: Manager routing hint */
+  managerRoute?: "sales" | "booking" | "question" | "objection" | "referral" | "followup" | "default" | null;
+  /** Phase 13: Dynamic sales mode — injected into system prompt based on lead score */
+  salesInstructions?: string | null;
+  /** เมื่อมีค่า ใช้แทน system prompt ที่ build จาก registry + clinic knowledge */
+  systemPromptOverride?: string | null;
+  /** ประวัติแชทล่าสุด — ให้ AI จำบริบทก่อนหน้า (เช่น ลูกค้าบอกสนใจจมูกแล้ว) */
+  chatHistory?: Array<{ role: string; content: string }>;
 }
 
 export interface RoleManagerOutput {
@@ -156,6 +173,8 @@ export interface RoleManagerOutput {
   media?: string[];
   /** true เมื่อเป็น customer channel และเรา strip internal (finance) ออกจาก prompt แล้ว = LLM ไม่เห็น finance */
   internalStrippedForCustomer?: boolean;
+  /** Phase 12: Prompt cache hit — used for cost tracking */
+  cacheHit?: boolean;
 }
 
 export async function runRoleManager(
@@ -200,13 +219,37 @@ export async function runRoleManager(
     };
   }
 
-  const { content: basePrompt, version: promptVersion, variant: promptVariant } = await getPromptContent("role-manager", {
-    org_id: input.org_id,
-    useDefault: SYSTEM_PROMPT_FALLBACK,
-  });
+  let systemPrompt: string;
+  let promptVersion = "0.0.0-default";
+  let promptVariant: string | undefined;
 
-  // Phase 3 #2: Append response contract to prevent hallucination
-  const systemPrompt = `${basePrompt}\n\n[CRITICAL] ${RESPONSE_CONTRACT}`;
+  if (input.systemPromptOverride?.trim()) {
+    systemPrompt = input.systemPromptOverride.trim();
+    promptVersion = "enriched";
+    promptVariant = "buildEnrichedSystemPrompt";
+  } else {
+    const promptResult = await getPromptContent("role-manager", {
+      org_id: input.org_id,
+      useDefault: SYSTEM_PROMPT_FALLBACK,
+    });
+    promptVersion = promptResult.version;
+    promptVariant = promptResult.variant;
+    // Phase 3 #2: Append response contract to prevent hallucination
+    // P1-P4: Inject clinic knowledge base เข้า system prompt
+    const clinicKnowledge = formatClinicKnowledgeForPrompt({ maxChars: 20000 });
+    systemPrompt = `${promptResult.content}\n\n## P1-P4 Clinic Knowledge Base (ใช้เป็น reference เมื่อลูกค้าถามเรื่องผลิตภัณฑ์/บริการ)\n${clinicKnowledge}\n\n[CRITICAL] ${RESPONSE_CONTRACT}`;
+
+    // Phase 6: Customer persona — inject tone adaptation
+    if (input.personaType && input.personaToneInstructions) {
+      systemPrompt += `\n\n[Persona] You are talking to a ${input.personaType} customer. Adapt your tone accordingly: ${input.personaToneInstructions}`;
+    }
+    if (input.managerRoute && input.managerRoute !== "default") {
+      systemPrompt += `\n\n[Routing] Primary agent for this turn: ${input.managerRoute}. Prioritize context from that agent when composing the reply.`;
+    }
+    if (input.salesInstructions) {
+      systemPrompt += `\n\n[Sales Mode] ${input.salesInstructions}`;
+    }
+  }
 
   const { out: publicCtx, knowledgeSummary } = buildPublicContext(input.analyticsContext);
   const isCustomerChannel = input.channel === "line" || input.channel === "web";
@@ -252,14 +295,32 @@ export async function runRoleManager(
     /โปร|promotion|มีโปร|สนใจโปร|โปรโมชั่น|โปรอะไร|โปรจมูก|โปรฟิลเลอร์|โปรเลเซอร์/i.test(sanitizedMessage)
       ? "\n[สำคัญ] ลูกค้าถามเรื่องโปร — ตอบเฉพาะจาก promotion/promotionDetails ใน Context เท่านั้น: ระบุชื่อโปรและสรุปสั้น ๆ (ราคาถ้ามี). ห้ามวกไปเรื่องอื่น. รูปโปรจะส่งแยกให้ลูกค้า.\n\n"
       : "";
-  const userContent = `ข้อความลูกค้า: "${sanitizedMessage}"${promotionInstruction}
 
-Context จาก Analytics:
-${truncated}${restrictedNote}
+  // Phase 12: Prompt cache — cache system+rag+history, append new message after
+  const historyPart = [
+    input.customerMemorySummary ? `Customer memory: ${input.customerMemorySummary}` : "",
+    (input.analyticsContext._crossAgentInsights ?? []).map((i) => `${i.type}: ${i.recommendation}`).join("\n"),
+    input.chatHistory?.length ? `Recent conversation (${input.chatHistory.length} turns)` : "",
+  ].filter(Boolean).join("\n");
+  const { getOrCreate: getPromptCache } = await import("./prompt-cache-manager");
+  const cacheContext = {
+    systemPrompt,
+    ragContext: `Context จาก Analytics:\n${truncated}${restrictedNote}\n\n[ห้าม] อย่าเอ่ยหรืออ้างอิงข้อมูลจาก internal (รวม finance/รายได้/ยอดขาย) กับลูกค้า — internal ใช้เพื่อเข้าใจแนวโน้มเท่านั้น\n\nตอบลูกค้าแบบมนุษย์จริง — คิดเอง แก้ปัญหาเอง ได้ใจความ ไม่อัตโนมัติ (สั้น 2–4 ประโยค ไม่มีคำนำ):`,
+    history: historyPart,
+  };
+  const cacheResult = await getPromptCache(input.org_id ?? "", cacheContext);
+  const systemContent = cacheResult.cachedPrefix;
+  const userContent = `ข้อความลูกค้า: "${sanitizedMessage}"${promotionInstruction}`;
 
-[ห้าม] อย่าเอ่ยหรืออ้างอิงข้อมูลจาก internal (รวม finance/รายได้/ยอดขาย) กับลูกค้า — internal ใช้เพื่อเข้าใจแนวโน้มเท่านั้น
-
-ตอบลูกค้าแบบมนุษย์จริง — คิดเอง แก้ปัญหาเอง ได้ใจความ ไม่อัตโนมัติ (สั้น 2–4 ประโยค ไม่มีคำนำ):`;
+  // สร้าง messages — ถ้ามี chatHistory ให้ใส่มาก่อนข้อความปัจจุบัน เพื่อให้ AI จำบริบท
+  const priorMessages = (input.chatHistory ?? [])
+    .filter((m) => m.role === "user" || m.role === "assistant")
+    .map((m) => ({ role: m.role as "user" | "assistant", content: sanitizeForLLM(m.content).slice(0, 500) }));
+  const messages: Array<{ role: "system" | "user" | "assistant"; content: string }> = [
+    { role: "system", content: systemContent },
+    ...priorMessages,
+    { role: "user", content: userContent },
+  ];
 
   try {
     const controller = new AbortController();
@@ -272,10 +333,7 @@ ${truncated}${restrictedNote}
     const completion = await openai.chat.completions.create(
       {
         model: modelConfig.model_name,
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userContent },
-        ],
+        messages,
         max_tokens: modelConfig.max_tokens,
         temperature: modelConfig.temperature,
       },
@@ -343,6 +401,7 @@ ${truncated}${restrictedNote}
       prompt_variant: promptVariant,
       media: mediaUrls.length > 0 ? [...new Set(mediaUrls)].slice(0, 5) : undefined,
       internalStrippedForCustomer: isCustomerChannel,
+      cacheHit: cacheResult.cacheHit,
     };
   } catch (err) {
     await recordCircuitFailure(OPENAI_CIRCUIT_KEY);

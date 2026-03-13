@@ -224,6 +224,16 @@ async function handleCreateFlow(
     };
 
     const result = await createBookingAtomic(orgId, data, { durationMinutes: 30 });
+    if (!("error" in result) && result.id) {
+      const { dispatchPartnerWebhooks } = await import("@/lib/partner-webhook-dispatch");
+      dispatchPartnerWebhooks(orgId, "booking.created", {
+        bookingId: result.id,
+        customerName: data.customerName,
+        service: data.service,
+        scheduledAt: data.scheduledAt,
+        branchName: data.branchName,
+      }).catch((e) => console.warn("[BookingIntent] partner webhook:", (e as Error)?.message?.slice(0, 50)));
+    }
     if ("error" in result) {
       const altCheck = effectiveBranchId
         ? await isSlotAvailable(orgId, effectiveBranchId, scheduledAt, { durationMinutes: 30 })

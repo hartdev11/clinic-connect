@@ -3,7 +3,10 @@
 import { useRef, useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import useSWR from "swr";
+import { collection, query, orderBy, limit, onSnapshot } from "firebase/firestore";
 import { useClinicContext } from "@/contexts/ClinicContext";
+import { useFirebaseRealtime } from "@/hooks/useFirebaseRealtime";
+import { getFirebaseFirestore, isFirebaseConfigReady } from "@/lib/firebase-client";
 import { apiFetcher } from "@/lib/api-fetcher";
 
 const STORAGE_KEY_PREFIX = "clinic_notif_last_seen";
@@ -45,6 +48,7 @@ type Notification = {
   actionUrl?: string;
   count?: number;
   timestamp: string;
+  read?: boolean;
 };
 
 type NotificationsResponse = {
@@ -93,7 +97,7 @@ function RefreshIcon({ className, spinning }: { className?: string; spinning?: b
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className={`${className ?? ""} ${spinning ? "animate-spin" : ""}`}
+      className={`${className ?? ""} ${spinning ? "animate-pulse" : ""}`}
     >
       <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
       <path d="M3 3v5h5" />
@@ -202,6 +206,53 @@ function NotificationSkeleton() {
   );
 }
 
+function TypeIcon({ type, severity }: { type: string; severity: NotificationSeverity }) {
+  switch (type) {
+    case "hot_lead":
+      return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 23a7 7 0 0 0 7-7c0-2.38-1.19-4.47-3-5.74V10c0 1.1-.9 2-2 2H6c-1.1 0-2-.9-2-2V2c0-.55.45-1 1-1s1 .45 1 1v2h4V2c0-.55.45-1 1-1s1 .45 1 1v2h4V2c0-.55.45-1 1-1s1 .45 1 1v.26C21.81 4.53 23 6.62 23 9c0 3.87-3.13 7-7 7z" />
+        </svg>
+      );
+    case "handoff_pending":
+    case "handoff_assigned":
+      return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+        </svg>
+      );
+    case "pending_booking":
+    case "booking.created":
+      return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+          <line x1="16" y1="2" x2="16" y2="6" />
+          <line x1="8" y1="2" x2="8" y2="6" />
+          <line x1="3" y1="10" x2="21" y2="10" />
+        </svg>
+      );
+    case "quota_warning":
+    case "quota_exceeded":
+      return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+          <circle cx="12" cy="12" r="4" />
+        </svg>
+      );
+    case "payment_success":
+    case "payment_failed":
+    case "billing_reminder":
+      return (
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+          <line x1="1" y1="10" x2="23" y2="10" />
+        </svg>
+      );
+    default:
+      return <SeverityIcon severity={severity} />;
+  }
+}
+
 function SeverityIcon({ severity }: { severity: NotificationSeverity }) {
   switch (severity) {
     case "urgent":
@@ -224,10 +275,10 @@ function NotificationItem({
 }) {
   const content = (
     <div
-      className={`flex gap-3 p-3 rounded-xl border ${config.bg} ${config.border} transition-colors hover:opacity-90`}
+      className={`flex gap-3 p-3 rounded-xl border ${config.bg} ${config.border} transition-colors hover:opacity-90 ${n.read ? "opacity-75" : ""}`}
     >
-      <span className={`flex-shrink-0 mt-0.5 ${config.icon}`}>
-        <SeverityIcon severity={n.severity} />
+      <span className={`flex-shrink-0 mt-0.5 ${config.icon} flex items-center`}>
+        <TypeIcon type={n.type} severity={n.severity} />
       </span>
       <div className="flex-1 min-w-0">
         <p className={`text-sm font-semibold ${config.text}`}>{n.title}</p>
@@ -255,10 +306,15 @@ function NotificationItem({
   return <div>{content}</div>;
 }
 
+type FilterMode = "all" | "unread";
+
 export function NotificationBell() {
   const { org_id, branch_id } = useClinicContext();
+  const firebase = useFirebaseRealtime();
   const [open, setOpen] = useState(false);
   const [lastSeen, setLastSeen] = useState<string | null>(null);
+  const [filter, setFilter] = useState<FilterMode>("all");
+  const [markingRead, setMarkingRead] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const btnRef = useRef<HTMLButtonElement>(null);
 
@@ -270,19 +326,47 @@ export function NotificationBell() {
     dedupingInterval: 30_000,
   });
 
+  // Real-time: onSnapshot triggers refetch when Firestore notifications change
+  useEffect(() => {
+    if (
+      !isFirebaseConfigReady() ||
+      !firebase.ready ||
+      !firebase.orgId ||
+      !firebase.signedIn
+    )
+      return;
+    const db = getFirebaseFirestore();
+    const colRef = collection(db, "organizations", firebase.orgId, "notifications");
+    const q = query(colRef, orderBy("createdAt", "desc"), limit(50));
+    const unsub = onSnapshot(q, () => mutate());
+    return () => unsub();
+  }, [firebase.ready, firebase.orgId, firebase.signedIn, mutate]);
+
   const lastSeenStored = lastSeen ?? getLastSeenFetchedAt(org_id, branch_id);
   const total = data?.totalCount ?? 0;
   const fetchedAt = data?.fetchedAt ?? null;
   const { urgent = [], warning = [], info = [] } = data?.grouped ?? {};
+  const allNotifications = [...urgent, ...warning, ...info];
   const unreadCount =
     fetchedAt && lastSeenStored && fetchedAt <= lastSeenStored ? 0 : total;
+  const filtered =
+    filter === "unread"
+      ? allNotifications.filter((n) => n.read !== true)
+      : allNotifications;
 
-  const handleMarkAllRead = useCallback(() => {
-    if (data?.fetchedAt) {
-      setLastSeenFetchedAt(org_id, branch_id, data.fetchedAt);
-      setLastSeen(data.fetchedAt);
+  const handleMarkAllRead = useCallback(async () => {
+    setMarkingRead(true);
+    try {
+      await fetch("/api/clinic/notifications", { method: "PATCH", credentials: "include" });
+      if (data?.fetchedAt) {
+        setLastSeenFetchedAt(org_id, branch_id, data.fetchedAt);
+        setLastSeen(data.fetchedAt);
+      }
+      await mutate();
+    } finally {
+      setMarkingRead(false);
     }
-  }, [data?.fetchedAt, org_id, branch_id]);
+  }, [data?.fetchedAt, org_id, branch_id, mutate]);
 
   useEffect(() => {
     if (!open) return;
@@ -358,81 +442,107 @@ export function NotificationBell() {
                   <button
                     type="button"
                     onClick={handleMarkAllRead}
-                    className="text-xs font-medium text-primary-600 hover:text-primary-700 hover:underline px-2 py-1"
+                    disabled={markingRead}
+                    className="text-xs font-medium text-primary-600 hover:text-primary-700 hover:underline px-2 py-1 disabled:opacity-50"
                   >
-                    อ่านทั้งหมดแล้ว
+                    {markingRead ? "กำลังอัปเดต…" : "อ่านทั้งหมดแล้ว"}
                   </button>
                 )}
               </div>
             </div>
+            {total > 0 && (
+              <div className="flex gap-1 mt-2">
+                <button
+                  type="button"
+                  onClick={() => setFilter("all")}
+                  className={`text-xs px-2 py-1 rounded-lg ${filter === "all" ? "bg-primary-100 text-primary-700" : "text-surface-500 hover:bg-surface-100"}`}
+                >
+                  ทั้งหมด
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFilter("unread")}
+                  className={`text-xs px-2 py-1 rounded-lg ${filter === "unread" ? "bg-primary-100 text-primary-700" : "text-surface-500 hover:bg-surface-100"}`}
+                >
+                  ยังไม่ได้อ่าน
+                </button>
+              </div>
+            )}
           </div>
 
           <div className="max-h-[min(70vh,420px)] overflow-y-auto">
             {!data && !error && <NotificationSkeleton />}
-            {data && total === 0 && !error && (
-              <div className="p-6 text-center text-surface-500 text-sm">
-                ทุกอย่างเรียบร้อย
-              </div>
-            )}
             {error && (
               <div className="p-4 text-center text-red-600 text-sm">
                 โหลดไม่สำเร็จ โปรดลองใหม่
               </div>
             )}
 
-            {urgent.length > 0 && (
-              <section className="p-3">
-                <h4 className="text-[11px] font-semibold uppercase tracking-wider text-red-600 mb-2 px-1">
-                  เร่งด่วน
-                </h4>
-                <div className="space-y-2">
-                  {urgent.map((n) => (
-                    <NotificationItem
-                      key={n.id}
-                      n={n}
-                      config={severityConfig.urgent}
-                      onClose={() => setOpen(false)}
-                    />
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {warning.length > 0 && (
-              <section className="p-3">
-                <h4 className="text-[11px] font-semibold uppercase tracking-wider text-amber-600 mb-2 px-1">
-                  ควรตรวจสอบ
-                </h4>
-                <div className="space-y-2">
-                  {warning.map((n) => (
-                    <NotificationItem
-                      key={n.id}
-                      n={n}
-                      config={severityConfig.warning}
-                      onClose={() => setOpen(false)}
-                    />
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {info.length > 0 && (
-              <section className="p-3">
-                <h4 className="text-[11px] font-semibold uppercase tracking-wider text-sky-600 mb-2 px-1">
-                  ข้อมูล
-                </h4>
-                <div className="space-y-2">
-                  {info.map((n) => (
-                    <NotificationItem
-                      key={n.id}
-                      n={n}
-                      config={severityConfig.info}
-                      onClose={() => setOpen(false)}
-                    />
-                  ))}
-                </div>
-              </section>
-            )}
+            {data && filtered.length === 0 ? (
+              <div className="p-6 text-center text-surface-500 text-sm">
+                {filter === "unread" ? "ไม่มีแจ้งเตือนที่ยังไม่ได้อ่าน" : "ทุกอย่างเรียบร้อย"}
+              </div>
+            ) : data ? (
+              <>
+                {filtered.filter((n) => n.severity === "urgent").length > 0 && (
+                  <section className="p-3">
+                    <h4 className="text-[11px] font-semibold uppercase tracking-wider text-red-600 mb-2 px-1">
+                      เร่งด่วน
+                    </h4>
+                    <div className="space-y-2">
+                      {filtered
+                        .filter((n) => n.severity === "urgent")
+                        .map((n) => (
+                          <NotificationItem
+                            key={n.id}
+                            n={n}
+                            config={severityConfig.urgent}
+                            onClose={() => setOpen(false)}
+                          />
+                        ))}
+                    </div>
+                  </section>
+                )}
+                {filtered.filter((n) => n.severity === "warning").length > 0 && (
+                  <section className="p-3">
+                    <h4 className="text-[11px] font-semibold uppercase tracking-wider text-amber-600 mb-2 px-1">
+                      ควรตรวจสอบ
+                    </h4>
+                    <div className="space-y-2">
+                      {filtered
+                        .filter((n) => n.severity === "warning")
+                        .map((n) => (
+                          <NotificationItem
+                            key={n.id}
+                            n={n}
+                            config={severityConfig.warning}
+                            onClose={() => setOpen(false)}
+                          />
+                        ))}
+                    </div>
+                  </section>
+                )}
+                {filtered.filter((n) => n.severity === "info").length > 0 && (
+                  <section className="p-3">
+                    <h4 className="text-[11px] font-semibold uppercase tracking-wider text-sky-600 mb-2 px-1">
+                      ข้อมูล
+                    </h4>
+                    <div className="space-y-2">
+                      {filtered
+                        .filter((n) => n.severity === "info")
+                        .map((n) => (
+                          <NotificationItem
+                            key={n.id}
+                            n={n}
+                            config={severityConfig.info}
+                            onClose={() => setOpen(false)}
+                          />
+                        ))}
+                    </div>
+                  </section>
+                )}
+              </>
+            ) : null}
           </div>
         </div>
       )}

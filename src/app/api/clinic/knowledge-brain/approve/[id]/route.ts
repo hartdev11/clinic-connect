@@ -19,6 +19,7 @@ import {
   checkPolicyCompliance,
 } from "@/lib/knowledge-brain";
 import { invalidateAICache } from "@/lib/ai/ai-feedback-loop";
+import { invalidateOrgCache } from "@/lib/ai/prompt-cache-manager";
 
 export const dynamic = "force-dynamic";
 
@@ -103,6 +104,7 @@ export async function POST(
       target_type: "clinic_knowledge",
     });
     void invalidateAICache({ org_id: orgId, scope: "knowledge" });
+    void invalidateOrgCache(orgId);
 
     return NextResponse.json({ ok: true, status: "approved" });
   } catch (err) {

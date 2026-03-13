@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { SectionHeader } from "@/components/layout/SectionHeader";
+import { useToast } from "@/components/ui/Toast";
 
 const PLAN_ORDER: Record<string, number> = {
   starter: 0,
@@ -20,6 +21,7 @@ interface SubscriptionData {
     status: string;
     maxBranches: number;
     currentPeriodEnd: string;
+    aiBlocked?: boolean;
   } | null;
   plans: { id: string; name: string; maxBranches: number; hasPrice: boolean }[];
   fairUse?: {
@@ -40,6 +42,7 @@ interface ProrationPreview {
 
 export function BillingSection() {
   const searchParams = useSearchParams();
+  const { addToast } = useToast();
   const [data, setData] = useState<SubscriptionData | null>(null);
   const [loading, setLoading] = useState(true);
   const [checkoutPlan, setCheckoutPlan] = useState<string | null>(null);
@@ -51,6 +54,7 @@ export function BillingSection() {
   const sessionId = searchParams.get("session_id");
   const [verifiedStatus, setVerifiedStatus] = useState<"success" | "pending" | "failed" | null>(null);
   const [verifyLoading, setVerifyLoading] = useState(false);
+  const [unblockLoading, setUnblockLoading] = useState(false);
 
   const fetchData = useCallback(() => {
     return fetch("/api/clinic/subscription")
@@ -150,6 +154,28 @@ export function BillingSection() {
     handleSubscribe(plan);
   }
 
+  async function handleUnblockAi() {
+    setUnblockLoading(true);
+    try {
+      const res = await fetch("/api/clinic/subscription", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ aiBlocked: false }),
+      });
+      const json = await res.json();
+      if (res.ok && json.ok) {
+        addToast({ title: "ปลดบล็อก AI สำเร็จ", variant: "success" });
+        fetchData();
+      } else {
+        addToast({ title: json.error ?? "ไม่สำเร็จ", variant: "error" });
+      }
+    } catch {
+      addToast({ title: "เกิดข้อผิดพลาด", variant: "error" });
+    } finally {
+      setUnblockLoading(false);
+    }
+  }
+
   if (loading) {
     return (
       <section>
@@ -222,6 +248,30 @@ export function BillingSection() {
       {upgradeSuccess && (
         <div className="mb-4 p-4 rounded-xl bg-green-50 border border-green-200 text-green-800 text-sm">
           อัปเกรดสำเร็จ — Stripe จะคิดเงินส่วนต่าง (proration) ทันที
+        </div>
+      )}
+
+      {/* Phase 11 — AI Blocked: ปุ่มปลดบล็อก */}
+      {data?.subscription?.aiBlocked === true && (
+        <div className="mb-4 p-4 rounded-xl bg-[var(--ent-warning-soft)] border border-[var(--ent-warning)] text-[var(--ent-warning)]">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="font-medium">บริการ AI ถูกระงับ (โควต้าเกิน)</p>
+              <p className="text-sm mt-1 opacity-90">
+                โควต้า AI หมดแล้ว — ปลดบล็อกเพื่อเปิดใช้งาน AI ใหม่
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              loading={unblockLoading}
+              disabled={unblockLoading}
+              onClick={handleUnblockAi}
+              className="border-[var(--ent-warning)] text-[var(--ent-warning)] hover:bg-[var(--ent-warning-soft)]"
+            >
+              ปลดบล็อก AI
+            </Button>
+          </div>
         </div>
       )}
 

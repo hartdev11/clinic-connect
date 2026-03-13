@@ -7,6 +7,7 @@ import { safeSumBaht, satangToBaht, toSatang } from "@/lib/money";
 import type {
   Booking,
   BookingCreate,
+  BookingStatus,
   Customer,
   Transaction,
   Promotion,
@@ -94,6 +95,27 @@ function endOfDay(date: Date): Date {
   return d;
 }
 
+/** Asia/Bangkok (UTC+7) day boundaries — สำหรับ Dashboard "วันนี้" ให้ตรงกับเวลาท้องถิ่นไทย */
+function startOfDayBangkok(date: Date): Date {
+  const utc = date.getTime();
+  const bangkokOffset = 7 * 60 * 60 * 1000;
+  const bangkok = new Date(utc + bangkokOffset);
+  const y = bangkok.getUTCFullYear();
+  const m = bangkok.getUTCMonth();
+  const d = bangkok.getUTCDate();
+  return new Date(Date.UTC(y, m, d, 0, 0, 0, 0) - bangkokOffset);
+}
+
+function endOfDayBangkok(date: Date): Date {
+  const utc = date.getTime();
+  const bangkokOffset = 7 * 60 * 60 * 1000;
+  const bangkok = new Date(utc + bangkokOffset);
+  const y = bangkok.getUTCFullYear();
+  const m = bangkok.getUTCMonth();
+  const d = bangkok.getUTCDate();
+  return new Date(Date.UTC(y, m, d, 23, 59, 59, 999) - bangkokOffset);
+}
+
 function startOfMonth(date: Date): Date {
   const d = new Date(date);
   d.setUTCDate(1);
@@ -128,6 +150,7 @@ export async function getUserById(userId: string): Promise<User | null> {
     id: doc.id,
     org_id: d.org_id ?? "",
     email: d.email ?? "",
+    name: (d.name ?? null) as string | null | undefined,
     role: (d.role as UserRole) ?? "staff",
     branch_ids: d.branch_ids ?? null,
     branch_roles: d.branch_roles ?? null,
@@ -172,10 +195,12 @@ export async function getUsersByOrgId(orgId: string): Promise<User[]> {
       id: d.id,
       org_id: data.org_id ?? orgId,
       email: data.email ?? "",
+      name: (data.name ?? null) as string | null | undefined,
       role: (data.role as UserRole) ?? "staff",
       branch_ids: data.branch_ids ?? null,
       branch_roles: data.branch_roles ?? null,
       default_branch_id: data.default_branch_id ?? null,
+      line_user_id: (data.line_user_id ?? null) as string | null | undefined,
       createdAt: data.createdAt ? toISO(data.createdAt) : "",
       updatedAt: data.updatedAt ? toISO(data.updatedAt) : "",
     };
@@ -188,6 +213,7 @@ export async function createUser(data: {
   email: string;
   passwordHash: string;
   role: UserRole;
+  name?: string | null;
   branch_ids?: string[] | null;
   branch_roles?: Record<string, "manager" | "staff"> | null;
   default_branch_id?: string | null;
@@ -204,6 +230,7 @@ export async function createUser(data: {
     email: data.email.trim().toLowerCase(),
     passwordHash: data.passwordHash,
     role: data.role,
+    name: data.name?.trim() || null,
     branch_ids: data.branch_ids ?? null,
     branch_roles: data.branch_roles ?? null,
     default_branch_id: defaultBranch,
@@ -241,6 +268,7 @@ export async function getOrgProfile(orgId: string): Promise<OrgProfile | null> {
     .collection(COLLECTIONS.branches)
     .where("org_id", "==", orgId)
     .get();
+  const status = (o.status as "active" | "suspended") ?? "active";
   return {
     id: orgId,
     org_id: orgId,
@@ -250,6 +278,7 @@ export async function getOrgProfile(orgId: string): Promise<OrgProfile | null> {
     phone: o.phone ?? "",
     email: o.email ?? "",
     createdAt: o.createdAt ? toISO(o.createdAt) : "",
+    status,
   };
 }
 
@@ -363,7 +392,7 @@ export async function getBookingsByDateRange(
     q = q.where("doctor_id", "==", doctorId) as typeof q;
   }
   const snapshot = await q.get();
-  let result = snapshot.docs.map((doc) => {
+  const result = snapshot.docs.map((doc) => {
     const d = doc.data();
     return {
       id: doc.id,
@@ -440,6 +469,51 @@ export async function getLatestReschedulableBooking(
     createdAt: toISO(d.createdAt),
     updatedAt: toISO(d.updatedAt),
   };
+}
+
+/** Phase 7: Last N bookings by chat_user_id (for handoff customer detail) */
+export async function getBookingsByChatUserId(
+  orgId: string,
+  chatUserId: string,
+  limit = 5
+): Promise<Booking[]> {
+  const snapshot = await db
+    .collection(COLLECTIONS.bookings)
+    .where("org_id", "==", orgId)
+    .where("chat_user_id", "==", chatUserId)
+    .orderBy("createdAt", "desc")
+    .limit(limit)
+    .get();
+  return snapshot.docs.map((doc) => {
+    const d = doc.data();
+    return {
+      id: doc.id,
+      org_id: d.org_id ?? orgId,
+      branch_id: d.branch_id,
+      customerName: d.customerName ?? "",
+      customerId: d.customerId,
+      phoneNumber: d.phoneNumber ?? null,
+      service: d.service ?? "",
+      procedure: d.procedure ?? null,
+      amount: typeof d.amount === "number" ? d.amount : null,
+      source: typeof d.source === "string" && ["line", "web", "admin", "ai"].includes(d.source) ? (d.source as Booking["source"]) : null,
+      channel: typeof d.channel === "string" && VALID_CHANNELS.includes(d.channel as (typeof VALID_CHANNELS)[number]) ? (d.channel as Booking["channel"]) : null,
+      doctor: d.doctor ?? null,
+      chatUserId: d.chat_user_id ?? null,
+      bookingCreationMode: d.booking_creation_mode ?? null,
+      requiresCustomerNotification: d.requires_customer_notification ?? undefined,
+      notificationStatus: d.notification_status ?? undefined,
+      notificationAttemptCount: typeof d.notification_attempt_count === "number" ? d.notification_attempt_count : undefined,
+      lastNotificationError: d.last_notification_error ?? undefined,
+      branchId: d.branchId,
+      branchName: d.branchName,
+      scheduledAt: toISO(d.scheduledAt),
+      status: (d.status as Booking["status"]) ?? "pending",
+      notes: d.notes ?? null,
+      createdAt: toISO(d.createdAt),
+      updatedAt: toISO(d.updatedAt),
+    };
+  });
 }
 
 /** Enterprise: คิวการจอง — เรียงตามเวลา มีเลขคิว แยกตามแพทย์ (ถ้ามี) */
@@ -565,7 +639,13 @@ export async function createBooking(orgId: string, data: BookingCreate): Promise
     createdAt: now,
     updatedAt: now,
   });
-  return ref.id;
+  const bookingId = ref.id;
+  if (data.chatUserId) {
+    updateCustomerOnBooking(orgId, data.chatUserId, data.scheduledAt).catch((err) =>
+      console.warn("[createBooking] updateCustomerOnBooking:", (err as Error)?.message)
+    );
+  }
+  return bookingId;
 }
 
 /** World-class: Atomic booking — Firestore transaction ป้องกัน race สุดท้าย */
@@ -647,6 +727,18 @@ export async function createBookingAtomic(
   });
 
   if (result === null) return { error: "SLOT_TAKEN" };
+  if (data.chatUserId) {
+    updateCustomerOnBooking(orgId, data.chatUserId, data.scheduledAt).catch((err) =>
+      console.warn("[createBookingAtomic] updateCustomerOnBooking:", (err as Error)?.message)
+    );
+    const { markConversionTrackingConverted } = await import("@/lib/conversion-tracking");
+    const customerId = data.customerId;
+    const lineUserId = data.chatUserId;
+    markConversionTrackingConverted(orgId, customerId ?? lineUserId, {
+      bookingId: result,
+      bookingValue: typeof data.amount === "number" ? data.amount : 0,
+    }).catch((err) => console.warn("[createBookingAtomic] conversion tracking:", (err as Error)?.message?.slice(0, 50)));
+  }
   return { id: result };
 }
 
@@ -819,17 +911,18 @@ export async function getDashboardStats(orgId: string, branchId?: string): Promi
 }
 
 // ─── Dashboard: bookings grouped by date ──────────────────────────────────
+/** ใช้ Asia/Bangkok (UTC+7) สำหรับวันนี้/พรุ่งนี้/มะรืน ให้ตรงกับผู้ใช้ในไทย */
 export async function getDashboardBookingsByDate(
   orgId: string,
   branchId?: string
 ): Promise<DashboardBookingsByDate[]> {
   const now = new Date();
-  const day0 = startOfDay(now);
-  const day0End = endOfDay(now);
-  const day1 = startOfDay(new Date(now.getTime() + 86400000));
-  const day1End = endOfDay(new Date(now.getTime() + 86400000));
-  const day2 = startOfDay(new Date(now.getTime() + 86400000 * 2));
-  const day2End = endOfDay(new Date(now.getTime() + 86400000 * 2));
+  const day0 = startOfDayBangkok(now);
+  const day0End = endOfDayBangkok(now);
+  const day1 = startOfDayBangkok(new Date(now.getTime() + 86400000));
+  const day1End = endOfDayBangkok(new Date(now.getTime() + 86400000));
+  const day2 = startOfDayBangkok(new Date(now.getTime() + 86400000 * 2));
+  const day2End = endOfDayBangkok(new Date(now.getTime() + 86400000 * 2));
 
   const Firestore = await import("firebase-admin/firestore");
 
@@ -848,10 +941,10 @@ export async function getDashboardBookingsByDate(
       const at = new Date(toISO(d.scheduledAt));
       return {
         id: doc.id,
-        customer: d.customerName ?? "",
-        service: d.service ?? "",
+        customer: (d.customerName ?? d.customer_name ?? "") as string,
+        service: (d.service ?? "") as string,
         time: at.toLocaleTimeString("th-TH", { hour: "2-digit", minute: "2-digit" }),
-        status: d.status ?? "pending",
+        status: (d.status ?? "pending") as BookingStatus,
       };
     });
   };
@@ -939,6 +1032,67 @@ export async function getDashboardChartData(
 
 // ─── Customers ────────────────────────────────────────────────────────────
 
+/**
+ * Phase 4 — Lead Score (0-1)
+ * Hot (0.7-1): chatted last 7d OR booking last 30d
+ * Warm (0.4-0.69): chatted last 30d OR booking last 90d
+ * Cold (0-0.39): no activity 30+ days
+ */
+export function computeLeadScore(
+  lastChatAt?: string | null,
+  lastBookingAt?: string | null
+): number {
+  const now = Date.now();
+  const ms7d = 7 * 86400000;
+  const ms30d = 30 * 86400000;
+  const ms90d = 90 * 86400000;
+
+  const chatAge = lastChatAt ? now - new Date(lastChatAt).getTime() : Infinity;
+  const bookingAge = lastBookingAt ? now - new Date(lastBookingAt).getTime() : Infinity;
+
+  if (chatAge <= ms7d || bookingAge <= ms30d) return 0.85; // Hot
+  if (chatAge <= ms30d || bookingAge <= ms90d) return 0.55; // Warm
+  return 0.2; // Cold
+}
+
+export type LeadScoreTier = "Hot" | "Warm" | "Cold";
+export function getLeadScoreTier(score: number): LeadScoreTier {
+  if (score >= 0.7) return "Hot";
+  if (score >= 0.4) return "Warm";
+  return "Cold";
+}
+
+function getCustomerDocIdForLineUser(orgId: string, lineUserId: string): string {
+  const safeId = lineUserId.replace(/[/\\]/g, "_");
+  return `line_${orgId}_${safeId}`;
+}
+
+/** Update customer when new booking (for chat_user_id) */
+export async function updateCustomerOnBooking(
+  orgId: string,
+  chatUserId: string,
+  scheduledAt: string
+): Promise<void> {
+  const { FieldValue } = await import("firebase-admin/firestore");
+  const docId = getCustomerDocIdForLineUser(orgId, chatUserId);
+  const docRef = db.collection(COLLECTIONS.customers).doc(docId);
+  const doc = await docRef.get();
+  if (!doc.exists) return;
+
+  const d = doc.data()!;
+  const lastChatAt = d.lastChatAt ? toISO(d.lastChatAt) : undefined;
+  const leadScore = computeLeadScore(lastChatAt, scheduledAt);
+
+  const priority =
+    leadScore >= 0.8 ? "very_hot" : leadScore >= 0.6 ? "hot" : leadScore >= 0.3 ? "warm" : "cold";
+  await docRef.update({
+    lastBookingAt: scheduledAt,
+    leadScore,
+    leadPriority: priority,
+    updatedAt: FieldValue.serverTimestamp(),
+  });
+}
+
 /** LINE: สร้าง/อัปเดต customer เมื่อมีคนแชท — ดึง displayName + pictureUrl จริงจาก LINE */
 export async function upsertLineCustomer(
   orgId: string,
@@ -965,9 +1119,24 @@ export async function upsertLineCustomer(
     accessToken = process.env.LINE_CHANNEL_ACCESS_TOKEN.trim();
   }
   if (accessToken) {
-    const profile = await getLineUserProfile(accessToken, lineUserId);
-    if (profile?.displayName) displayName = profile.displayName;
-    if (profile?.pictureUrl) pictureUrl = profile.pictureUrl;
+    try {
+      const profile = await getLineUserProfile(accessToken, lineUserId);
+      if (profile?.displayName) displayName = profile.displayName;
+      if (profile?.pictureUrl) pictureUrl = profile.pictureUrl;
+      if (process.env.NODE_ENV === "development" && profile) {
+        console.log("[upsertLineCustomer] Profile fetched:", {
+          userId: lineUserId.slice(0, 8) + "...",
+          displayName: !!profile.displayName,
+          pictureUrl: !!profile.pictureUrl,
+        });
+      }
+    } catch (err) {
+      if (process.env.NODE_ENV === "development") {
+        console.warn("[upsertLineCustomer] getLineUserProfile error:", (err as Error)?.message?.slice(0, 80));
+      }
+    }
+  } else if (process.env.NODE_ENV === "development") {
+    console.warn("[upsertLineCustomer] No accessToken for org:", orgId.slice(0, 8) + "...");
   }
 
   const payload = {
@@ -1003,14 +1172,23 @@ export async function getCustomers(
     includeDeleted?: boolean;
     /** Filter by channel: line, facebook, instagram, tiktok, web. Omit for all. */
     source?: import("@/types/clinic").CustomerSource;
+    /** Search by name (case-insensitive contains). Fetches extra and filters client-side. */
+    search?: string;
+    /** Sort: leadScore desc | lastChatAt desc (default). Client-side when leadScore. */
+    sortBy?: "leadScore" | "lastChatAt";
+    /** Filter by lead tier: hot (≥0.6) | warm (≥0.3) | cold (<0.3). Client-side. */
+    leadFilter?: "hot" | "warm" | "cold";
   } = {}
 ): Promise<{ items: Customer[]; lastId: string | null }> {
   const limit = Math.min(opts.limit ?? DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE);
+  const searchLower = opts.search?.toLowerCase().trim();
+  const needsExtraFetch = searchLower || opts.leadFilter || opts.sortBy === "leadScore";
+  const fetchMultiplier = searchLower ? 5 : opts.leadFilter || opts.sortBy === "leadScore" ? 4 : opts.includeDeleted ? 1 : 2;
   let q = db
     .collection(COLLECTIONS.customers)
     .where("org_id", "==", orgId)
     .orderBy("createdAt", "desc")
-    .limit((opts.includeDeleted ? 1 : 2) * limit + 5);
+    .limit(fetchMultiplier * limit + (needsExtraFetch ? 50 : 5));
   if (opts.branchId) q = q.where("branch_id", "==", opts.branchId) as typeof q;
   if (opts.source) q = q.where("source", "==", opts.source) as typeof q;
   if (opts.startAfterId) {
@@ -1021,16 +1199,35 @@ export async function getCustomers(
   const snapshot = await q.get();
   const mapDoc = (doc: { id: string; data: () => Record<string, unknown> }): Customer => {
     const d = doc.data()!;
+    const name = String(d.name ?? d.displayName ?? d.lineDisplayName ?? "").trim();
+    const phone = typeof d.phone === "string" ? d.phone : typeof d.phoneNumber === "string" ? d.phoneNumber : null;
+    const pictureUrl =
+      (typeof d.pictureUrl === "string" ? d.pictureUrl : null) ??
+      (typeof d.lineProfilePicture === "string" ? d.lineProfilePicture : null) ??
+      (typeof d.avatarUrl === "string" ? d.avatarUrl : null);
+    const lastChatAt = d.lastChatAt ? toISO(d.lastChatAt) : undefined;
+    const lastBookingAt = d.lastBookingAt ? toISO(d.lastBookingAt) : undefined;
+    const storedLeadScore = typeof d.leadScore === "number" ? d.leadScore : undefined;
+    const leadScore = storedLeadScore ?? computeLeadScore(lastChatAt, lastBookingAt);
+    const leadPriority = typeof d.leadPriority === "string" ? d.leadPriority : null;
+    const leadScoreHistory = Array.isArray(d.leadScoreHistory)
+      ? (d.leadScoreHistory as Array<{ date: string; score: number }>)
+      : undefined;
     return {
       id: doc.id,
       org_id: (typeof d.org_id === "string" ? d.org_id : orgId) as string,
       branch_id: typeof d.branch_id === "string" ? d.branch_id : undefined,
-      name: (d.name ?? "") as string,
+      name,
+      phone: phone || undefined,
       source: (d.source ?? "line") as Customer["source"],
       externalId: d.externalId as string | undefined,
-      pictureUrl: (typeof d.pictureUrl === "string" ? d.pictureUrl : null) as string | null,
+      pictureUrl: pictureUrl as string | null,
       status: (d.status ?? "active") as Customer["status"],
-      lastChatAt: d.lastChatAt ? toISO(d.lastChatAt) : undefined,
+      lastChatAt,
+      lastBookingAt,
+      leadScore,
+      leadPriority: leadPriority ?? undefined,
+      leadScoreHistory,
       aiResponded: d.aiResponded as boolean | undefined,
       deleted_at: d.deleted_at ? toISO(d.deleted_at) : null,
       createdAt: (() => {
@@ -1047,9 +1244,100 @@ export async function getCustomers(
   if (!opts.includeDeleted) {
     items = items.filter((c) => !c.deleted_at);
   }
+  if (searchLower) {
+    const matches = (c: Customer) =>
+      (c.name ?? "").toLowerCase().includes(searchLower) ||
+      (c.phone ?? "").replace(/\D/g, "").includes(searchLower.replace(/\D/g, ""));
+    items = items.filter(matches);
+  }
+  if (opts.leadFilter) {
+    const score = (c: Customer) => c.leadScore ?? 0;
+    if (opts.leadFilter === "hot") items = items.filter((c) => score(c) >= 0.6);
+    else if (opts.leadFilter === "warm") items = items.filter((c) => { const s2 = score(c); return s2 >= 0.3 && s2 < 0.6; });
+    else if (opts.leadFilter === "cold") items = items.filter((c) => score(c) < 0.3);
+  }
+  if (opts.sortBy === "leadScore") {
+    items.sort((a, b) => (b.leadScore ?? 0) - (a.leadScore ?? 0));
+  } else if (opts.sortBy === "lastChatAt") {
+    items.sort((a, b) => {
+      const ta = a.lastChatAt ? new Date(a.lastChatAt).getTime() : 0;
+      const tb = b.lastChatAt ? new Date(b.lastChatAt).getTime() : 0;
+      return tb - ta;
+    });
+  }
   const sliced = items.slice(0, limit);
   const lastId = items.length > limit ? sliced[limit - 1]?.id ?? null : null;
   return { items: sliced, lastId };
+}
+
+/** Phase 21: Count hot leads (leadScore ≥ 0.6) for dashboard alerts */
+export async function getHotLeadsCount(
+  orgId: string,
+  branchId?: string | null
+): Promise<number> {
+  let q = db
+    .collection(COLLECTIONS.customers)
+    .where("org_id", "==", orgId)
+    .where("leadScore", ">=", 0.6)
+    .limit(501);
+  if (branchId) q = q.where("branch_id", "==", branchId) as typeof q;
+  const snap = await q.get();
+  return snap.size;
+}
+
+/** Phase 13: Top hot leads for dashboard widget — score ≥ 0.6, sorted by score desc */
+export async function getHotLeads(
+  orgId: string,
+  opts?: { branchId?: string; limit?: number }
+): Promise<Customer[]> {
+  const { items } = await getCustomers(orgId, {
+    branchId: opts?.branchId,
+    limit: opts?.limit ?? 5,
+    leadFilter: "hot",
+    sortBy: "leadScore",
+  });
+  return items;
+}
+
+/** รายการลูกค้า LINE ที่ยังไม่มี pictureUrl/displayName — สำหรับ backfill */
+export async function getCustomersNeedingProfileBackfill(
+  orgId: string,
+  limit = 20
+): Promise<Customer[]> {
+  const snapshot = await db
+    .collection(COLLECTIONS.customers)
+    .where("org_id", "==", orgId)
+    .where("source", "==", "line")
+    .limit(limit * 2)
+    .get();
+  const items: Customer[] = [];
+  for (const doc of snapshot.docs) {
+    const d = doc.data();
+    if (d.deleted_at) continue;
+    const externalId = d.externalId;
+    if (!externalId || typeof externalId !== "string") continue;
+    const name = (d.name ?? "").toString().trim();
+    const pictureUrl = typeof d.pictureUrl === "string" ? d.pictureUrl : null;
+    const needsBackfill = !pictureUrl || name === "ลูกค้า LINE";
+    if (!needsBackfill) continue;
+    items.push({
+      id: doc.id,
+      org_id: (d.org_id ?? orgId) as string,
+      branch_id: d.branch_id,
+      name,
+      source: "line" as const,
+      externalId,
+      pictureUrl,
+      status: (d.status ?? "active") as Customer["status"],
+      lastChatAt: d.lastChatAt ? toISO(d.lastChatAt) : undefined,
+      aiResponded: d.aiResponded,
+      deleted_at: d.deleted_at ? toISO(d.deleted_at) : null,
+      createdAt: toISO(d.createdAt),
+      updatedAt: toISO(d.updatedAt),
+    });
+    if (items.length >= limit) break;
+  }
+  return items;
 }
 
 export async function getCustomerById(
@@ -1063,11 +1351,13 @@ export async function getCustomerById(
   if (d.org_id !== orgId) return null;
   const deletedAt = d.deleted_at ? toISO(d.deleted_at) : null;
   if (deletedAt && !opts?.includeDeleted) return null;
+  const phone = typeof d.phone === "string" ? d.phone : typeof d.phoneNumber === "string" ? d.phoneNumber : undefined;
   return {
     id: doc.id,
     org_id: d.org_id ?? orgId,
     branch_id: d.branch_id,
     name: d.name ?? "",
+    phone: phone ?? undefined,
     source: (d.source as Customer["source"]) ?? "line",
     externalId: d.externalId,
     pictureUrl: d.pictureUrl ?? null,
@@ -1148,9 +1438,8 @@ export async function getTransactions(
 
 // ─── Dashboard extras (promotions, pending, feedback, WoW) ─────────────────
 export async function getActivePromotionsCount(orgId: string, branchId?: string): Promise<number> {
-  const Firestore = await import("firebase-admin/firestore");
   const now = new Date();
-  let q = db
+  const q = db
     .collection(COLLECTIONS.promotions)
     .where("org_id", "==", orgId)
     .where("status", "==", "active")
@@ -1303,7 +1592,7 @@ export async function getPromotionsExpiringSoon(
   const Firestore = await import("firebase-admin/firestore");
   const now = new Date();
   const deadline = new Date(now.getTime() + withinDays * 86400000);
-  let q = db
+  const q = db
     .collection(COLLECTIONS.promotions)
     .where("org_id", "==", orgId)
     .where("status", "==", "active")
@@ -1389,7 +1678,7 @@ export async function getPromotions(
   opts: { branchId?: string; status?: PromotionStatus | "all"; targetGroup?: PromotionTargetGroup | "all"; limit?: number } = {}
 ): Promise<Promotion[]> {
   const limit = Math.min(opts.limit ?? DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE);
-  let q = db
+  const q = db
     .collection(COLLECTIONS.promotions)
     .where("org_id", "==", orgId)
     .orderBy("status", "asc")
@@ -1662,13 +1951,13 @@ export async function getConversationFeedbackInRange(
   const to = new Date(opts.to);
   from.setUTCHours(0, 0, 0, 0);
   to.setUTCHours(23, 59, 59, 999);
-  let q = db
+  const q = db
     .collection(COLLECTIONS.conversation_feedback)
     .where("org_id", "==", orgId)
     .where("createdAt", ">=", Firestore.Timestamp.fromDate(from))
     .where("createdAt", "<=", Firestore.Timestamp.fromDate(to))
     .orderBy("createdAt", "asc")
-    .limit(limit) as ReturnType<typeof db.collection>["where"];
+    .limit(limit);
   const snapshot = await q.get();
   trackFirestoreQuery({
     collection: COLLECTIONS.conversation_feedback,
@@ -1681,22 +1970,22 @@ export async function getConversationFeedbackInRange(
     const d = doc.data();
     return {
       id: doc.id,
-      org_id: d.org_id ?? null,
-      branch_id: d.branch_id ?? null,
-      user_id: d.user_id ?? null,
-      userMessage: d.userMessage ?? "",
-      botReply: d.botReply ?? "",
-      intent: d.intent ?? null,
-      service: d.service ?? null,
-      area: d.area ?? null,
-      source: d.source ?? "line",
-      adminSentBy: d.adminSentBy ?? null,
-      adminLabel: d.adminLabel ?? null,
-      adminLabeledAt: d.adminLabeledAt ? toISO(d.adminLabeledAt) : null,
-      adminLabeledBy: d.adminLabeledBy ?? null,
-      createdAt: toISO(d.createdAt),
-      updatedAt: toISO(d.updatedAt),
-      correlation_id: d.correlation_id ?? null,
+      org_id: (d.org_id as string | null) ?? null,
+      branch_id: (d.branch_id as string | null) ?? null,
+      user_id: (d.user_id as string | null) ?? null,
+      userMessage: (d.userMessage as string) ?? "",
+      botReply: (d.botReply as string) ?? "",
+      intent: (d.intent as string | null) ?? null,
+      service: (d.service as string | null) ?? null,
+      area: (d.area as string | null) ?? null,
+      source: ((d.source as string) ?? "line") as "line" | "web" | "admin",
+      adminSentBy: (d.adminSentBy as string | null) ?? null,
+      adminLabel: ((d.adminLabel as string | null) ?? null) as FeedbackLabel,
+      adminLabeledAt: d.adminLabeledAt ? toISO(d.adminLabeledAt as Timestamp) : null,
+      adminLabeledBy: (d.adminLabeledBy as string | null) ?? null,
+      createdAt: toISO(d.createdAt as Timestamp),
+      updatedAt: toISO(d.updatedAt as Timestamp),
+      correlation_id: (d.correlation_id as string | null) ?? null,
     };
   });
   if (opts.branchId != null) {
@@ -1748,6 +2037,37 @@ export async function listConversationFeedbackByUserId(
   });
   const lastId = snapshot.docs.length > limit ? snapshot.docs[limit - 1].id : null;
   return { items, lastId };
+}
+
+/** ดึงแชทล่าสุดของลูกค้า (สำหรับส่งเข้า AI context) — เรียงจากเก่าไปใหม่ */
+export async function getRecentConversationForAI(
+  orgId: string,
+  lineUserId: string,
+  limit = 5
+): Promise<Array<{ role: "user" | "assistant"; content: string }>> {
+  const q = db
+    .collection(COLLECTIONS.conversation_feedback)
+    .where("org_id", "==", orgId)
+    .where("user_id", "==", lineUserId)
+    .orderBy("createdAt", "desc")
+    .limit(limit);
+
+  const snapshot = await q.get();
+  const items = snapshot.docs.map((doc) => {
+    const d = doc.data();
+    return {
+      userMessage: (d.userMessage ?? "") as string,
+      botReply: (d.botReply ?? "") as string,
+    };
+  });
+  // Reverse เพื่อให้ลำดับจากเก่าไปใหม่ (user, assistant, user, assistant...)
+  items.reverse();
+  const history: Array<{ role: "user" | "assistant"; content: string }> = [];
+  for (const item of items) {
+    if (item.userMessage.trim()) history.push({ role: "user", content: item.userMessage });
+    if (item.botReply.trim()) history.push({ role: "assistant", content: item.botReply });
+  }
+  return history;
 }
 
 export async function updateFeedbackLabel(
@@ -1844,6 +2164,8 @@ export async function getSubscriptionByOrgId(orgId: string): Promise<Subscriptio
     current_period_start: toISO(d.current_period_start),
     current_period_end: toISO(d.current_period_end),
     stripe_subscription_id: d.stripe_subscription_id ?? null,
+    aiBlocked: !!d.aiBlocked,
+    quota_warning_sent_at: typeof d.quota_warning_sent_at === "string" ? d.quota_warning_sent_at : null,
     createdAt: toISO(d.createdAt),
     updatedAt: toISO(d.updatedAt),
   };
@@ -1870,6 +2192,8 @@ export async function getSubscriptionByStripeId(
     current_period_start: toISO(d.current_period_start),
     current_period_end: toISO(d.current_period_end),
     stripe_subscription_id: d.stripe_subscription_id ?? null,
+    aiBlocked: !!d.aiBlocked,
+    quota_warning_sent_at: typeof d.quota_warning_sent_at === "string" ? d.quota_warning_sent_at : null,
     createdAt: toISO(d.createdAt),
     updatedAt: toISO(d.updatedAt),
   };
@@ -1906,6 +2230,49 @@ export async function updateSubscriptionByStripeId(
   await doc.ref.update(updates);
   const orgId = doc.data()?.org_id;
   return orgId ? { orgId, previousPlan: prev } : false;
+}
+
+/** Phase 11 — Set aiBlocked on subscription when quota exceeded */
+export async function updateSubscriptionAiBlocked(
+  subscriptionId: string,
+  aiBlocked: boolean
+): Promise<void> {
+  const { FieldValue } = await import("firebase-admin/firestore");
+  await db.collection(COLLECTIONS.subscriptions).doc(subscriptionId).update({
+    aiBlocked,
+    updatedAt: FieldValue.serverTimestamp(),
+  });
+}
+
+/** Phase 11 — Set quota_warning_sent_at (YYYY-MM-DD) to avoid duplicate warnings */
+export async function updateSubscriptionQuotaWarningSent(
+  subscriptionId: string,
+  dateKey: string
+): Promise<void> {
+  const { FieldValue } = await import("firebase-admin/firestore");
+  await db.collection(COLLECTIONS.subscriptions).doc(subscriptionId).update({
+    quota_warning_sent_at: dateKey,
+    updatedAt: FieldValue.serverTimestamp(),
+  });
+}
+
+/** Phase 17 — Increment conversations_included (topup success) */
+export async function incrementSubscriptionConversations(
+  orgId: string,
+  amount: number
+): Promise<boolean> {
+  const snap = await db
+    .collection(COLLECTIONS.subscriptions)
+    .where("org_id", "==", orgId)
+    .limit(1)
+    .get();
+  if (snap.empty) return false;
+  const { FieldValue } = await import("firebase-admin/firestore");
+  await snap.docs[0].ref.update({
+    conversations_included: FieldValue.increment(amount),
+    updatedAt: FieldValue.serverTimestamp(),
+  });
+  return true;
 }
 
 export async function createBranch(data: {

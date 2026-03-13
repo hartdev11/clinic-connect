@@ -43,24 +43,36 @@ export async function GET(request: NextRequest) {
 
     const byChannel: Record<string, { count: number; amount: number }> = {};
     const byProcedure: Record<string, number> = {};
-    const byDate: Record<string, number> = {};
+    const byDate: Record<string, { count: number; amount: number }> = {};
+    const byDoctor: Record<string, { count: number; amount: number; cancelledCount: number }> = {};
     let totalCount = 0;
     let totalAmount = 0;
+    let cancelledCount = 0;
 
     for (const b of items) {
       totalCount++;
-      const ch = b.channel ?? b.source ?? "other";
-      if (!byChannel[ch]) byChannel[ch] = { count: 0, amount: 0 };
-      byChannel[ch].count++;
       const amt = b.amount ?? 0;
-      byChannel[ch].amount += amt;
       totalAmount += amt;
+      if (b.status === "cancelled" || b.status === "no-show") cancelledCount++;
+
+      const chKey = b.channel ?? b.source ?? "other";
+      if (!byChannel[chKey]) byChannel[chKey] = { count: 0, amount: 0 };
+      byChannel[chKey].count++;
+      byChannel[chKey].amount += amt;
 
       const proc = b.procedure || b.service || "—";
       byProcedure[proc] = (byProcedure[proc] ?? 0) + 1;
 
       const d = b.scheduledAt.slice(0, 10);
-      byDate[d] = (byDate[d] ?? 0) + 1;
+      if (!byDate[d]) byDate[d] = { count: 0, amount: 0 };
+      byDate[d].count += 1;
+      byDate[d].amount += amt;
+
+      const doctorKey = b.doctor?.trim() || "(ไม่มีแพทย์)";
+      if (!byDoctor[doctorKey]) byDoctor[doctorKey] = { count: 0, amount: 0, cancelledCount: 0 };
+      byDoctor[doctorKey].count += 1;
+      byDoctor[doctorKey].amount += amt;
+      if (b.status === "cancelled" || b.status === "no-show") byDoctor[doctorKey].cancelledCount += 1;
     }
 
     return {
@@ -69,13 +81,24 @@ export async function GET(request: NextRequest) {
       to: to.toISOString(),
       totalCount,
       totalAmount,
+      cancelledCount,
+      cancellationRate: totalCount > 0 ? (cancelledCount / totalCount) * 100 : 0,
       byChannel: Object.entries(byChannel).map(([k, v]) => ({ channel: k, ...v })),
       byProcedure: Object.entries(byProcedure)
         .sort((a, b) => b[1] - a[1])
         .map(([name, count]) => ({ name, count })),
       byDate: Object.entries(byDate)
         .sort((a, b) => a[0].localeCompare(b[0]))
-        .map(([date, count]) => ({ date, count })),
+        .map(([date, v]) => ({ date, count: v.count, amount: v.amount })),
+      byDoctor: Object.entries(byDoctor)
+        .sort((a, b) => b[1].count - a[1].count)
+        .map(([doctor, v]) => ({
+          doctor,
+          count: v.count,
+          amount: v.amount,
+          cancelledCount: v.cancelledCount,
+          cancellationRate: v.count > 0 ? (v.cancelledCount / v.count) * 100 : 0,
+        })),
       items: items.map((b) => ({
         id: b.id,
         customerName: b.customerName,

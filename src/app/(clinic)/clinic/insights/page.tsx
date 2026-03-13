@@ -2,6 +2,7 @@
 
 import React, { useCallback, useMemo, useState } from "react";
 import useSWR from "swr";
+import { motion } from "framer-motion";
 import { useClinicContext } from "@/contexts/ClinicContext";
 import {
   LineChart,
@@ -18,13 +19,27 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
-import { Card, CardHeader } from "@/components/ui/Card";
-import { PageHeader } from "@/components/layout/PageHeader";
-import { SectionHeader } from "@/components/layout/SectionHeader";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Button } from "@/components/ui/Button";
+import { StatCard } from "@/components/ui/StatCard";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { apiFetcher } from "@/lib/api-fetcher";
 
-const CHART = { primary: "#0f766e", secondary: "#64748b", grid: "#e2e8f0", text: "#64748b" };
-const PIE_COLORS = ["#0f766e", "#0d9488", "#14b8a6", "#2dd4bf", "#5eead4", "#94a3b8"];
+/* Phase 3 — semantic chart colors (no hex) */
+const CHART_COLORS = [
+  "var(--color-rg-400)",
+  "var(--color-rg-600)",
+  "var(--color-cream-500)",
+  "var(--color-mauve-400)",
+  "var(--ent-accent)",
+];
+const CHART = {
+  primary: CHART_COLORS[0],
+  secondary: CHART_COLORS[1],
+  grid: "var(--cream-300)",
+  axis: "var(--cream-500)",
+};
+const PIE_COLORS = CHART_COLORS;
 
 type DateRangeKey = "7d" | "30d" | "90d" | "custom";
 
@@ -135,17 +150,26 @@ function buildQuery(params: {
   return sp.toString();
 }
 
-const EmptyState = ({ message }: { message: string }) => (
-  <div className="flex flex-col items-center justify-center py-12 px-4 rounded-xl bg-surface-50 border border-surface-100 text-center">
-    <p className="text-4xl mb-3">📊</p>
-    <p className="text-surface-600 text-sm font-medium">{message}</p>
-    <p className="text-surface-500 text-xs mt-1">ข้อมูลอัปเดตตามช่วงวันที่ที่เลือก</p>
-  </div>
+const InsightsEmptyState = ({ message }: { message: string }) => (
+  <EmptyState
+    icon={<span className="text-2xl">📊</span>}
+    title={message}
+    description="ข้อมูลอัปเดตตามช่วงวันที่ที่เลือก"
+  />
 );
 
 const SkeletonCard = () => (
-  <div className="h-24 rounded-xl bg-surface-100 animate-pulse" />
+  <div className="h-24 rounded-2xl bg-cream-200 animate-pulse" />
 );
+
+/** Heatmap scale: var(--color-rg-200) to var(--color-rg-700) */
+function getHeatmapBg(intensity: number): string {
+  if (intensity <= 0) return "var(--color-rg-200)";
+  if (intensity < 0.25) return "var(--color-rg-300)";
+  if (intensity < 0.5) return "var(--color-rg-400)";
+  if (intensity < 0.75) return "var(--color-rg-600)";
+  return "var(--color-rg-700)";
+}
 
 function HeatmapGrid({
   data,
@@ -161,9 +185,9 @@ function HeatmapGrid({
     <table className="w-full text-xs border-collapse">
       <thead>
         <tr>
-          <th className="p-1 border border-surface-200 bg-surface-50 font-medium text-surface-600 w-8">วัน</th>
+          <th className="p-1 border border-cream-200 bg-cream-100 font-body font-medium text-mauve-600 w-8">วัน</th>
           {Array.from({ length: 24 }, (_, h) => (
-            <th key={h} className="p-1 border border-surface-200 bg-surface-50 font-medium text-surface-600 w-8">
+            <th key={h} className="p-1 border border-cream-200 bg-cream-100 font-body font-medium text-mauve-600 w-8">
               {h}
             </th>
           ))}
@@ -172,16 +196,19 @@ function HeatmapGrid({
       <tbody>
         {dayLabels.map((label, dayOfWeek) => (
           <tr key={dayOfWeek}>
-            <td className="p-1 border border-surface-200 bg-surface-50 font-medium text-surface-600">{label}</td>
+            <td className="p-1 border border-cream-200 bg-cream-100 font-body font-medium text-mauve-600">{label}</td>
             {Array.from({ length: 24 }, (_, hour) => {
               const count = cellMap.get(`${hour}-${dayOfWeek}`) ?? 0;
               const intensity = maxCount > 0 ? count / maxCount : 0;
-              const bg = intensity > 0 ? `rgba(15, 118, 110, ${0.2 + intensity * 0.7})` : "var(--surface-50, #f8fafc)";
+              const bg = getHeatmapBg(intensity);
               return (
                 <td
                   key={hour}
-                  className="p-1 border border-surface-100 text-center"
-                  style={{ backgroundColor: bg }}
+                  className="p-1 border border-cream-200 text-center"
+                  style={{
+                    backgroundColor: bg,
+                    color: intensity >= 0.75 ? "white" : "inherit",
+                  }}
                   title={`${label} ${hour}:00 — ${count}`}
                 >
                   {count > 0 ? count : ""}
@@ -196,20 +223,6 @@ function HeatmapGrid({
 }
 
 const DAY_LABELS = ["อา", "จ", "อ", "พ", "พฤ", "ศ", "ส"];
-
-function TrendBadge({ direction, percentChange }: { direction: "up" | "down" | "flat"; percentChange: number }) {
-  if (direction === "flat") return null;
-  const isUp = direction === "up";
-  const text = `${isUp ? "↑" : "↓"} ${Math.abs(percentChange).toFixed(1)}%`;
-  return (
-    <span
-      className={`ml-1.5 text-xs font-medium ${isUp ? "text-emerald-600" : "text-amber-600"}`}
-      title={text}
-    >
-      {text}
-    </span>
-  );
-}
 
 export default function InsightsPage() {
   const { branch_id, currentOrg, selectedBranchId, setSelectedBranchId, currentUser } = useClinicContext();
@@ -268,6 +281,12 @@ export default function InsightsPage() {
     apiFetcher,
     { revalidateOnFocus: true, dedupingInterval: 60_000 }
   );
+  const { data: conversion } = useSWR<{
+    cold: { total: number; converted: number; rate: number; avg_value: number };
+    warm: { total: number; converted: number; rate: number; avg_value: number };
+    hot: { total: number; converted: number; rate: number; avg_value: number };
+    very_hot: { total: number; converted: number; rate: number; avg_value: number };
+  }>(`${base}/conversion?${query}`, apiFetcher, { revalidateOnFocus: true, dedupingInterval: 60_000 });
 
   const hasAnyData = (overview?.totalChats ?? 0) > 0 || (overview?.revenue ?? 0) > 0 || (overview?.totalBookings ?? 0) > 0;
   const branches = currentOrg?.branches ?? [];
@@ -294,83 +313,49 @@ export default function InsightsPage() {
     URL.revokeObjectURL(url);
   }, [overview]);
 
+  const formatRevenue = (v: number) =>
+    `฿${v.toLocaleString("th-TH", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+
   return (
     <div className="space-y-8 pb-12">
       <PageHeader
-        title="Insights & Reports"
-        description="AI Business Intelligence — รายได้ แชท AI การดำเนินงาน และคำแนะนำ"
-        aiAnalyze
-      />
-
-      {/* Alerts above fold */}
-      {alerts?.alerts && alerts.alerts.length > 0 && (
-        <section className="space-y-2">
-          {alerts.alerts.map((a, i) => (
-            <div
-              key={i}
-              className={`rounded-xl border p-4 ${
-                a.severity === "high"
-                  ? "bg-amber-50 border-amber-200"
-                  : "bg-surface-50 border-surface-200"
-              }`}
+        title="Insights"
+        subtitle="วิเคราะห์ข้อมูลเชิงลึกของคลินิก"
+        shimmer
+        actions={
+          <div className="flex items-center gap-3">
+            <select
+              value={range}
+              onChange={(e) => setRange(e.target.value as DateRangeKey)}
+              className="h-9 px-3 rounded-xl font-body text-sm text-mauve-600 bg-white border border-cream-300 focus:outline-none focus:ring-2 focus:ring-rg-300/50"
             >
-              <p className="font-medium text-surface-900 text-sm">{a.message}</p>
-              <p className="text-surface-600 text-xs mt-1">{a.recommendation}</p>
-            </div>
-          ))}
-        </section>
-      )}
-
-      {/* Sticky Top Bar: Date Range, Branch, Export, KPI */}
-      <div className="sticky top-0 z-10 bg-white/95 backdrop-blur border-b border-surface-100 -mx-4 px-4 py-4 space-y-4">
-        <div className="flex flex-wrap items-center gap-3">
-          <span className="text-sm font-medium text-surface-600">ช่วงเวลา</span>
-          {(["7d", "30d", "90d"] as const).map((r) => (
-            <button
-              key={r}
-              onClick={() => setRange(r)}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                range === r
-                  ? "bg-primary-600 text-white"
-                  : "bg-surface-100 text-surface-700 hover:bg-surface-200"
-              }`}
-            >
-              {r === "7d" ? "7 วัน" : r === "30d" ? "30 วัน" : "90 วัน"}
-            </button>
-          ))}
-          {range === "custom" && (
-            <>
-              <input
-                type="date"
-                value={customFrom}
-                onChange={(e) => setCustomFrom(e.target.value)}
-                className="px-2 py-1.5 rounded-lg border border-surface-200 text-sm"
-              />
-              <span className="text-surface-400">ถึง</span>
-              <input
-                type="date"
-                value={customTo}
-                onChange={(e) => setCustomTo(e.target.value)}
-                className="px-2 py-1.5 rounded-lg border border-surface-200 text-sm"
-              />
-            </>
-          )}
-          <button
-            onClick={() => setRange("custom")}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium ${
-              range === "custom" ? "bg-primary-600 text-white" : "bg-surface-100 text-surface-700 hover:bg-surface-200"
-            }`}
-          >
-            กำหนดเอง
-          </button>
-
-          {branches.length > 1 && (
-            <>
-              <span className="text-surface-400 mx-1">|</span>
+              <option value="7d">7 วัน</option>
+              <option value="30d">30 วัน</option>
+              <option value="90d">90 วัน</option>
+              <option value="custom">กำหนดเอง</option>
+            </select>
+            {range === "custom" && (
+              <>
+                <input
+                  type="date"
+                  value={customFrom}
+                  onChange={(e) => setCustomFrom(e.target.value)}
+                  className="h-9 px-2 rounded-xl border border-cream-200 font-body text-sm text-mauve-700"
+                />
+                <span className="font-body text-mauve-400">ถึง</span>
+                <input
+                  type="date"
+                  value={customTo}
+                  onChange={(e) => setCustomTo(e.target.value)}
+                  className="h-9 px-2 rounded-xl border border-cream-200 font-body text-sm text-mauve-700"
+                />
+              </>
+            )}
+            {branches.length > 1 && (
               <select
                 value={branchId ?? ""}
                 onChange={(e) => setSelectedBranchId(e.target.value || null)}
-                className="px-3 py-1.5 rounded-lg border border-surface-200 text-sm bg-white"
+                className="h-9 px-3 rounded-xl font-body text-sm text-mauve-600 bg-white border border-cream-300 focus:outline-none focus:ring-2 focus:ring-rg-300/50"
               >
                 <option value="">ทุกสาขา</option>
                 {branches.map((b) => (
@@ -379,92 +364,154 @@ export default function InsightsPage() {
                   </option>
                 ))}
               </select>
-            </>
-          )}
+            )}
+            <Button variant="secondary" size="sm" onClick={handleExportCsv} disabled={!overview}>
+              ส่งออก
+            </Button>
+          </div>
+        }
+      />
 
-          <button
-            onClick={handleExportCsv}
-            disabled={!overview}
-            className="ml-auto px-3 py-1.5 rounded-lg text-sm font-medium bg-surface-100 text-surface-700 hover:bg-surface-200 disabled:opacity-50"
-          >
-            Export CSV
-          </button>
-        </div>
-
-        {/* KPI Snapshot */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {overviewLoading ? (
-            Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
-          ) : overviewError ? (
-            <div className="col-span-full text-sm text-amber-600">
-              โหลดข้อมูลไม่สำเร็จ — ลองรีเฟรชหรือเช็กการเข้าสู่ระบบ
+      {/* Alerts above fold */}
+      {alerts?.alerts && alerts.alerts.length > 0 && (
+        <section className="space-y-2">
+          {alerts.alerts.map((a, i) => (
+            <div
+              key={i}
+              className={`rounded-2xl border p-4 ${
+                a.severity === "high"
+                  ? "bg-amber-50 border-amber-200"
+                  : "bg-cream-50 border-cream-200"
+              }`}
+            >
+              <p className="font-body font-medium text-mauve-900 text-sm">{a.message}</p>
+              <p className="font-body text-mauve-600 text-xs mt-1">{a.recommendation}</p>
             </div>
-          ) : overview ? (
-            <>
-              <Card padding="md">
-                <p className="text-xs text-surface-500 font-medium">รายได้</p>
-                <p className="text-lg font-bold text-surface-900 mt-0.5 flex items-baseline">
-                  ฿{overview.revenue.toLocaleString("th-TH", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-                  {comparison && <TrendBadge direction={comparison.revenue.direction} percentChange={comparison.revenue.percentChange} />}
-                </p>
-              </Card>
-              <Card padding="md">
-                <p className="text-xs text-surface-500 font-medium">Conversion (แชท→จอง)</p>
-                <p className="text-lg font-bold text-surface-900 mt-0.5 flex items-baseline">
-                  {overview.conversionRate}%
-                  {comparison && <TrendBadge direction={comparison.conversionRate.direction} percentChange={comparison.conversionRate.percentChange} />}
-                </p>
-              </Card>
-              <Card padding="md">
-                <p className="text-xs text-surface-500 font-medium">AI Close Rate</p>
-                <p className="text-lg font-bold text-surface-900 mt-0.5 flex items-baseline">
-                  {overview.aiCloseRate}%
-                  {comparison && <TrendBadge direction={comparison.aiCloseRate.direction} percentChange={comparison.aiCloseRate.percentChange} />}
-                </p>
-              </Card>
-              <Card padding="md">
-                <p className="text-xs text-surface-500 font-medium">Escalation Rate</p>
-                <p className="text-lg font-bold text-surface-900 mt-0.5 flex items-baseline">
-                  {overview.escalationRate}%
-                  {comparison && <TrendBadge direction={comparison.escalationRate.direction} percentChange={comparison.escalationRate.percentChange} />}
-                </p>
-              </Card>
-            </>
-          ) : null}
-        </div>
+          ))}
+        </section>
+      )}
+
+      {/* KPI Row */}
+      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
+        {overviewLoading ? (
+          Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
+        ) : overviewError ? (
+          <div className="col-span-full font-body text-sm text-amber-600">
+            โหลดข้อมูลไม่สำเร็จ — ลองรีเฟรชหรือเช็กการเข้าสู่ระบบ
+          </div>
+        ) : overview ? (
+          <>
+            <StatCard
+              label="รายได้รวม"
+              value={formatRevenue(overview.revenue)}
+              trend={comparison ? { value: comparison.revenue.percentChange, positive: comparison.revenue.direction === "up" } : undefined}
+              icon={<span>◻</span>}
+              delay={0}
+              shimmer
+            />
+            <StatCard
+              label="การจองทั้งหมด"
+              value={overview.totalBookings}
+              trend={comparison ? { value: comparison.conversionRate.percentChange, positive: comparison.conversionRate.direction === "up" } : undefined}
+              icon={<span>⬡</span>}
+              delay={0.08}
+            />
+            <StatCard
+              label="ลูกค้าใหม่"
+              value={overview.totalChats}
+              trend={comparison ? { value: comparison.aiCloseRate.percentChange, positive: comparison.aiCloseRate.direction === "up" } : undefined}
+              icon={<span>◎</span>}
+              delay={0.16}
+            />
+            <StatCard
+              label="ความพึงพอใจ"
+              value={`${overview.aiCloseRate}%`}
+              trend={comparison ? { value: comparison.escalationRate.percentChange, positive: comparison.escalationRate.direction === "down" } : undefined}
+              icon={<span>✦</span>}
+              delay={0.24}
+            />
+          </>
+        ) : null}
       </div>
 
       {!hasAnyData && !overviewLoading && overview && (
-        <Card padding="lg">
-          <EmptyState message="เริ่มรับแชทจากลูกค้าเพื่อปลดล็อก Insights — ข้อมูลจะแสดงเมื่อมีแชท การจอง หรือรายได้ในช่วงที่เลือก" />
-        </Card>
+        <div className="luxury-card p-6">
+          <InsightsEmptyState message="เริ่มรับแชทจากลูกค้าเพื่อปลดล็อก Insights — ข้อมูลจะแสดงเมื่อมีแชท การจอง หรือรายได้ในช่วงที่เลือก" />
+        </div>
+      )}
+
+      {/* Conversion Attribution (Phase 21) */}
+      {conversion && (
+        <section>
+          <h2 className="font-display text-lg font-semibold text-mauve-800 mb-4">Conversion Attribution</h2>
+          <p className="font-body text-sm text-mauve-500 mb-4">อัตราการแปลง Lead Tier → Booking (30 วันล่าสุด)</p>
+          <div className="luxury-card overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-cream-200 text-left font-body text-mauve-600">
+                    <th className="py-3 px-4 font-medium">Lead Tier</th>
+                    <th className="py-3 px-4 font-medium text-right">Total Leads</th>
+                    <th className="py-3 px-4 font-medium text-right">Converted</th>
+                    <th className="py-3 px-4 font-medium text-right">Rate</th>
+                    <th className="py-3 px-4 font-medium text-right">Avg Booking Value</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    { key: "cold", label: "Cold", data: conversion.cold },
+                    { key: "warm", label: "Warm", data: conversion.warm },
+                    { key: "hot", label: "Hot", data: conversion.hot },
+                    { key: "very_hot", label: "Very Hot", data: conversion.very_hot },
+                  ].map(({ key, label, data }) => (
+                    <tr
+                      key={key}
+                      className={`border-b border-cream-100 last:border-0 ${
+                        key === "hot" || key === "very_hot" ? "bg-rg-50/50" : ""
+                      }`}
+                    >
+                      <td className="py-2.5 px-4 font-body font-medium text-mauve-900">{label}</td>
+                      <td className="py-2.5 px-4 text-right font-body text-mauve-800">{data.total}</td>
+                      <td className="py-2.5 px-4 text-right font-body text-mauve-800">{data.converted}</td>
+                      <td className="py-2.5 px-4 text-right font-body text-mauve-800">{data.rate}%</td>
+                      <td className="py-2.5 px-4 text-right font-body text-mauve-800">
+                        {data.avg_value > 0 ? formatRevenue(data.avg_value) : "—"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
       )}
 
       {/* Branch Intelligence (Owner only) */}
       {isOwner && branchPerformance && branchPerformance.branches.length > 0 && (
         <section>
-          <SectionHeader title="Branch Intelligence" description="คะแนนประสิทธิภาพแต่ละสาขา (Owner only)" />
-          <Card padding="lg">
+          <h2 className="font-display text-lg font-semibold text-mauve-800 mb-4">Branch Intelligence</h2>
+          <p className="font-body text-sm text-mauve-500 mb-4">คะแนนประสิทธิภาพแต่ละสาขา (Owner only)</p>
+          <div className="luxury-card overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-surface-200 text-left text-surface-600">
-                    <th className="py-3 px-2 font-medium">สาขา</th>
-                    <th className="py-3 px-2 font-medium text-right">คะแนน</th>
-                    <th className="py-3 px-2 font-medium text-right">สถานะ</th>
-                    <th className="py-3 px-2 font-medium text-right">รายได้</th>
-                    <th className="py-3 px-2 font-medium text-right">Growth %</th>
-                    <th className="py-3 px-2 font-medium text-right">Conversion</th>
+                  <tr className="border-b border-cream-200 text-left font-body text-mauve-600">
+                    <th className="py-3 px-4 font-medium">สาขา</th>
+                    <th className="py-3 px-4 font-medium text-right">คะแนน</th>
+                    <th className="py-3 px-4 font-medium text-right">สถานะ</th>
+                    <th className="py-3 px-4 font-medium text-right">รายได้</th>
+                    <th className="py-3 px-4 font-medium text-right">Growth %</th>
+                    <th className="py-3 px-4 font-medium text-right">Conversion</th>
                   </tr>
                 </thead>
                 <tbody>
                   {branchPerformance.branches.map((b) => (
-                    <tr key={b.branchId} className="border-b border-surface-100 last:border-0">
-                      <td className="py-2.5 px-2 font-medium text-surface-900">{b.branchName}</td>
-                      <td className="py-2.5 px-2 text-right">{b.performanceScore}</td>
-                      <td className="py-2.5 px-2 text-right">
+                    <tr key={b.branchId} className="border-b border-cream-100 last:border-0">
+                      <td className="py-2.5 px-4 font-body font-medium text-mauve-900">{b.branchName}</td>
+                      <td className="py-2.5 px-4 text-right font-body text-mauve-800">{b.performanceScore}</td>
+                      <td className="py-2.5 px-4 text-right">
                         <span
-                          className={`inline-flex px-2 py-0.5 rounded text-xs font-medium ${
+                          className={`inline-flex px-2 py-0.5 rounded-lg text-xs font-body font-medium ${
                             b.status === "Strong"
                               ? "bg-emerald-100 text-emerald-800"
                               : b.status === "Monitor"
@@ -475,261 +522,331 @@ export default function InsightsPage() {
                           {b.status}
                         </span>
                       </td>
-                      <td className="py-2.5 px-2 text-right">฿{b.revenue.toLocaleString("th-TH", { maximumFractionDigits: 0 })}</td>
-                      <td className="py-2.5 px-2 text-right">{b.growthPercent}%</td>
-                      <td className="py-2.5 px-2 text-right">{b.conversionRate}%</td>
+                      <td className="py-2.5 px-4 text-right font-body text-mauve-800">฿{b.revenue.toLocaleString("th-TH", { maximumFractionDigits: 0 })}</td>
+                      <td className="py-2.5 px-4 text-right font-body text-mauve-800">{b.growthPercent}%</td>
+                      <td className="py-2.5 px-4 text-right font-body text-mauve-800">{b.conversionRate}%</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-          </Card>
+          </div>
         </section>
       )}
 
-      {/* 1. Revenue Intelligence */}
-      <section>
-        <SectionHeader title="Revenue Intelligence" description="แนวโน้มรายได้ และรายได้แยกตามบริการ" />
+      {/* Charts Grid: Revenue + Booking by service + Intent + Heatmap */}
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
+        {/* Revenue chart */}
         {revenueLoading ? (
-          <div className="h-64 rounded-xl bg-surface-100 animate-pulse" />
+          <div className="h-72 rounded-2xl bg-cream-200 animate-pulse" />
         ) : revenue && (revenue.trend.length > 0 || revenue.byService.length > 0) ? (
-          <div className="grid md:grid-cols-2 gap-6">
-            <Card padding="lg">
-              <CardHeader title="Revenue Trend" subtitle="รายได้ต่อวัน (฿)" />
-              <div className="h-64 mt-4">
+          <>
+            <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+              <div className="luxury-card p-6">
+                <h3 className="font-display text-lg font-semibold text-mauve-800 mb-5">รายได้ตามช่วงเวลา</h3>
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={revenue.trend.length ? revenue.trend : [{ date: "-", dayLabel: "-", revenue: 0 }]} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                      <defs>
+                        <linearGradient id="rgGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor={CHART.primary} stopOpacity={0.3} />
+                          <stop offset="100%" stopColor={CHART.primary} stopOpacity={0} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke={CHART.grid} />
+                      <XAxis dataKey="dayLabel" tick={{ fontSize: 11, fill: CHART.axis }} />
+                      <YAxis tick={{ fontSize: 11, fill: CHART.axis }} tickFormatter={(v) => `฿${v}`} />
+                      <Tooltip
+                        contentStyle={{ borderRadius: "12px", border: "1px solid var(--cream-200)", fontFamily: "var(--font-body)" }}
+                        formatter={(v: number | undefined) => [`฿${Number(v ?? 0).toLocaleString("th-TH")}`, "รายได้"]}
+                        labelFormatter={(_, payload) => (payload?.[0]?.payload?.date as string) ?? ""}
+                      />
+                      <Line type="monotone" dataKey="revenue" stroke={CHART.primary} strokeWidth={2} dot={{ r: 3 }} fill="url(#rgGradient)" name="รายได้" />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </motion.div>
+            <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
+              <div className="luxury-card p-6">
+                <h3 className="font-display text-lg font-semibold text-mauve-800 mb-5">การจองตามบริการ</h3>
+                {revenue.byService.length > 0 ? (
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={revenue.byService.slice(0, 8)} layout="vertical" margin={{ top: 8, right: 8, left: 80, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke={CHART.grid} />
+                        <XAxis type="number" tick={{ fontSize: 11, fill: CHART.axis }} tickFormatter={(v) => `฿${v}`} />
+                        <YAxis type="category" dataKey="serviceName" width={75} tick={{ fontSize: 10, fill: CHART.axis }} />
+                        <Tooltip
+                          contentStyle={{ borderRadius: "12px", border: "1px solid var(--cream-200)", fontFamily: "var(--font-body)" }}
+                          formatter={(v: number | undefined) => [`฿${Number(v ?? 0).toLocaleString("th-TH")}`, "รายได้"]}
+                        />
+                        <Bar dataKey="revenue" fill={CHART.primary} name="รายได้" radius={[0, 8, 8, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                ) : (
+                  <InsightsEmptyState message="ยังไม่มีรายได้จากบริการในช่วงนี้" />
+                )}
+              </div>
+            </motion.div>
+          </>
+        ) : (
+          <>
+            <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+              <div className="luxury-card p-6">
+                <h3 className="font-display text-lg font-semibold text-mauve-800 mb-5">รายได้ตามช่วงเวลา</h3>
+                <InsightsEmptyState message="ยังไม่มีข้อมูลรายได้ในช่วงที่เลือก — เมื่อมีใบแจ้งหนี้ที่ชำระแล้ว ข้อมูลจะแสดงที่นี่" />
+              </div>
+            </motion.div>
+            <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
+              <div className="luxury-card p-6">
+                <h3 className="font-display text-lg font-semibold text-mauve-800 mb-5">การจองตามบริการ</h3>
+                <InsightsEmptyState message="ยังไม่มีรายได้จากบริการในช่วงนี้" />
+              </div>
+            </motion.div>
+          </>
+        )}
+
+        {/* Chat intent distribution */}
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
+          <div className="luxury-card p-6">
+            <h3 className="font-display text-lg font-semibold text-mauve-800 mb-5">การกระจาย Intent แชท</h3>
+            {conversationLoading ? (
+              <div className="h-64 rounded-2xl bg-cream-200 animate-pulse" />
+            ) : conversation && conversation.intentDistribution.length > 0 ? (
+              <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={revenue.trend.length ? revenue.trend : [{ date: "-", revenue: 0 }]} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke={CHART.grid} />
-                    <XAxis dataKey="dayLabel" tick={{ fontSize: 11, fill: CHART.text }} />
-                    <YAxis tick={{ fontSize: 11, fill: CHART.text }} tickFormatter={(v) => `฿${v}`} />
-                    <Tooltip formatter={(v: number) => [`฿${v.toLocaleString("th-TH")}`, "รายได้"]} labelFormatter={(_, payload) => payload[0]?.payload?.date} />
-                    <Line type="monotone" dataKey="revenue" stroke={CHART.primary} strokeWidth={2} dot={{ r: 3 }} name="รายได้" />
-                  </LineChart>
+                  <PieChart>
+                    <Pie
+                      data={conversation.intentDistribution}
+                      dataKey="count"
+                      nameKey="intent"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={80}
+                      label={({ name, value }) => `${name ?? ""}: ${value ?? 0}`}
+                    >
+                      {conversation.intentDistribution.map((_, i) => (
+                        <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{ borderRadius: "12px", border: "1px solid var(--cream-200)", fontFamily: "var(--font-body)" }}
+                      formatter={(v: number | undefined) => [v ?? 0, "จำนวน"]}
+                    />
+                  </PieChart>
                 </ResponsiveContainer>
               </div>
-            </Card>
-            <Card padding="lg">
-              <CardHeader title="Revenue by Service" subtitle="รายได้แยกตามบริการ" />
-              {revenue.byService.length > 0 ? (
-                <div className="h-64 mt-4">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={revenue.byService.slice(0, 8)} layout="vertical" margin={{ top: 8, right: 8, left: 80, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke={CHART.grid} />
-                      <XAxis type="number" tick={{ fontSize: 11 }} tickFormatter={(v) => `฿${v}`} />
-                      <YAxis type="category" dataKey="serviceName" width={75} tick={{ fontSize: 10 }} />
-                      <Tooltip formatter={(v: number) => [`฿${v.toLocaleString("th-TH")}`, "รายได้"]} />
-                      <Bar dataKey="revenue" fill={CHART.primary} name="รายได้" radius={[0, 4, 4, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              ) : (
-                <EmptyState message="ยังไม่มีรายได้จากบริการในช่วงนี้" />
-              )}
-            </Card>
+            ) : (
+              <InsightsEmptyState message="ยังไม่มีแชทในช่วงนี้" />
+            )}
           </div>
-        ) : (
-          <Card padding="lg">
-            <EmptyState message="ยังไม่มีข้อมูลรายได้ในช่วงที่เลือก — เมื่อมีใบแจ้งหนี้ที่ชำระแล้ว ข้อมูลจะแสดงที่นี่" />
-          </Card>
-        )}
-      </section>
+        </motion.div>
 
-      {/* 2. Conversation Intelligence */}
-      <section>
-        <SectionHeader title="Conversation Intelligence" description="การกระจาย Intent และคำถามยอดนิยม" />
-        {conversationLoading ? (
-          <div className="h-64 rounded-xl bg-surface-100 animate-pulse" />
-        ) : conversation && (conversation.intentDistribution.length > 0 || conversation.topQuestions.length > 0) ? (
-          <div className="grid md:grid-cols-2 gap-6">
-            <Card padding="lg">
-              <CardHeader title="Intent Distribution" subtitle="ประเภทคำถามจากลูกค้า" />
-              {conversation.intentDistribution.length > 0 ? (
-                <div className="h-64 mt-4">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={conversation.intentDistribution}
-                        dataKey="count"
-                        nameKey="intent"
-                        cx="50%"
-                        cy="50%"
-                        outerRadius={80}
-                        label={({ intent, count }) => `${intent}: ${count}`}
-                      >
-                        {conversation.intentDistribution.map((_, i) => (
-                          <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <Tooltip formatter={(v: number) => [v, "จำนวน"]} />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-              ) : (
-                <EmptyState message="ยังไม่มีแชทในช่วงนี้" />
-              )}
-            </Card>
-            <Card padding="lg">
-              <CardHeader title="คำถามยอดนิยม" subtitle="Top questions จากลูกค้า" />
-              {conversation.topQuestions.length > 0 ? (
-                <ul className="space-y-2 mt-2 max-h-64 overflow-y-auto">
-                  {conversation.topQuestions.slice(0, 15).map((q, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm">
-                      <span className="w-6 h-6 rounded-full bg-surface-100 flex items-center justify-center text-xs font-medium text-surface-500 flex-shrink-0">
-                        {i + 1}
-                      </span>
-                      <span className="text-surface-700 flex-1 truncate" title={q.text}>
-                        {q.text}
-                      </span>
-                      <span className="font-semibold text-surface-900 flex-shrink-0">{q.count}</span>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <EmptyState message="ยังไม่มีคำถามในช่วงนี้" />
-              )}
-            </Card>
+        {/* Booking heatmap */}
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}>
+          <div className="luxury-card p-6">
+            <h3 className="font-display text-lg font-semibold text-mauve-800 mb-5">Heatmap การจองตามชั่วโมง</h3>
+            {operationalLoading ? (
+              <div className="h-48 rounded-2xl bg-cream-200 animate-pulse" />
+            ) : operational && operational.bookingHeatmap && operational.bookingHeatmap.length > 0 ? (
+              <div className="overflow-x-auto">
+                <HeatmapGrid data={operational.bookingHeatmap} dayLabels={DAY_LABELS} />
+              </div>
+            ) : operational && operational.chatPeakHeatmap && operational.chatPeakHeatmap.length > 0 ? (
+              <div className="overflow-x-auto">
+                <HeatmapGrid data={operational.chatPeakHeatmap} dayLabels={DAY_LABELS} />
+              </div>
+            ) : (
+              <InsightsEmptyState message="ยังไม่มีข้อมูลการจอง/แชทตามชั่วโมงในช่วงนี้" />
+            )}
           </div>
-        ) : (
-          <Card padding="lg">
-            <EmptyState message="เริ่มรับแชทจากลูกค้าเพื่อดู Intent และคำถามยอดนิยม" />
-          </Card>
-        )}
-      </section>
+        </motion.div>
+      </div>
 
-      {/* 3. AI Performance */}
+      {/* Top questions table */}
+      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
+        <div className="luxury-card overflow-hidden">
+          <div className="px-6 py-5 border-b border-cream-200">
+            <h3 className="font-display text-lg font-semibold text-mauve-800">คำถามยอดนิยม</h3>
+          </div>
+          <div className="divide-y divide-cream-200">
+            {conversation?.topQuestions?.slice(0, 15).map((q, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.6 + i * 0.04 }}
+                className="flex items-center gap-4 px-6 py-4 hover:bg-cream-50 transition-colors"
+              >
+                <span className="font-display text-2xl font-bold text-rg-200 w-8 text-center flex-shrink-0">
+                  {i + 1}
+                </span>
+                <p className="flex-1 font-body text-sm text-mauve-700">{q.text}</p>
+                <div className="flex items-center gap-3 flex-shrink-0">
+                  <div className="w-24 h-1.5 rounded-full bg-cream-200 overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-gradient-to-r from-rg-400 to-rg-600"
+                      style={{ width: `${conversation.topQuestions[0]?.count ? (q.count / conversation.topQuestions[0].count) * 100 : 0}%` }}
+                    />
+                  </div>
+                  <span className="font-body text-xs text-mauve-500 w-12 text-right">{q.count} ครั้ง</span>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+          {(!conversation?.topQuestions || conversation.topQuestions.length === 0) && !conversationLoading && (
+            <div className="px-6 py-8">
+              <InsightsEmptyState message="ยังไม่มีคำถามในช่วงนี้" />
+            </div>
+          )}
+        </div>
+      </motion.div>
+
+      {/* AI Performance */}
       <section>
-        <SectionHeader title="AI Performance Intelligence" description="ความแม่นยำและคำตอบที่ fail" />
+        <h2 className="font-display text-lg font-semibold text-mauve-800 mb-4">AI Performance Intelligence</h2>
+        <p className="font-body text-sm text-mauve-500 mb-4">ความแม่นยำและคำตอบที่ fail</p>
         {aiPerfLoading ? (
-          <div className="h-48 rounded-xl bg-surface-100 animate-pulse" />
+          <div className="h-48 rounded-2xl bg-cream-200 animate-pulse" />
         ) : aiPerf ? (
           <div className="grid md:grid-cols-2 gap-6">
-            <Card padding="lg">
-              <CardHeader title="AI Accuracy" subtitle="จาก feedback ที่ติดป้าย (ดี/แย่)" />
+            <div className="luxury-card p-6">
+              <h3 className="font-display text-base font-semibold text-mauve-800">AI Accuracy</h3>
+              <p className="font-body text-xs text-mauve-400 mt-0.5">จาก feedback ที่ติดป้าย (ดี/แย่)</p>
               <div className="mt-4 flex items-baseline gap-2">
-                <span className="text-3xl font-bold text-surface-900">{aiPerf.accuracyScore}%</span>
-                <span className="text-sm text-surface-500">
+                <span className="font-display text-3xl font-bold text-mauve-800">{aiPerf.accuracyScore}%</span>
+                <span className="font-body text-sm text-mauve-400">
                   ({aiPerf.successCount} / {aiPerf.totalLabeled} ที่ติดป้าย)
                 </span>
               </div>
-              <p className="text-xs text-surface-500 mt-2">
+              <p className="font-body text-xs text-mauve-400 mt-2">
                 Human Override Rate: {aiPerf.humanOverrideRate}%
               </p>
-            </Card>
-            <Card padding="lg">
-              <CardHeader title="คำถามที่ AI ตอบแย่ (Top Failed)" subtitle="จากป้าย fail ใน Golden Dataset" />
+            </div>
+            <div className="luxury-card p-6">
+              <h3 className="font-display text-base font-semibold text-mauve-800">คำถามที่ AI ตอบแย่ (Top Failed)</h3>
+              <p className="font-body text-xs text-mauve-400 mt-0.5">จากป้าย fail ใน Golden Dataset</p>
               {aiPerf.topFailedQueries.length > 0 ? (
                 <ul className="space-y-2 mt-2 max-h-48 overflow-y-auto">
                   {aiPerf.topFailedQueries.slice(0, 8).map((q, i) => (
-                    <li key={i} className="text-sm text-surface-700 truncate" title={q.userMessage}>
+                    <li key={i} className="font-body text-sm text-mauve-700 truncate" title={q.userMessage}>
                       {q.userMessage}
-                      <span className="ml-2 font-semibold text-surface-900">{q.count}</span>
+                      <span className="ml-2 font-semibold text-mauve-900">{q.count}</span>
                     </li>
                   ))}
                 </ul>
               ) : (
-                <p className="text-sm text-surface-500 mt-2">ยังไม่มีคำตอบที่ติดป้ายแย่</p>
+                <p className="font-body text-sm text-mauve-400 mt-2">ยังไม่มีคำตอบที่ติดป้ายแย่</p>
               )}
-            </Card>
+            </div>
           </div>
         ) : null}
       </section>
 
-      {/* 4. Operational */}
+      {/* Operational: Booking Peak + Collapsible Heatmaps */}
       <section>
-        <SectionHeader title="Operational Intelligence" description="Peak Chat Time และการจอง" />
+        <h2 className="font-display text-lg font-semibold text-mauve-800 mb-4">Operational Intelligence</h2>
+        <p className="font-body text-sm text-mauve-500 mb-4">Peak Chat Time และการจอง</p>
         {operationalLoading ? (
-          <div className="h-48 rounded-xl bg-surface-100 animate-pulse" />
+          <div className="h-48 rounded-2xl bg-cream-200 animate-pulse" />
         ) : operational && (operational.bookingPeakByHour.some((x) => x.count > 0) || operational.chatPeakHeatmap.length > 0) ? (
           <div className="space-y-6">
-            <Card padding="lg">
-              <CardHeader title="Booking Peak by Hour" subtitle="จำนวนการจองแยกตามชั่วโมง" />
+            <div className="luxury-card p-6">
+              <h3 className="font-display text-base font-semibold text-mauve-800">Booking Peak by Hour</h3>
+              <p className="font-body text-xs text-mauve-400 mt-0.5">จำนวนการจองแยกตามชั่วโมง</p>
               <div className="h-56 mt-4">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={operational.bookingPeakByHour} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke={CHART.grid} />
-                    <XAxis dataKey="hour" tick={{ fontSize: 11 }} tickFormatter={(h) => `${h}:00`} />
-                    <YAxis tick={{ fontSize: 11 }} />
-                    <Tooltip formatter={(v: number) => [v, "การจอง"]} labelFormatter={(h) => `${h}:00`} />
-                    <Bar dataKey="count" fill={CHART.primary} name="การจอง" radius={[4, 4, 0, 0]} />
+                    <XAxis dataKey="hour" tick={{ fontSize: 11, fill: CHART.axis }} tickFormatter={(h) => `${h}:00`} />
+                    <YAxis tick={{ fontSize: 11, fill: CHART.axis }} />
+                    <Tooltip
+                      contentStyle={{ borderRadius: "12px", border: "1px solid var(--cream-200)", fontFamily: "var(--font-body)" }}
+                      formatter={(v: number | undefined) => [v ?? 0, "การจอง"]}
+                      labelFormatter={(h) => `${h}:00`}
+                    />
+                    <Bar dataKey="count" fill={CHART.primary} name="การจอง" radius={[8, 8, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
-              <p className="text-xs text-surface-500 mt-2">
+              <p className="font-body text-xs text-mauve-400 mt-2">
                 แชททั้งหมด: {operational.totalChats} | การจองทั้งหมด: {operational.totalBookings}
               </p>
-            </Card>
-            {/* Collapsible Heatmaps */}
+            </div>
             <div className="space-y-3">
               <button
                 type="button"
                 onClick={() => setHeatmapOpen(heatmapOpen === "chat" ? null : "chat")}
-                className="flex items-center justify-between w-full px-4 py-3 rounded-xl border border-surface-200 bg-surface-50 text-left text-sm font-medium text-surface-800 hover:bg-surface-100"
+                className="flex items-center justify-between w-full px-4 py-3 rounded-2xl border border-cream-200 bg-cream-50 font-body text-sm font-medium text-mauve-800 hover:bg-cream-100 transition-colors"
               >
                 Chat Heatmap (ชั่วโมง × วัน)
-                <span className="text-surface-400">{heatmapOpen === "chat" ? "▼" : "▶"}</span>
+                <span className="text-mauve-400">{heatmapOpen === "chat" ? "▼" : "▶"}</span>
               </button>
               {heatmapOpen === "chat" && operational.chatPeakHeatmap.length > 0 && (
-                <Card padding="md">
+                <div className="luxury-card p-4">
                   <div className="overflow-x-auto">
                     <HeatmapGrid data={operational.chatPeakHeatmap} dayLabels={DAY_LABELS} />
                   </div>
-                </Card>
+                </div>
               )}
               <button
                 type="button"
                 onClick={() => setHeatmapOpen(heatmapOpen === "booking" ? null : "booking")}
-                className="flex items-center justify-between w-full px-4 py-3 rounded-xl border border-surface-200 bg-surface-50 text-left text-sm font-medium text-surface-800 hover:bg-surface-100"
+                className="flex items-center justify-between w-full px-4 py-3 rounded-2xl border border-cream-200 bg-cream-50 font-body text-sm font-medium text-mauve-800 hover:bg-cream-100 transition-colors"
               >
                 Booking Heatmap (ชั่วโมง × วัน)
-                <span className="text-surface-400">{heatmapOpen === "booking" ? "▼" : "▶"}</span>
+                <span className="text-mauve-400">{heatmapOpen === "booking" ? "▼" : "▶"}</span>
               </button>
               {heatmapOpen === "booking" && operational.bookingHeatmap && operational.bookingHeatmap.length > 0 && (
-                <Card padding="md">
+                <div className="luxury-card p-4">
                   <div className="overflow-x-auto">
                     <HeatmapGrid data={operational.bookingHeatmap} dayLabels={DAY_LABELS} />
                   </div>
-                </Card>
+                </div>
               )}
             </div>
           </div>
         ) : (
-          <Card padding="lg">
-            <EmptyState message="ยังไม่มีข้อมูลแชท/การจองในช่วงนี้" />
-          </Card>
+          <div className="luxury-card p-6">
+            <InsightsEmptyState message="ยังไม่มีข้อมูลแชท/การจองในช่วงนี้" />
+          </div>
         )}
       </section>
 
-      {/* 5. Knowledge + Gap Detection */}
+      {/* Knowledge + Gap Detection */}
       <section>
-        <SectionHeader title="Knowledge Intelligence" description="ความครอบคลุมและช่องว่าง (Unanswered)" />
+        <h2 className="font-display text-lg font-semibold text-mauve-800 mb-4">Knowledge Intelligence</h2>
+        <p className="font-body text-sm text-mauve-500 mb-4">ความครอบคลุมและช่องว่าง (Unanswered)</p>
         {knowledgeLoading ? (
-          <div className="h-24 rounded-xl bg-surface-100 animate-pulse" />
+          <div className="h-24 rounded-2xl bg-cream-200 animate-pulse" />
         ) : knowledge ? (
-          <Card padding="lg">
+          <div className="luxury-card p-6">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>
-                <p className="text-sm font-medium text-surface-700">เอกสารทั้งหมด: {knowledge.totalDocuments} | เปิดใช้งาน: {knowledge.activeDocuments}</p>
+                <p className="font-body text-sm font-medium text-mauve-700">เอกสารทั้งหมด: {knowledge.totalDocuments} | เปิดใช้งาน: {knowledge.activeDocuments}</p>
                 {knowledge.coveragePercent != null && (
-                  <p className="text-sm text-surface-600 mt-1">Coverage: {knowledge.coveragePercent}%</p>
+                  <p className="font-body text-sm text-mauve-600 mt-1">Coverage: {knowledge.coveragePercent}%</p>
                 )}
                 {knowledge.unansweredCount != null && knowledge.unansweredCount > 0 && (
-                  <p className="text-sm text-amber-700 mt-1">คำถามที่ยังไม่มี Intent ชัด (other): {knowledge.unansweredCount}</p>
+                  <p className="font-body text-sm text-amber-700 mt-1">คำถามที่ยังไม่มี Intent ชัด (other): {knowledge.unansweredCount}</p>
                 )}
-                <p className="text-sm text-surface-600 mt-2">{knowledge.coverageNote}</p>
+                <p className="font-body text-sm text-mauve-600 mt-2">{knowledge.coverageNote}</p>
               </div>
               {(knowledge.activeDocuments === 0 || (knowledge.coveragePercent != null && knowledge.coveragePercent < 100)) && (
                 <a
                   href="/clinic/knowledge"
-                  className="inline-flex items-center px-4 py-2 rounded-lg bg-primary-600 text-white text-sm font-medium hover:bg-primary-700"
+                  className="inline-flex items-center px-4 py-2 rounded-xl font-body text-sm font-medium bg-rg-500 text-white hover:bg-rg-600 transition-colors"
                 >
                   เพิ่ม Knowledge
                 </a>
               )}
             </div>
             {knowledge.topMissingTopics && knowledge.topMissingTopics.length > 0 && (
-              <div className="mt-4 pt-4 border-t border-surface-100">
-                <p className="text-xs font-medium text-surface-600 mb-2">หัวข้อที่ถามบ่อยแต่ยังไม่มี Intent ชัด (Top Missing)</p>
-                <ul className="space-y-1 text-sm text-surface-700">
+              <div className="mt-4 pt-4 border-t border-cream-200">
+                <p className="font-body text-xs font-medium text-mauve-600 mb-2">หัวข้อที่ถามบ่อยแต่ยังไม่มี Intent ชัด (Top Missing)</p>
+                <ul className="space-y-1 font-body text-sm text-mauve-700">
                   {knowledge.topMissingTopics.slice(0, 5).map((t, i) => (
                     <li key={i} className="truncate" title={t.text}>
                       {t.text} — {t.count}
@@ -738,30 +855,31 @@ export default function InsightsPage() {
                 </ul>
               </div>
             )}
-          </Card>
+          </div>
         ) : null}
       </section>
 
-      {/* 6. Executive Summary (AI) */}
+      {/* Executive Summary (AI) */}
       <section>
-        <SectionHeader title="Strategic AI Executive Report" description="สรุปจาก AI ตามเมตริกช่วงนี้" />
+        <h2 className="font-display text-lg font-semibold text-mauve-800 mb-4">Strategic AI Executive Report</h2>
+        <p className="font-body text-sm text-mauve-500 mb-4">สรุปจาก AI ตามเมตริกช่วงนี้</p>
         {executiveLoading ? (
-          <div className="h-32 rounded-xl bg-surface-100 animate-pulse" />
+          <div className="h-32 rounded-2xl bg-cream-200 animate-pulse" />
         ) : executive ? (
-          <Card padding="lg">
+          <div className="luxury-card p-6">
             {executive.summary ? (
-              <div className="p-5 rounded-xl bg-primary-50/50 border border-primary-100">
-                <p className="text-surface-800 text-sm leading-relaxed whitespace-pre-wrap">{executive.summary}</p>
+              <div className="p-5 rounded-2xl bg-rg-50/50 border border-rg-100">
+                <p className="font-body text-mauve-800 text-sm leading-relaxed whitespace-pre-wrap">{executive.summary}</p>
               </div>
             ) : (
-              <p className="text-sm text-surface-500">
+              <p className="font-body text-sm text-mauve-400">
                 {executive.message ?? "ไม่มีสรุป — ตั้งค่า GEMINI_API_KEY เพื่อสร้างสรุปจาก AI หรือเลือกช่วงที่มีข้อมูล"}
               </p>
             )}
-            <p className="text-xs text-surface-400 mt-3">
+            <p className="font-body text-xs text-mauve-400 mt-3">
               ช่วง: {executive.from?.slice(0, 10)} ถึง {executive.to?.slice(0, 10)}
             </p>
-          </Card>
+          </div>
         ) : null}
       </section>
     </div>

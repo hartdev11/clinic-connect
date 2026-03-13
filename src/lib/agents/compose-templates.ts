@@ -506,6 +506,10 @@ export function templateHesitation(state: ConversationState, userMessage: string
   let normalizeText = "จริงๆ แล้วการทำหัตถการความงามมีความปลอดภัยสูงค่ะ";
   if (state.service === "surgery") {
     normalizeText = "จริงๆ แล้วการทำศัลยกรรมมีความปลอดภัยสูงค่ะ แต่ต้องเลือกแพทย์และคลินิกที่เชื่อถือได้";
+    // เมื่อลูกค้ากลัวเจ็บ — ระบุว่ามียาชา/sedation
+    if (/เจ็บ/.test(lower)) {
+      normalizeText += "\nเรื่องความเจ็บ มีการให้ยาชาค่ะ คุณหมอจะดูแลให้สบายที่สุด";
+    }
   }
   
   // ให้ข้อมูลสั้น

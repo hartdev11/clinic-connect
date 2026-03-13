@@ -178,3 +178,68 @@ export function computeKnowledgeQualityScore(
 }
 
 export { MIN_APPROVE_SCORE };
+
+/** Phase 16: Quality filter for learned items from handoffs */
+export interface ShouldLearnInput {
+  item: { type: string; confidence: number; answer?: string; details?: string; price?: string; service?: string };
+  conversationQuality: number;
+  existingSimilarity?: number;
+  existingPrice?: number;
+  sourceAgeDays?: number;
+}
+
+export interface ShouldLearnResult {
+  ok: boolean;
+  reason: string;
+}
+
+const HALLUCINATION_RISK_PATTERNS = [
+  { pattern: /100%|แน่นอน|ทุกคน|เสมอ/, risk: 0.2 },
+  { pattern: /รักษา|หาย|แก้|ถาวร/, risk: 0.3 },
+];
+
+export function shouldLearn(
+  input: ShouldLearnInput,
+  opts?: { checkDuplicate?: (text: string) => Promise<number>; checkPriceConflict?: (service: string, price: number) => Promise<number | null> }
+): ShouldLearnResult {
+  const { item, conversationQuality, existingSimilarity, existingPrice, sourceAgeDays } = input;
+
+  if (item.confidence < 0.5) {
+    return { ok: false, reason: "confidence < 0.5" };
+  }
+  if (conversationQuality < 0.6) {
+    return { ok: false, reason: "conversationQuality < 0.6" };
+  }
+
+  const answer = item.answer ?? item.details ?? "";
+  const len = answer.length;
+  if (len < 10 || len > 500) {
+    return { ok: false, reason: `answer length ${len} not in 10-500` };
+  }
+
+  if (existingSimilarity !== undefined && existingSimilarity >= 0.9) {
+    return { ok: false, reason: "duplicate (similarity >= 0.9)" };
+  }
+
+  if (item.type === "pricing" && existingPrice != null && item.price) {
+    const priceNum = parseInt(String(item.price).replace(/,/g, ""), 10);
+    const diff = Math.abs(priceNum - existingPrice);
+    if (diff > 500) {
+      return { ok: false, reason: "price conflict (diff > 500฿)" };
+    }
+  }
+
+  let hallucinationRisk = 0;
+  for (const { pattern, risk } of HALLUCINATION_RISK_PATTERNS) {
+    if (pattern.test(answer)) hallucinationRisk += risk;
+  }
+  if (hallucinationRisk >= 0.3) {
+    return { ok: false, reason: "hallucination risk >= 0.3" };
+  }
+
+  if (item.type === "pricing" && sourceAgeDays !== undefined && sourceAgeDays > 90) {
+    return { ok: false, reason: "pricing source > 90 days old" };
+  }
+
+  return { ok: true, reason: "pass" };
+}

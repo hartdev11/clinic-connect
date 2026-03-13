@@ -4,6 +4,7 @@
  * Phase 2 #16: Retrieval confidence layer, low_confidence flag, abstain strategy
  */
 import { listKnowledgeDocsForOrg } from "@/lib/knowledge-data";
+import { expandRagQueryForBodyPart } from "@/lib/knowledge-retrieval";
 import {
   searchKnowledgeWithPyramid,
   type KnowledgeSearchContext,
@@ -15,6 +16,8 @@ const AGENT_NAME = "knowledge-agent";
 /** Phase 3 #15: Retrieval <150ms target */
 const TIMEOUT_MS = 150;
 const RAG_TOP_K = 5;
+/** Phase 14: Threshold for "good" RAG results — below this we try fallbacks */
+const RAG_THRESHOLD = 0.7;
 
 /** Build structured context from RAG hit metadata — for Role Manager / anti-hallucination */
 function buildStructuredFromMetadata(meta: Record<string, unknown> | undefined): Record<string, unknown> {
@@ -89,12 +92,6 @@ async function executeKnowledgeAnalytics(
   const riskFlags: string[] = [];
   let recommendation: string | null = null;
 
-  const pyramidCtx: KnowledgeSearchContext = {
-    level: org_id ? "org" : "global",
-    org_id,
-    branch_id: branch_id ?? undefined,
-  };
-
   const useVectorRAG = Boolean(userMessage?.trim() && org_id);
 
   let retrievalConfidence = 0;
@@ -115,9 +112,11 @@ async function executeKnowledgeAnalytics(
         getRetrievalMode,
         isAbstainRequired,
       } = await import("@/lib/knowledge-brain/retrieval-intelligence");
-      const { FAILSAFE_MESSAGE, isFailsafeError } = await import("@/lib/knowledge-brain/failsafe");
 
-      const kbResults = await searchKnowledgeBrain(org_id, userMessage!.trim(), RAG_TOP_K);
+      const ragQuery = expandRagQueryForBodyPart(userMessage!.trim());
+      let kbResults = await searchKnowledgeBrain(org_id, ragQuery, RAG_TOP_K);
+      const { reRankKnowledgeHits } = await import("@/lib/knowledge-brain/retrieval-intelligence");
+      kbResults = reRankKnowledgeHits(kbResults, userMessage!.trim());
       const top = kbResults[0];
       const qualityFromMeta = top?.metadata?.quality_score as number | undefined;
       retrievalConfidence = computeRetrievalConfidenceWeighted(kbResults, {
@@ -131,9 +130,11 @@ async function executeKnowledgeAnalytics(
       knowledgeQualityScore = qualityFromMeta;
       retrievalKnowledgeIds = kbResults.map((r) => r.id.replace(/^(clinic_|global_)/, ""));
 
-      if (kbResults.length > 0) {
-        const top = kbResults[0];
-        for (const r of kbResults) {
+      const goodKbResults = kbResults.filter((r) => (typeof r.score === "number" ? r.score : 0) >= RAG_THRESHOLD);
+
+      if (goodKbResults.length > 0) {
+        const topGood = goodKbResults[0];
+        for (const r of goodKbResults) {
           const sn = (r.metadata?.service_name as string) ?? "";
           const cat = (r.metadata?.category as string) ?? "";
           const content = (r.metadata?.content as string) ?? "";
@@ -144,12 +145,11 @@ async function executeKnowledgeAnalytics(
         const unique = [...new Set(keyFindings)];
         keyFindings.length = 0;
         keyFindings.push(...unique.slice(0, 15));
-        recommendation = kbResults.length >= 2 ? "KB_RAG_MATCH" : "KB_RAG_SINGLE";
+        recommendation = goodKbResults.length >= 2 ? "KB_RAG_MATCH" : "KB_RAG_SINGLE";
         if (isAbstainRequired(getRetrievalMode(retrievalConfidence))) {
           riskFlags.push("RAG_ABSTAIN_REQUIRED");
         }
-        // Enterprise: เอาข้อมูล structured จาก top hit สำหรับ Role Manager / anti-hallucination
-        _structuredKnowledge = top ? buildStructuredFromMetadata(top.metadata) : null;
+        _structuredKnowledge = topGood ? buildStructuredFromMetadata(topGood.metadata) : null;
       }
     } catch (err) {
       const { isFailsafeError } = await import("@/lib/knowledge-brain/failsafe");
@@ -161,29 +161,10 @@ async function executeKnowledgeAnalytics(
     try {
       const { retrieveKnowledgeContext } = await import("@/lib/knowledge-retrieval");
       const ragResults = await retrieveKnowledgeContext(org_id, userMessage!.trim());
+      const goodTopicResults = ragResults.filter((r) => (r.finalScore ?? r.score ?? 0) >= RAG_THRESHOLD);
 
-      for (const r of ragResults) {
-        const topic = (r.metadata?.topic as string) ?? "";
-        const category = (r.metadata?.category as string) ?? "";
-        const content = (r.metadata?.content as string) ?? "";
-        if (topic) keyFindings.push(`topic:${topic}`);
-        if (category) keyFindings.push(`category:${category}`);
-        if (content) keyFindings.push(`rag_snippet:${content.slice(0, 150)}`);
-      }
-      const unique = [...new Set(keyFindings)];
-      keyFindings.length = 0;
-      keyFindings.push(...unique.slice(0, 15));
-
-      recommendation = ragResults.length >= 2 ? "RAG_MATCH" : ragResults.length === 1 ? "RAG_SINGLE" : "RAG_NO_MATCH";
-      if (ragResults.length === 0) riskFlags.push("RAG_EMPTY");
-    } catch {
-      try {
-        const ragResults = await searchKnowledgeWithPyramid(
-          userMessage!.trim(),
-          pyramidCtx,
-          { topK: RAG_TOP_K, is_active: true }
-        );
-        for (const r of ragResults) {
+      if (goodTopicResults.length > 0) {
+        for (const r of goodTopicResults) {
           const topic = (r.metadata?.topic as string) ?? "";
           const category = (r.metadata?.category as string) ?? "";
           const content = (r.metadata?.content as string) ?? "";
@@ -194,10 +175,47 @@ async function executeKnowledgeAnalytics(
         const unique = [...new Set(keyFindings)];
         keyFindings.length = 0;
         keyFindings.push(...unique.slice(0, 15));
-        recommendation = ragResults.length >= 2 ? "RAG_MATCH" : ragResults.length === 1 ? "RAG_SINGLE" : "RAG_NO_MATCH";
+        recommendation = goodTopicResults.length >= 2 ? "RAG_MATCH" : "RAG_SINGLE";
+      }
+    } catch {
+      // fallthrough to global
+    }
+
+    if (keyFindings.length === 0) {
+      try {
+        const globalCtx: KnowledgeSearchContext = { level: "global" };
+        const globalResults = await searchKnowledgeWithPyramid(
+          userMessage!.trim(),
+          globalCtx,
+          { topK: RAG_TOP_K, is_active: true }
+        );
+        const goodGlobal = globalResults.filter((r) => {
+          const s = r.score;
+          return typeof s === "number" && s >= RAG_THRESHOLD;
+        });
+        if (goodGlobal.length > 0) {
+          for (const r of goodGlobal) {
+            const topic = (r.metadata?.topic as string) ?? "";
+            const category = (r.metadata?.category as string) ?? "";
+            const content = (r.metadata?.content as string) ?? "";
+            if (topic) keyFindings.push(`topic:${topic}`);
+            if (category) keyFindings.push(`category:${category}`);
+            if (content) keyFindings.push(`rag_snippet:${content.slice(0, 150)}`);
+          }
+          const unique = [...new Set(keyFindings)];
+          keyFindings.length = 0;
+          keyFindings.push(...unique.slice(0, 15));
+          recommendation = goodGlobal.length >= 2 ? "RAG_MATCH" : "RAG_SINGLE";
+        }
       } catch {
         riskFlags.push("RAG_UNAVAILABLE");
       }
+    }
+
+    if (keyFindings.length === 0) {
+      riskFlags.push("RAG_EMPTY");
+      const { logKnowledgeGap } = await import("@/lib/knowledge-gap-logger");
+      void logKnowledgeGap(org_id, userMessage!.trim());
     }
   }
 

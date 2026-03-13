@@ -14,8 +14,9 @@ import {
   getMessageHash,
 } from "@/lib/line-idempotency";
 import { checkOrSetIdempotency, setLineEventReply } from "@/lib/idempotency";
-import { usePipeline, use7AgentChat } from "@/lib/feature-flags";
+import { isPipelineEnabled, is7AgentChatEnabled } from "@/lib/feature-flags";
 import { chatOrchestrate } from "@/lib/ai/orchestrator";
+import { triggerHandoff } from "@/lib/handoff-trigger";
 import { toSignedUrlsForLine } from "@/lib/promotion-storage";
 
 export const dynamic = "force-dynamic";
@@ -74,7 +75,7 @@ async function sendLineReply(
 }
 
 /** อ่าน body จาก stream — ใน Next.js บาง env request.text() คืนว่างแม้มี Content-Length */
-async function readRequestBody(request: NextRequest): Promise<string> {
+async function readRequestBody(request: Request): Promise<string> {
   const stream = request.body;
   if (!stream) return await request.text();
   const reader = stream.getReader();
@@ -183,26 +184,49 @@ export async function POST(request: NextRequest) {
     if (userId && process.env.NODE_ENV === "development") {
       console.log("[LINE Webhook] User ID:", userId.slice(0, 10) + "...");
     }
-    const shouldUse7Agent = use7AgentChat();
-    const shouldUsePipeline = usePipeline();
+    const shouldUse7Agent = is7AgentChatEnabled();
+    const shouldUsePipeline = isPipelineEnabled();
     const lineOrgId = process.env.LINE_ORG_ID?.trim() || null;
 
     void (async () => {
       try {
+        const BLOCKED_MSG = "บริการถูกระงับชั่วคราว กรุณาติดต่อผู้ดูแลระบบ";
+        if (lineOrgId) {
+          const sub = await getSubscriptionByOrgId(lineOrgId);
+          if (sub?.aiBlocked) {
+            if (token) await sendLineReply(replyToken, BLOCKED_MSG, token);
+            return;
+          }
+        }
+
         let replyText: string;
         let intent: { intent?: string; service?: string; area?: string } | undefined;
         let mediaUrls: string[] | undefined;
 
         if (shouldUse7Agent && lineOrgId) {
-          // 7-Agent System: 1 Role Manager + 6 Analytics (1 LLM call)
           const result = await chatOrchestrate({
             message: userText,
             org_id: lineOrgId,
             branch_id: null,
             userId: userId ?? null,
+            channel: "line",
           });
           replyText = result.reply?.trim() || "";
+          mediaUrls = result.media;
           intent = { intent: "general_chat" };
+          if (result.handoffTriggered?.triggerType === "low_ai_confidence" && userId) {
+            const pct = Math.round((result.handoffTriggered.confidence ?? 0) * 100);
+            triggerHandoff({
+              orgId: lineOrgId,
+              lineUserId: userId,
+              triggerType: "low_ai_confidence",
+              triggerMessage: `⚠️ AI ไม่แน่ใจ (confidence: ${pct}%) — ข้อความลูกค้า: ${userText.slice(0, 80)}`,
+            }).catch((err) => {
+              if (process.env.NODE_ENV === "development") {
+                console.warn("[LINE Webhook] triggerHandoff error:", (err as Error)?.message?.slice(0, 60));
+              }
+            });
+          }
         } else if (shouldUsePipeline) {
           // FE-5 — ดึง subscription plan สำหรับ context
           let subscriptionPlan: string | undefined;
@@ -259,6 +283,14 @@ export async function POST(request: NextRequest) {
           }).catch((err) => {
             if (process.env.NODE_ENV === "development") {
               console.warn("[LINE Webhook] Feedback save error:", (err as Error)?.message?.slice(0, 60));
+            }
+          });
+        }
+        if (lineOrgId && userId && userText) {
+          const { updateCustomerLeadScore } = await import("@/lib/ai/lead-score-updater");
+          updateCustomerLeadScore(lineOrgId, userId, userText).catch((err) => {
+            if (process.env.NODE_ENV === "development") {
+              console.warn("[LINE Webhook] Lead score update error:", (err as Error)?.message?.slice(0, 60));
             }
           });
         }

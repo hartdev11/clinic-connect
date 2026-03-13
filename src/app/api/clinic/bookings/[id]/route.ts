@@ -10,6 +10,8 @@ import { getEffectiveUser, requireBranchAccess, requireRole } from "@/lib/rbac";
 import {
   computeRequiresCustomerNotification,
   sendBookingConfirmation,
+  sendBookingRejection,
+  scheduleBookingReminder,
 } from "@/lib/booking-notification";
 import type { BookingChannel } from "@/types/clinic";
 import { runWithObservability } from "@/lib/observability/run-with-observability";
@@ -43,6 +45,7 @@ export async function PATCH(
 
     const body = (await request.json()) as Record<string, unknown>;
     const updates: Parameters<typeof updateBooking>[2] = {};
+    const rejectReason = typeof body.rejectReason === "string" ? body.rejectReason.trim() : "";
 
     if (typeof body.customerName === "string" && body.customerName.trim()) updates.customerName = body.customerName.trim();
     if (typeof body.phoneNumber === "string") updates.phoneNumber = body.phoneNumber.trim() || null;
@@ -86,6 +89,32 @@ export async function PATCH(
         sendBookingConfirmation({ orgId, bookingId, booking: updatedBooking }).catch((err) =>
           console.warn("[Booking PATCH] Notification failed:", (err as Error).message)
         );
+      }
+    }
+
+    // BullMQ: 24h reminder when scheduledAt created/updated
+    if (updates.scheduledAt) {
+      const scheduledAt = new Date(updates.scheduledAt);
+      const mergedBooking = await getBookingById(orgId, bookingId);
+      if (mergedBooking) {
+        await scheduleBookingReminder(bookingId, scheduledAt, orgId, {
+          customerId: mergedBooking.customerId ?? undefined,
+          lineUserId: mergedBooking.chatUserId ?? undefined,
+        }).catch((err) => console.warn("[Booking PATCH] scheduleBookingReminder:", (err as Error)?.message));
+      }
+    }
+
+    // Enterprise: ปฏิเสธการจอง → ส่งเหตุผลให้ลูกค้าผ่านช่องทางที่จองมา
+    const statusChangedToCancelled = updates.status === "cancelled" && booking.status !== "cancelled";
+    if (statusChangedToCancelled && rejectReason && booking.chatUserId && booking.channel) {
+      const updated = await getBookingById(orgId, bookingId);
+      if (updated) {
+        sendBookingRejection({
+          orgId,
+          bookingId,
+          booking: updated,
+          rejectReason,
+        }).catch((err) => console.warn("[Booking PATCH] Rejection notification failed:", (err as Error).message));
       }
     }
 

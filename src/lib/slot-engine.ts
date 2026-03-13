@@ -253,7 +253,7 @@ export async function getAvailableSlots(
 ): Promise<SlotResult> {
   const durationMinutes = opts?.durationMinutes ?? 30;
   const procedure = opts?.procedure?.trim();
-  let doctorId = opts?.doctorId;
+  const doctorId = opts?.doctorId;
 
   const d = new Date(dateStr);
   const dayOfWeek = DAY_KEYS[d.getDay()] as DayOfWeek;
@@ -325,8 +325,8 @@ export async function getAvailableSlots(
     }
     allSlots.sort((a, b) => a.startISO.localeCompare(b.startISO));
   } else {
-    let openStr = dayHours.open;
-    let closeStr = dayHours.close;
+    const openStr = dayHours.open;
+    const closeStr = dayHours.close;
     const slotDuration = branchHours?.slot_duration_minutes ?? durationMinutes;
     const slots = generateSlotsInRange(openStr, closeStr, slotDuration, dateStr);
     for (const slot of slots) {

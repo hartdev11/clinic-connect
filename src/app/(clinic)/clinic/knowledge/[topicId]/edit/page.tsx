@@ -3,10 +3,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
-import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { PageHeader } from "@/components/layout/PageHeader";
+import { Input, Textarea } from "@/components/ui/Input";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { getMaxContentLength } from "@/lib/knowledge-validation";
 import type { KnowledgeTopicCategory, KnowledgeVersionPayload } from "@/types/knowledge";
 
@@ -169,8 +168,8 @@ export default function KnowledgeEditPage() {
   if (fetching) {
     return (
       <div className="space-y-8">
-        <PageHeader title="แก้ไขข้อมูล" description="กำลังโหลด..." />
-        <div className="h-64 rounded-2xl bg-surface-100 animate-pulse" />
+        <PageHeader title="แก้ไขข้อมูล" subtitle="กำลังโหลด..." />
+        <div className="h-64 rounded-2xl bg-cream-200 animate-pulse" />
       </div>
     );
   }
@@ -179,29 +178,29 @@ export default function KnowledgeEditPage() {
     <div className="space-y-8">
       <PageHeader
         title="แก้ไขข้อมูล"
-        description="ข้อมูลนี้จะถูกใช้โดย AI เพื่อตอบคำถามลูกค้าใน LINE และช่องทางออนไลน์อื่น ๆ"
+        subtitle="ข้อมูลนี้จะถูกใช้โดย AI เพื่อตอบคำถามลูกค้าใน LINE และช่องทางออนไลน์อื่น ๆ"
       />
 
-      <Card padding="lg">
+      <div className="luxury-card p-6">
         <div className="space-y-6 max-w-2xl">
           <div>
-            <label className="block text-sm font-medium text-surface-700 mb-1">
+            <label className="block font-body text-sm font-medium text-mauve-700 mb-1">
               หัวข้อ <span className="text-red-500">*</span>
             </label>
             <Input
               value={form.topic ?? ""}
               onChange={(e) => setForm((f) => ({ ...f, topic: e.target.value }))}
               placeholder="เช่น โบท็อกซ์, ฟิลเลอร์, เลเซอร์กำจัดขน"
-              className="w-full text-base"
+              className="w-full"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-surface-700 mb-1">
+            <label className="block font-body text-sm font-medium text-mauve-700 mb-1">
               ประเภท <span className="text-red-500">*</span>
             </label>
             <select
-              className="w-full px-4 py-2.5 rounded-xl border border-surface-200 text-base focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 bg-white"
+              className="w-full px-4 py-2.5 rounded-2xl border border-cream-200 font-body text-base text-mauve-800 bg-white focus:ring-2 focus:ring-rg-300/50 focus:border-rg-400 focus:outline-none"
               value={form.category ?? "service"}
               onChange={(e) => setForm((f) => ({ ...f, category: e.target.value as KnowledgeTopicCategory }))}
             >
@@ -222,11 +221,11 @@ export default function KnowledgeEditPage() {
             >
               ✨ ให้ AI ช่วยเขียน
             </Button>
-            <span className="text-sm text-surface-500">กรอกหัวข้อและประเภทก่อน แล้วกดปุ่มนี้</span>
+            <span className="font-body text-sm text-mauve-400">กรอกหัวข้อและประเภทก่อน แล้วกดปุ่มนี้</span>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-surface-700 mb-1">สรุปสั้น ๆ</label>
+            <label className="block font-body text-sm font-medium text-mauve-700 mb-1">สรุปสั้น ๆ</label>
             <div className="flex gap-2">
               <Input
                 value={summaryInput}
@@ -240,13 +239,13 @@ export default function KnowledgeEditPage() {
               </Button>
             </div>
             {(form.summary ?? []).length > 0 && (
-              <ul className="mt-2 flex flex-wrap gap-2 list-disc list-inside text-surface-600 text-sm">
+              <ul className="mt-2 flex flex-wrap gap-2 list-disc list-inside font-body text-mauve-600 text-sm">
                 {(form.summary ?? []).map((s, i) => (
                   <li key={i} className="flex items-center gap-1">
                     {s}
                     <button
                       type="button"
-                      className="text-surface-400 hover:text-red-600"
+                      className="text-mauve-400 hover:text-red-600"
                       onClick={() =>
                         setForm((f) => ({
                           ...f,
@@ -263,23 +262,23 @@ export default function KnowledgeEditPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-surface-700 mb-1">
+            <label className="block font-body text-sm font-medium text-mauve-700 mb-1">
               รายละเอียดทั้งหมด <span className="text-red-500">*</span>
             </label>
-            <textarea
-              className="w-full px-4 py-3 rounded-xl border border-surface-200 text-base focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 min-h-[200px] resize-y"
+            <Textarea
+              className="w-full min-h-[200px] resize-y"
               value={form.content ?? ""}
               onChange={(e) => setForm((f) => ({ ...f, content: e.target.value }))}
               placeholder="กรอกรายละเอียดที่ AI จะใช้ตอบลูกค้า (สามารถใช้ bullet และย่อหน้าได้)"
               maxLength={maxLen + 100}
             />
-            <p className="mt-1 text-sm text-surface-500">
+            <p className="mt-1 font-body text-sm text-mauve-400">
               {form.content?.length ?? 0} / {maxLen.toLocaleString()} ตัวอักษร
             </p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-surface-700 mb-1">
+            <label className="block font-body text-sm font-medium text-mauve-700 mb-1">
               ตัวอย่างคำถามที่ลูกค้าอาจถาม (ไม่บังคับ)
             </label>
             <div className="flex gap-2">
@@ -295,13 +294,13 @@ export default function KnowledgeEditPage() {
               </Button>
             </div>
             {(form.exampleQuestions ?? []).length > 0 && (
-              <ul className="mt-2 flex flex-wrap gap-2 list-disc list-inside text-surface-600 text-sm">
+              <ul className="mt-2 flex flex-wrap gap-2 list-disc list-inside font-body text-mauve-600 text-sm">
                 {(form.exampleQuestions ?? []).map((q, i) => (
                   <li key={i} className="flex items-center gap-1">
                     {q}
                     <button
                       type="button"
-                      className="text-surface-400 hover:text-red-600"
+                      className="text-mauve-400 hover:text-red-600"
                       onClick={() =>
                         setForm((f) => ({
                           ...f,
@@ -318,18 +317,18 @@ export default function KnowledgeEditPage() {
           </div>
 
           {error && (
-            <div className="p-4 rounded-xl bg-red-50 border border-red-100 text-red-800 text-sm">
+            <div className="p-4 rounded-2xl bg-red-50 border border-red-100 font-body text-red-800 text-sm">
               {error}
             </div>
           )}
           {assistWarning && (
-            <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-sm">
+            <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 font-body text-amber-800 text-sm">
               {assistWarning}
             </div>
           )}
 
           {financialConfirm && (
-            <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-sm">
+            <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 font-body text-amber-800 text-sm">
               <p className="font-medium">ข้อมูลด้านการเงินไม่ควรใส่ในส่วนนี้</p>
               <p className="mt-1">หากยืนยันว่าต้องการบันทึก กรุณากด &quot;บันทึกหลังยืนยัน&quot;</p>
               <div className="mt-3 flex gap-2">
@@ -358,7 +357,7 @@ export default function KnowledgeEditPage() {
             </Link>
           </div>
         </div>
-      </Card>
+      </div>
     </div>
   );
 }

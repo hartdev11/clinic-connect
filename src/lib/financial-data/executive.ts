@@ -212,7 +212,7 @@ export async function getRevenueBreakdown(
     }
   }
 
-  let bookingMap = new Map<string, { doctor?: string; channel?: string }>();
+  const bookingMap = new Map<string, { doctor?: string; channel?: string }>();
   if (bookingIds.size > 0) {
     const batchSize = 100;
     const ids = Array.from(bookingIds);
@@ -246,7 +246,7 @@ export async function getRevenueBreakdown(
   }
 
   const branchIds = Array.from(byBranchMap.keys()).filter((k) => k !== "(ไม่มีสาขา)");
-  let branchNames: Record<string, string> = {};
+  const branchNames: Record<string, string> = {};
   if (branchIds.length > 0) {
     const branchSnap = await db.collection(COLLECTIONS.branches).get();
     for (const doc of branchSnap.docs) {

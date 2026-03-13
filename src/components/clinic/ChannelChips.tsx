@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Channel chips for Customer & Chat — LINE, Facebook, Instagram, TikTok, Web
+ * Channel chips for Customer & Chat — LINE, Facebook, Instagram, TikTok
  * Enterprise: aria, keyboard nav, reduced motion
  */
 import type { CustomerSource } from "@/types/clinic";
@@ -22,46 +22,11 @@ export const CHANNELS: {
     border: "border-surface-200",
     icon: <ChannelIconAll />,
   },
-  {
-    value: "line",
-    label: "LINE",
-    color: "text-[#06c755]",
-    bg: "bg-[#06c755]/8",
-    border: "border-[#06c755]/30",
-    icon: <ChannelIconLine />,
-  },
-  {
-    value: "facebook",
-    label: "Facebook",
-    color: "text-[#1877f2]",
-    bg: "bg-[#1877f2]/8",
-    border: "border-[#1877f2]/30",
-    icon: <ChannelIconFacebook />,
-  },
-  {
-    value: "instagram",
-    label: "Instagram",
-    color: "text-[#e4405f]",
-    bg: "bg-gradient-to-br from-[#f9ed32]/20 via-[#e4405f]/15 to-[#833ab4]/20",
-    border: "border-[#e4405f]/30",
-    icon: <ChannelIconInstagram />,
-  },
-  {
-    value: "tiktok",
-    label: "TikTok",
-    color: "text-[#000000]",
-    bg: "bg-[#00f2ea]/10",
-    border: "border-[#ff0050]/20",
-    icon: <ChannelIconTikTok />,
-  },
-  {
-    value: "web",
-    label: "Web",
-    color: "text-surface-600",
-    bg: "bg-surface-100",
-    border: "border-surface-200",
-    icon: <ChannelIconWeb />,
-  },
+  /* brand color — semantic tokens (tailwind theme) */
+  { value: "line", label: "LINE", color: "text-line-500", bg: "bg-line-500/10", border: "border-line-500/30", icon: <ChannelIconLine /> },
+  { value: "facebook", label: "Facebook", color: "text-facebook-500", bg: "bg-facebook-500/10", border: "border-facebook-500/30", icon: <ChannelIconFacebook /> },
+  { value: "instagram", label: "Instagram", color: "text-instagram-500", bg: "bg-gradient-to-br from-instagram-yellow/20 via-instagram-500/15 to-instagram-purple/20", border: "border-instagram-500/30", icon: <ChannelIconInstagram /> },
+  { value: "tiktok", label: "TikTok", color: "text-tiktok-black", bg: "bg-tiktok-cyan/10", border: "border-tiktok-pink/20", icon: <ChannelIconTikTok /> },
 ];
 
 function ChannelIconAll() {
@@ -100,14 +65,6 @@ function ChannelIconTikTok() {
   return (
     <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
       <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-1-.05A6.33 6.33 0 005 20.1a6.34 6.34 0 0010.86-4.43v-7a8.16 8.16 0 004.77 1.52v-3.4a4.85 4.85 0 01-1-.1z" />
-    </svg>
-  );
-}
-
-function ChannelIconWeb() {
-  return (
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
     </svg>
   );
 }
@@ -173,6 +130,10 @@ export function ChannelChips({
   );
 }
 
+const LABEL_FALLBACK: Record<string, string> = {
+  web: "Web",
+};
+
 export function getChannelLabel(source: string): string {
-  return CHANNELS.find((c) => c.value === source)?.label ?? source;
+  return CHANNELS.find((c) => c.value === source)?.label ?? LABEL_FALLBACK[source] ?? source;
 }

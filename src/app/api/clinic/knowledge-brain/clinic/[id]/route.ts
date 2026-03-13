@@ -18,6 +18,7 @@ import {
   computeKnowledgeQualityScore,
 } from "@/lib/knowledge-brain";
 import { invalidateAICache } from "@/lib/ai/ai-feedback-loop";
+import { invalidateOrgCache } from "@/lib/ai/prompt-cache-manager";
 
 export const dynamic = "force-dynamic";
 const RATE_LIMIT = { windowSeconds: 60, max: 30 };
@@ -87,6 +88,7 @@ export async function PATCH(
       details: { fields: Object.keys(data) },
     });
     void invalidateAICache({ org_id: orgId, scope: "knowledge" });
+    void invalidateOrgCache(orgId);
 
     return NextResponse.json({ ok: true, version: updated?.version });
   } catch (err) {

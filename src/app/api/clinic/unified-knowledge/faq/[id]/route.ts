@@ -68,7 +68,7 @@ export async function PATCH(
         user_id: auth.userId || null,
         target_id: id,
         target_type: "clinic_faq",
-        details: Object.keys(data),
+        details: { fields: Object.keys(data) },
       });
       const updated = await getClinicFaqById(auth.orgId, id);
       return NextResponse.json(updated ?? { id, success: true });

@@ -201,6 +201,16 @@ export async function softDeleteClinicService(orgId: string, id: string): Promis
   return true;
 }
 
+/** Soft delete all clinic services for org (onboarding replace). */
+export async function softDeleteAllClinicServices(orgId: string): Promise<number> {
+  const services = await listClinicServices(orgId, { limit: 200, includeDeleted: false });
+  const now = new Date().toISOString();
+  for (const s of services) {
+    await clinicServicesRef(orgId).doc(s.id).update({ deleted_at: now, updated_at: now });
+  }
+  return services.length;
+}
+
 // ─── Clinic FAQ ────────────────────────────────────────────────────────────
 
 function mapClinicFaqDoc(id: string, clinicId: string, d: Record<string, unknown>): ClinicFaq {
@@ -218,14 +228,51 @@ function mapClinicFaqDoc(id: string, clinicId: string, d: Record<string, unknown
   };
 }
 
+const FAQ_ORDER_DOC = "faq_order";
+
+function faqOrderRef(orgId: string) {
+  return db.collection("organizations").doc(orgId).collection("knowledge").doc(FAQ_ORDER_DOC);
+}
+
+/** Get FAQ display order (array of ids). Empty if not set. */
+export async function getFaqOrder(orgId: string): Promise<string[]> {
+  const doc = await faqOrderRef(orgId).get();
+  if (!doc.exists) return [];
+  const ids = doc.data()?.ids;
+  return Array.isArray(ids) ? ids.filter((x): x is string => typeof x === "string") : [];
+}
+
+/** Set FAQ display order. */
+export async function setFaqOrder(orgId: string, ids: string[]): Promise<void> {
+  await faqOrderRef(orgId).set({ ids, updated_at: new Date().toISOString() }, { merge: true });
+}
+
 export async function listClinicFaq(orgId: string, limit = 100, opts?: { includeDeleted?: boolean }): Promise<ClinicFaq[]> {
-  const snap = await clinicFaqRef(orgId).orderBy("updated_at", "desc").limit(opts?.includeDeleted ? limit : limit * 2).get();
+  const [order, snap] = await Promise.all([
+    getFaqOrder(orgId),
+    clinicFaqRef(orgId).orderBy("updated_at", "desc").limit(opts?.includeDeleted ? limit : limit * 2).get(),
+  ]);
   let items = snap.docs.map((doc) => {
     const d = doc.data();
     return mapClinicFaqDoc(doc.id, orgId, d);
   });
   if (!opts?.includeDeleted) items = items.filter((f) => !f.deleted_at);
-  return items.slice(0, limit);
+  items = items.slice(0, limit);
+
+  if (order.length > 0) {
+    const byId = new Map(items.map((f) => [f.id, f]));
+    const ordered: ClinicFaq[] = [];
+    for (const id of order) {
+      const f = byId.get(id);
+      if (f) {
+        ordered.push(f);
+        byId.delete(id);
+      }
+    }
+    ordered.push(...byId.values());
+    return ordered;
+  }
+  return items;
 }
 
 export async function getClinicFaqById(orgId: string, id: string, opts?: { includeDeleted?: boolean }): Promise<ClinicFaq | null> {

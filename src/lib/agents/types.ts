@@ -108,10 +108,12 @@ export interface ComposeInput {
   tone?: string;
 }
 
-/** Agent E — Escalation & Human Handoff output */
+/** Agent E — Escalation & Human Handoff output (Phase 7) */
 export interface EscalationResult {
   handoff: boolean;
   target?: "admin" | "doctor" | "support";
+  /** Phase 7: trigger type for handoff_session */
+  triggerType?: "angry_customer" | "explicit_request" | "loop_detected" | "medical";
 }
 
 /** Agent F — Memory / CRM / Analytics output */

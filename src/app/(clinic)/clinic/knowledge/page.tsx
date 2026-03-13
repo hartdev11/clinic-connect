@@ -2,11 +2,31 @@
 
 import { useState, useCallback, useEffect } from "react";
 import Link from "next/link";
-import { PageHeader } from "@/components/layout/PageHeader";
-import { Card } from "@/components/ui/Card";
+import { motion } from "framer-motion";
+import { Bars3Icon } from "@heroicons/react/24/outline";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { cn } from "@/lib/utils";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
+import { Input, Textarea } from "@/components/ui/Input";
 import { Badge } from "@/components/ui/Badge";
+import { EmptyState } from "@/components/ui/EmptyState";
 import type {
   UnifiedKnowledgeStatus,
   GlobalService,
@@ -14,8 +34,8 @@ import type {
   ClinicFaq,
 } from "@/types/unified-knowledge";
 
-const PAGE_TITLE = "ข้อมูลที่ AI ใช้ตอบลูกค้า";
-const PAGE_SUBTITLE = "จัดการข้อมูลที่ AI ใช้ตอบลูกค้าแบบอัตโนมัติ";
+const PAGE_TITLE = "Knowledge Base";
+const PAGE_SUBTITLE = "จัดการข้อมูลที่ AI ใช้ตอบคำถามลูกค้า";
 
 function formatDate(iso: string | null): string {
   if (!iso) return "—";
@@ -35,7 +55,7 @@ function StatusCards({ status, loading }: { status: UnifiedKnowledgeStatus | nul
     return (
       <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-3">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-28 rounded-2xl bg-surface-100/80 animate-pulse" />
+          <div key={i} className="h-28 rounded-2xl bg-cream-200 animate-pulse" />
         ))}
       </div>
     );
@@ -43,41 +63,41 @@ function StatusCards({ status, loading }: { status: UnifiedKnowledgeStatus | nul
   if (!status) return null;
   return (
     <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-3">
-      <Card padding="lg" className="bg-[#fefbfb] rounded-2xl shadow-sm">
-        <h4 className="text-sm font-medium text-surface-600">ความรู้มาตรฐานจากแพลตฟอร์ม</h4>
-        <p className="mt-2 text-lg font-semibold text-surface-800">
+      <div className="luxury-card p-6">
+        <h4 className="font-body text-sm font-medium text-mauve-600">ความรู้มาตรฐานจากแพลตฟอร์ม</h4>
+        <p className="mt-2 font-display text-lg font-semibold text-mauve-800">
           {status.global.active ? "Active" : "—"}
         </p>
-        <p className="mt-1 text-xs text-surface-500">Version {status.global.version}</p>
-      </Card>
-      <Card padding="lg" className="bg-[#fefbfb] rounded-2xl shadow-sm">
-        <h4 className="text-sm font-medium text-surface-600">ข้อมูลของคลินิกคุณ</h4>
-        <p className="mt-2 text-lg font-semibold text-surface-800">
+        <p className="mt-1 font-body text-xs text-mauve-400">Version {status.global.version}</p>
+      </div>
+      <div className="luxury-card p-6">
+        <h4 className="font-body text-sm font-medium text-mauve-600">ข้อมูลของคลินิกคุณ</h4>
+        <p className="mt-2 font-display text-lg font-semibold text-mauve-800">
           {status.clinic.active ? "Active" : "—"}
         </p>
-        <p className="mt-1 text-xs text-surface-500">
+        <p className="mt-1 font-body text-xs text-mauve-400">
           อัปเดตล่าสุด {formatDate(status.clinic.last_updated)}
         </p>
-        <Badge variant={status.clinic.embedding_status === "ok" ? "default" : "warning"} className="mt-2">
+        <Badge variant={status.clinic.embedding_status === "ok" ? "default" : "warning"} className="mt-2" size="sm">
           {status.clinic.embedding_status === "ok" ? "พร้อมใช้งาน" : "มีปัญหา"}
         </Badge>
         {status.clinic.last_embedding_at && (
-          <p className="mt-1 text-xs text-surface-500">
+          <p className="mt-1 font-body text-xs text-mauve-400">
             ฝังล่าสุด {formatDate(status.clinic.last_embedding_at)}
           </p>
         )}
-      </Card>
-      <Card padding="lg" className="bg-[#fefbfb] rounded-2xl shadow-sm">
-        <h4 className="text-sm font-medium text-surface-600">โปรโมชันปัจจุบัน</h4>
-        <p className="mt-2 text-lg font-semibold text-surface-800">
+      </div>
+      <div className="luxury-card p-6">
+        <h4 className="font-body text-sm font-medium text-mauve-600">โปรโมชันปัจจุบัน</h4>
+        <p className="mt-2 font-display text-lg font-semibold text-mauve-800">
           {status.promotions.active_count} โปรโมชัน
         </p>
         {status.promotions.expiry_warnings > 0 && (
-          <Badge variant="warning" className="mt-2">
+          <Badge variant="warning" className="mt-2" size="sm">
             หมดอายุใน 7 วัน: {status.promotions.expiry_warnings}
           </Badge>
         )}
-      </Card>
+      </div>
     </div>
   );
 }
@@ -135,75 +155,74 @@ function ServiceCard({
     status !== service.status;
 
   return (
-    <Card padding="lg" className="rounded-2xl shadow-sm">
+    <div className="luxury-card p-6">
       {titleReadOnly ? (
-        <h3 className="text-lg font-semibold text-surface-800">{displayName}</h3>
+        <h3 className="font-display text-lg font-semibold text-mauve-800">{displayName}</h3>
       ) : (
-        <input
-          type="text"
+        <Input
           value={custom_title}
           onChange={(e) => setCustomTitle(e.target.value)}
-          className="w-full text-lg font-semibold text-surface-800 bg-transparent border-b border-transparent hover:border-surface-200 focus:border-primary-400 focus:outline-none rounded px-0"
           placeholder="ชื่อบริการ"
+          className="w-full font-display text-lg font-semibold text-mauve-800 border-0 border-b border-transparent hover:border-cream-300 focus:border-rg-400 rounded-none px-0"
         />
       )}
       <div className="mt-2 flex flex-wrap items-center gap-2">
         {global && (
-          <Badge variant="info">
+          <Badge variant="info" size="sm">
             Template v{global.version}
             {service.template_version_at_embed != null && ` (ฝังเมื่อ v${service.template_version_at_embed})`}
           </Badge>
         )}
         {templateUpdateAvailable && (
-          <Badge variant="warning">มีเทมเพลตเวอร์ชันใหม่</Badge>
+          <Badge variant="warning" size="sm">มีเทมเพลตเวอร์ชันใหม่</Badge>
         )}
         {service.status === "embedding_failed" && (
-          <Badge variant="warning">อัปเดตข้อมูลไม่สำเร็จ — กดบันทึกเพื่อลองใหม่</Badge>
+          <Badge variant="warning" size="sm">อัปเดตข้อมูลไม่สำเร็จ — กดบันทึกเพื่อลองใหม่</Badge>
         )}
         {service.status === "active" && !templateUpdateAvailable && (
-          <Badge variant="default">พร้อมใช้งาน</Badge>
+          <Badge variant="default" size="sm">พร้อมใช้งาน</Badge>
         )}
       </div>
       {global?.standard_description && (
-        <div className="mt-3 rounded-lg bg-surface-50 p-3 text-sm text-surface-600">
+        <div className="mt-3 rounded-2xl bg-cream-100 p-3 font-body text-sm text-mauve-600">
           {global.compliance_locked ? (
-            <span className="text-surface-500">(ข้อความมาตรฐาน — ไม่สามารถแก้ไข)</span>
+            <span className="text-mauve-400">(ข้อความมาตรฐาน — ไม่สามารถแก้ไข)</span>
           ) : null}
           <p className="mt-1">{global.standard_description}</p>
         </div>
       )}
-      <hr className="my-4 border-surface-200" />
+      <hr className="my-4 border-cream-200" />
       <div className="space-y-3">
-        <label className="block text-sm font-medium text-surface-700">จุดเด่นของคลินิกคุณ</label>
+        <label className="block font-body text-sm font-medium text-mauve-700">จุดเด่นของคลินิกคุณ</label>
         <Input
           value={custom_highlight}
           onChange={(e) => setCustomHighlight(e.target.value)}
           placeholder="จุดเด่นหรือข้อความโปรโมท"
           className="w-full"
         />
-        <label className="block text-sm font-medium text-surface-700">ราคา</label>
+        <label className="block font-body text-sm font-medium text-mauve-700">ราคา</label>
         <Input
           value={custom_price}
           onChange={(e) => setCustomPrice(e.target.value)}
           placeholder="ช่วงราคา หรือราคาเริ่มต้น"
           className="w-full"
         />
-        <label className="block text-sm font-medium text-surface-700">รายละเอียดเพิ่มเติม</label>
-        <textarea
+        <label className="block font-body text-sm font-medium text-mauve-700">รายละเอียดเพิ่มเติม</label>
+        <Textarea
           value={custom_description}
           onChange={(e) => setCustomDescription(e.target.value)}
           placeholder="รายละเอียดเพิ่มเติม"
-          className="w-full min-h-[80px] rounded-lg border border-surface-200 px-3 py-2 text-sm focus:border-primary-400 focus:outline-none focus:ring-1 focus:ring-primary-400"
+          className="w-full min-h-[80px] rounded-2xl border-cream-200"
           rows={3}
         />
       </div>
       <div className="mt-4 flex flex-wrap items-center gap-3">
-        <label className="flex items-center gap-2 text-sm">
+        <label className="flex items-center gap-2 font-body text-sm text-mauve-700">
           <input
             type="checkbox"
             checked={status === "active"}
             onChange={(e) => setStatus(e.target.checked ? "active" : "inactive")}
-            className="rounded border-surface-300 text-primary-600 focus:ring-primary-500"
+            className="rounded border-cream-300 text-rg-500 focus:ring-rg-400"
           />
           เปิดใช้งาน
         </label>
@@ -221,16 +240,15 @@ function ServiceCard({
             variant="secondary"
             size="md"
             onClick={() => setArchiveConfirm(true)}
-            className="text-surface-600"
           >
             เก็บถาวร
           </Button>
         )}
       </div>
       {archiveConfirm && onArchive && (
-        <div className="mt-4 rounded-xl border border-surface-200 bg-surface-50 p-3">
-          <p className="text-sm text-surface-700">ต้องการเก็บบริการนี้เข้าถาวรหรือไม่? ข้อมูลจะไม่แสดงใน AI</p>
-          <div className="mt-2 flex gap-2">
+        <div className="mt-4 rounded-2xl border border-cream-200 bg-cream-50 p-4">
+          <p className="font-body text-sm text-mauve-700">ต้องการเก็บบริการนี้เข้าถาวรหรือไม่? ข้อมูลจะไม่แสดงใน AI</p>
+          <div className="mt-3 flex gap-2">
             <Button size="sm" variant="primary" onClick={() => { onArchive(service.id); setArchiveConfirm(false); }}>
               ยืนยัน
             </Button>
@@ -238,7 +256,7 @@ function ServiceCard({
           </div>
         </div>
       )}
-    </Card>
+    </div>
   );
 }
 
@@ -248,10 +266,12 @@ function FaqItem({
   item,
   onSave,
   onDelete,
+  dragHandle,
 }: {
   item: ClinicFaq;
   onSave: (id: string, payload: { question?: string; answer?: string }) => void;
   onDelete: (id: string) => void;
+  dragHandle?: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
   const [question, setQuestion] = useState(item.question);
@@ -270,33 +290,36 @@ function FaqItem({
   };
 
   return (
-    <div className="rounded-xl border border-surface-200 bg-white">
-      <button
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center justify-between gap-2 px-4 py-3 text-left text-sm font-medium text-surface-800 hover:bg-surface-50"
-      >
-        <span className="line-clamp-1">{question || "(ไม่มีคำถาม)"}</span>
-        <span className="flex shrink-0 items-center gap-1">
-          {item.status === "embedding_failed" && (
-            <Badge variant="warning" className="text-xs">มีปัญหา</Badge>
-          )}
-          <span className="text-surface-400">{open ? "▲" : "▼"}</span>
-        </span>
-      </button>
+    <div className="rounded-2xl border border-cream-200 bg-white luxury-card overflow-hidden">
+      <div className="flex items-stretch">
+        {dragHandle}
+        <button
+          type="button"
+          onClick={() => setOpen((o) => !o)}
+          className="flex flex-1 min-w-0 items-center justify-between gap-2 px-4 py-3 text-left font-body text-sm font-medium text-mauve-800 hover:bg-cream-50 transition-colors"
+        >
+          <span className="line-clamp-1">{question || "(ไม่มีคำถาม)"}</span>
+          <span className="flex shrink-0 items-center gap-1">
+            {item.status === "embedding_failed" && (
+              <Badge variant="warning" size="sm">มีปัญหา</Badge>
+            )}
+            <span className="text-mauve-400">{open ? "▲" : "▼"}</span>
+          </span>
+        </button>
+      </div>
       {open && (
-        <div className="border-t border-surface-100 px-4 py-3">
+        <div className="border-t border-cream-200 px-4 py-3 bg-cream-50/50">
           <Input
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             placeholder="คำถาม"
             className="mb-3 w-full"
           />
-          <textarea
+          <Textarea
             value={answer}
             onChange={(e) => setAnswer(e.target.value)}
             placeholder="คำตอบ"
-            className="mb-3 w-full min-h-[80px] rounded-lg border border-surface-200 px-3 py-2 text-sm focus:border-primary-400 focus:outline-none"
+            className="mb-3 w-full min-h-[80px] rounded-2xl border-cream-200"
             rows={3}
           />
           <div className="flex gap-2">
@@ -321,6 +344,55 @@ function FaqItem({
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function SortableFaqItem({
+  item,
+  onSave,
+  onDelete,
+}: {
+  item: ClinicFaq;
+  onSave: (id: string, payload: { question?: string; answer?: string }) => void;
+  onDelete: (id: string) => void;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: item.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  const handle = (
+    <button
+      type="button"
+      {...attributes}
+      {...listeners}
+      className="flex shrink-0 items-center justify-center w-10 cursor-grab active:cursor-grabbing text-cream-400 hover:text-cream-600 transition-colors"
+      aria-label="ลากเพื่อจัดเรียง"
+    >
+      <Bars3Icon className="h-5 w-5" />
+    </button>
+  );
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={cn(
+        "transition-all duration-200 ease-out",
+        isDragging && "opacity-90 shadow-luxury-lg z-10"
+      )}
+    >
+      <FaqItem item={item} onSave={onSave} onDelete={onDelete} dragHandle={handle} />
     </div>
   );
 }
@@ -520,6 +592,43 @@ export default function UnifiedKnowledgePage() {
     [fetchFaq, fetchStatus]
   );
 
+  const handleReorderFaq = useCallback(
+    async (newOrder: string[]) => {
+      const res = await fetch("/api/clinic/unified-knowledge/faq/reorder", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ ids: newOrder }),
+      });
+      if (res.ok) {
+        setToast("จัดเรียงแล้ว");
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setToast(data.error ?? "จัดเรียงไม่สำเร็จ");
+      }
+    },
+    []
+  );
+
+  const faqSensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  const handleFaqDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event;
+      if (!over || active.id === over.id) return;
+      const oldIndex = faqItems.findIndex((f) => f.id === active.id);
+      const newIndex = faqItems.findIndex((f) => f.id === over.id);
+      if (oldIndex === -1 || newIndex === -1) return;
+      const reordered = arrayMove(faqItems, oldIndex, newIndex);
+      setFaqItems(reordered);
+      handleReorderFaq(reordered.map((f) => f.id));
+    },
+    [faqItems, handleReorderFaq]
+  );
+
   const handleAddFaq = useCallback(
     async (question: string, answer: string) => {
       const res = await fetch("/api/clinic/unified-knowledge/faq", {
@@ -571,113 +680,136 @@ export default function UnifiedKnowledgePage() {
     return () => clearTimeout(t);
   }, [toast]);
 
+  const handleAddTopic = () => {
+    if (tab === "services") setAddServiceOpen(true);
+    else if (tab === "faq") setAddFaqOpen(true);
+  };
+
+  const knowledgeTabs = [
+    { value: "services" as const, label: "บริการ" },
+    { value: "faq" as const, label: "คำถามที่พบบ่อย" },
+    { value: "promotions" as const, label: "โปรโมชัน" },
+  ];
+
   return (
-    <div className="min-h-screen bg-[#fefbfb]">
-      <PageHeader title={PAGE_TITLE} description={PAGE_SUBTITLE} />
+    <div className="min-h-screen bg-cream-50/30">
       <div className="mx-auto max-w-5xl px-4 pb-10 pt-4">
+        <PageHeader
+          title={PAGE_TITLE}
+          subtitle={PAGE_SUBTITLE}
+          actions={
+            <div className="flex gap-3">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={handleProcessQueue}
+                disabled={processQueueLoading}
+                loading={processQueueLoading}
+              >
+                ⬢ Sync ทั้งหมด
+              </Button>
+              <Button
+                variant="primary"
+                size="sm"
+                shimmer
+                onClick={handleAddTopic}
+                disabled={tab === "promotions"}
+              >
+                + เพิ่มหัวข้อ
+              </Button>
+            </div>
+          }
+        />
         <section className="mb-8">
           {status?.ai_status != null && (
-            <div className="mb-4 flex flex-wrap items-center gap-3 rounded-2xl border border-surface-200 bg-white px-4 py-3 shadow-sm">
-              <span className="text-sm font-medium text-surface-700">สถานะ AI:</span>
-              <Badge variant={status.ai_status === "issue" ? "warning" : "default"}>
+            <div className="mb-4 flex flex-wrap items-center gap-3 rounded-2xl border border-cream-200 bg-white px-4 py-3 shadow-luxury">
+              <span className="font-body text-sm font-medium text-mauve-700">สถานะ AI:</span>
+              <Badge variant={status.ai_status === "issue" ? "warning" : "default"} size="sm">
                 {status.ai_status === "ready" && "พร้อมใช้งาน"}
                 {status.ai_status === "updating" && "กำลังอัปเดต"}
                 {status.ai_status === "issue" && "มีปัญหา"}
               </Badge>
               {status.clinic.last_embedding_at && (
-                <span className="text-xs text-surface-500">
+                <span className="font-body text-xs text-mauve-400">
                   ฝังล่าสุด {formatDate(status.clinic.last_embedding_at)}
                 </span>
               )}
               {status.clinic.warning_count > 0 && (
-                <Badge variant="warning">คำเตือน {status.clinic.warning_count}</Badge>
+                <Badge variant="warning" size="sm">คำเตือน {status.clinic.warning_count}</Badge>
               )}
             </div>
           )}
           <StatusCards status={status} loading={loadingStatus} />
-          <div className="mt-4 flex flex-wrap items-center gap-3">
-            <Button
-              variant="secondary"
-              size="md"
-              onClick={handleProcessQueue}
-              disabled={processQueueLoading}
-              loading={processQueueLoading}
-            >
-              อัปเดตข้อมูลให้ AI
-            </Button>
-            {processQueueMessage && (
-              <span className="text-sm text-surface-600">{processQueueMessage}</span>
-            )}
-          </div>
+          {processQueueMessage && (
+            <p className="mt-3 font-body text-sm text-mauve-600">{processQueueMessage}</p>
+          )}
           {status?.platform_managed_mode && (
-            <div className="mt-4 rounded-xl border border-primary-200/80 bg-primary-50/60 px-4 py-2 text-sm text-primary-800">
+            <div className="mt-4 rounded-2xl border border-rg-200/80 bg-rg-50/60 px-4 py-2 font-body text-sm text-mauve-800">
               โหมดจัดการโดยแพลตฟอร์ม: คุณแก้ไขได้เฉพาะ จุดเด่น ราคา และรายละเอียดเพิ่มเติม เทมเพลตบริการมาจากแพลตฟอร์ม
             </div>
           )}
         </section>
 
-        <nav className="mb-6 flex gap-1 border-b border-surface-200">
-          {(["services", "faq", "promotions"] as const).map((t) => (
+        <div className="flex gap-1 p-1 bg-cream-200 rounded-2xl mb-6 w-fit">
+          {knowledgeTabs.map((t) => (
             <button
-              key={t}
+              key={t.value}
               type="button"
-              onClick={() => setTab(t)}
-              className={`rounded-t-lg px-4 py-2 text-sm font-medium transition-colors ${
-                tab === t
-                  ? "border border-b-0 border-surface-200 bg-white text-primary-600"
-                  : "text-surface-600 hover:bg-surface-50 hover:text-surface-800"
-              }`}
+              onClick={() => setTab(t.value)}
+              className={cn(
+                "px-5 py-2 rounded-xl text-sm font-body font-medium transition-all duration-200",
+                tab === t.value
+                  ? "bg-white text-mauve-700 shadow-luxury"
+                  : "text-mauve-400 hover:text-mauve-600"
+              )}
             >
-              {t === "services" && "บริการ"}
-              {t === "faq" && "คำถามที่พบบ่อย"}
-              {t === "promotions" && "โปรโมชัน"}
+              {t.label}
             </button>
           ))}
-        </nav>
+        </div>
 
         {tab === "services" && (
           <section>
-            <div className="mb-4 flex justify-end">
-              <Button variant="primary" size="md" onClick={() => setAddServiceOpen(true)}>
-                + เพิ่มบริการ
-              </Button>
-            </div>
             {loadingServices ? (
-              <div className="space-y-4">
+              <div className="grid gap-4 sm:grid-cols-1 lg:grid-cols-2">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-48 rounded-2xl bg-surface-100 animate-pulse" />
+                  <div key={i} className="h-48 rounded-2xl bg-cream-200 animate-pulse" />
                 ))}
               </div>
             ) : clinicServices.length === 0 ? (
-              <Card padding="lg" className="text-center py-12">
-                <p className="text-surface-600">ยังไม่มีบริการ</p>
-                <p className="mt-1 text-sm text-surface-500">
-                  กด &quot;+ เพิ่มบริการ&quot; เพื่อเพิ่มบริการจากเทมเพลตหรือสร้างเอง
-                </p>
-                <Button
-                  variant="primary"
-                  size="md"
-                  className="mt-4"
-                  onClick={() => setAddServiceOpen(true)}
-                >
-                  + เพิ่มบริการ
-                </Button>
-              </Card>
+              <div className="luxury-card p-6">
+                <EmptyState
+                  icon={<span className="text-2xl">◇</span>}
+                  title="ยังไม่มีบริการ"
+                  description="กด &quot;+ เพิ่มหัวข้อ&quot; เพื่อเพิ่มบริการจากเทมเพลตหรือสร้างเอง"
+                  action={
+                    <Button variant="primary" size="md" onClick={() => setAddServiceOpen(true)}>
+                      + เพิ่มบริการ
+                    </Button>
+                  }
+                />
+              </div>
             ) : (
               <div className="grid gap-4 sm:grid-cols-1 lg:grid-cols-2">
-                {clinicServices.map((svc) => {
+                {clinicServices.map((svc, i) => {
                   const global = svc.global_service_id
                     ? globalServices.find((g) => g.id === svc.global_service_id) ?? null
                     : null;
                   return (
-                    <ServiceCard
+                    <motion.div
                       key={svc.id}
-                      service={svc}
-                      global={global}
-                      platformManagedMode={status?.platform_managed_mode}
-                      onSave={handleSaveService}
-                      onArchive={handleArchiveService}
-                    />
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.05 }}
+                    >
+                      <ServiceCard
+                        service={svc}
+                        global={global}
+                        platformManagedMode={status?.platform_managed_mode}
+                        onSave={handleSaveService}
+                        onArchive={handleArchiveService}
+                      />
+                    </motion.div>
                   );
                 })}
               </div>
@@ -687,48 +819,54 @@ export default function UnifiedKnowledgePage() {
 
         {tab === "faq" && (
           <section>
-            <div className="mb-4 flex justify-end">
-              <Button variant="primary" size="md" onClick={() => setAddFaqOpen(true)}>
-                + เพิ่มคำถาม
-              </Button>
-            </div>
             {loadingFaq ? (
               <div className="space-y-2">
                 {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="h-14 rounded-xl bg-surface-100 animate-pulse" />
+                  <div key={i} className="h-14 rounded-2xl bg-cream-200 animate-pulse" />
                 ))}
               </div>
             ) : faqItems.length === 0 ? (
-              <Card padding="lg" className="text-center py-12">
-                <p className="text-surface-600">ยังไม่มีคำถามที่พบบ่อย</p>
-                <Button
-                  variant="primary"
-                  size="md"
-                  className="mt-4"
-                  onClick={() => setAddFaqOpen(true)}
-                >
-                  + เพิ่มคำถาม
-                </Button>
-              </Card>
-            ) : (
-              <div className="space-y-2">
-                {faqItems.map((item) => (
-                  <FaqItem
-                    key={item.id}
-                    item={item}
-                    onSave={handleSaveFaq}
-                    onDelete={handleDeleteFaq}
-                  />
-                ))}
+              <div className="luxury-card p-6">
+                <EmptyState
+                  icon={<span className="text-2xl">◎</span>}
+                  title="ยังไม่มีคำถามที่พบบ่อย"
+                  action={
+                    <Button variant="primary" size="md" onClick={() => setAddFaqOpen(true)}>
+                      + เพิ่มคำถาม
+                    </Button>
+                  }
+                />
               </div>
+            ) : (
+              <DndContext
+                sensors={faqSensors}
+                collisionDetection={closestCenter}
+                onDragEnd={handleFaqDragEnd}
+              >
+                <SortableContext
+                  items={faqItems.map((f) => f.id)}
+                  strategy={verticalListSortingStrategy}
+                >
+                  <div className="space-y-2">
+                    {faqItems.map((item) => (
+                      <SortableFaqItem
+                        key={item.id}
+                        item={item}
+                        onSave={handleSaveFaq}
+                        onDelete={handleDeleteFaq}
+                      />
+                    ))}
+                  </div>
+                </SortableContext>
+              </DndContext>
             )}
           </section>
         )}
 
         {tab === "promotions" && (
           <section>
-            <Card padding="lg" className="rounded-2xl">
-              <p className="text-surface-600">
+            <div className="luxury-card p-6">
+              <p className="font-body text-mauve-600">
                 จัดการโปรโมชันและโปรโมชันที่กำลังหมดอายุได้ที่หน้ารายการโปรโมชัน
               </p>
               <Link href="/clinic/promotions">
@@ -736,7 +874,7 @@ export default function UnifiedKnowledgePage() {
                   ไปที่หน้ารายการโปรโมชัน
                 </Button>
               </Link>
-            </Card>
+            </div>
           </section>
         )}
 
@@ -758,7 +896,7 @@ export default function UnifiedKnowledgePage() {
         {toast && (
           <div
             role="alert"
-            className="fixed bottom-4 right-4 z-50 rounded-xl bg-surface-800 px-4 py-2 text-sm text-white shadow-lg"
+            className="fixed bottom-4 right-4 z-50 rounded-2xl bg-mauve-800 px-4 py-2 font-body text-sm text-white shadow-luxury"
           >
             {toast}
           </div>
@@ -802,18 +940,18 @@ function AddServiceModal({
     <>
       <div className="fixed inset-0 z-40 bg-black/30" onClick={onClose} aria-hidden />
       <div
-        className="fixed left-1/2 top-1/2 z-50 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-6 shadow-xl"
+        className="fixed left-1/2 top-1/2 z-50 w-full max-w-md -translate-x-1/2 -translate-y-1/2 luxury-card p-6 shadow-luxury"
         role="dialog"
         aria-labelledby="add-service-title"
       >
-        <h2 id="add-service-title" className="text-lg font-semibold text-surface-800">
+        <h2 id="add-service-title" className="font-display text-lg font-semibold text-mauve-800">
           เพิ่มบริการ
         </h2>
         {platformManagedMode && (
-          <p className="mt-1 text-xs text-surface-500">โหมดจัดการโดยแพลตฟอร์ม: ต้องเลือกเทมเพลตจากแพลตฟอร์ม</p>
+          <p className="mt-1 font-body text-xs text-mauve-400">โหมดจัดการโดยแพลตฟอร์ม: ต้องเลือกเทมเพลตจากแพลตฟอร์ม</p>
         )}
         <form onSubmit={handleSubmit} className="mt-4 space-y-3">
-          <label className="block text-sm font-medium text-surface-700">
+          <label className="block font-body text-sm font-medium text-mauve-700">
             {platformManagedMode ? "เทมเพลต *" : "เทมเพลต (ถ้ามี)"}
           </label>
           <select
@@ -823,7 +961,7 @@ function AddServiceModal({
               const g = globalServices.find((x) => x.id === e.target.value);
               if (g && !customTitle) setCustomTitle(g.name);
             }}
-            className="w-full rounded-lg border border-surface-200 px-3 py-2 text-sm"
+            className="w-full rounded-2xl border border-cream-200 px-3 py-2 font-body text-sm text-mauve-800 bg-white focus:border-rg-400 focus:outline-none focus:ring-1 focus:ring-rg-400"
             required={platformManagedMode}
           >
             {!platformManagedMode && <option value="">— ไม่ใช้เทมเพลต —</option>}
@@ -833,7 +971,7 @@ function AddServiceModal({
               </option>
             ))}
           </select>
-          <label className="block text-sm font-medium text-surface-700">ชื่อบริการ *</label>
+          <label className="block font-body text-sm font-medium text-mauve-700">ชื่อบริการ *</label>
           <Input
             value={customTitle}
             onChange={(e) => setCustomTitle(e.target.value)}
@@ -842,10 +980,10 @@ function AddServiceModal({
             className="w-full"
           />
           <div className="mt-4 flex gap-2 justify-end">
-            <Button type="button" variant="secondary" onClick={onClose}>
+            <Button type="button" variant="secondary" size="sm" onClick={onClose}>
               ยกเลิก
             </Button>
-            <Button type="submit" variant="primary" disabled={submitting} loading={submitting}>
+            <Button type="submit" variant="primary" size="sm" disabled={submitting} loading={submitting}>
               เพิ่ม
             </Button>
           </div>
@@ -883,15 +1021,15 @@ function AddFaqModal({
     <>
       <div className="fixed inset-0 z-40 bg-black/30" onClick={onClose} aria-hidden />
       <div
-        className="fixed left-1/2 top-1/2 z-50 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white p-6 shadow-xl"
+        className="fixed left-1/2 top-1/2 z-50 w-full max-w-md -translate-x-1/2 -translate-y-1/2 luxury-card p-6 shadow-luxury"
         role="dialog"
         aria-labelledby="add-faq-title"
       >
-        <h2 id="add-faq-title" className="text-lg font-semibold text-surface-800">
+        <h2 id="add-faq-title" className="font-display text-lg font-semibold text-mauve-800">
           เพิ่มคำถามที่พบบ่อย
         </h2>
         <form onSubmit={handleSubmit} className="mt-4 space-y-3">
-          <label className="block text-sm font-medium text-surface-700">คำถาม *</label>
+          <label className="block font-body text-sm font-medium text-mauve-700">คำถาม *</label>
           <Input
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
@@ -899,19 +1037,19 @@ function AddFaqModal({
             required
             className="w-full"
           />
-          <label className="block text-sm font-medium text-surface-700">คำตอบ</label>
-          <textarea
+          <label className="block font-body text-sm font-medium text-mauve-700">คำตอบ</label>
+          <Textarea
             value={answer}
             onChange={(e) => setAnswer(e.target.value)}
             placeholder="คำตอบ"
-            className="w-full min-h-[80px] rounded-lg border border-surface-200 px-3 py-2 text-sm"
+            className="w-full min-h-[80px] rounded-2xl border-cream-200"
             rows={3}
           />
           <div className="mt-4 flex gap-2 justify-end">
-            <Button type="button" variant="secondary" onClick={onClose}>
+            <Button type="button" variant="secondary" size="sm" onClick={onClose}>
               ยกเลิก
             </Button>
-            <Button type="submit" variant="primary" disabled={submitting} loading={submitting}>
+            <Button type="submit" variant="primary" size="sm" disabled={submitting} loading={submitting}>
               เพิ่ม
             </Button>
           </div>

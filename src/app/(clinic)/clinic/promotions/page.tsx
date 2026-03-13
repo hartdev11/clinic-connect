@@ -2,9 +2,15 @@
 
 import { useState, useCallback, useEffect, useMemo } from "react";
 import useSWR from "swr";
-import { PageHeader } from "@/components/layout/PageHeader";
+import { motion } from "framer-motion";
+import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
+import { Input } from "@/components/ui/Input";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { useClinicContext } from "@/contexts/ClinicContext";
 import { apiFetcher } from "@/lib/api-fetcher";
+import { cn } from "@/lib/utils";
 import type { Promotion, PromotionStatus, PromotionTargetGroup } from "@/types/clinic";
 
 const STATUS_OPTIONS: { value: PromotionStatus | "all"; label: string }[] = [
@@ -17,18 +23,26 @@ const STATUS_OPTIONS: { value: PromotionStatus | "all"; label: string }[] = [
 ];
 
 const STATUS_DOT_COLOR: Record<string, string> = {
-  active: "#059669",
-  scheduled: "#2563EB",
-  expired: "#94A3B8",
-  archived: "#64748B",
-  draft: "#94A3B8",
+  active: "var(--ent-success)",
+  scheduled: "var(--ent-info)",
+  expired: "var(--cream-400)",
+  archived: "var(--cream-400)",
+  draft: "var(--cream-400)",
 };
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString("th-TH", { day: "numeric", month: "short", year: "numeric" });
 }
 
-/** Promotion Intelligence Overview — 4 soft metric cards, no shadow */
+const STATUS_LABEL: Record<string, string> = {
+  active: "กำลังใช้งาน",
+  scheduled: "กำหนดเวลา",
+  expired: "หมดอายุ",
+  archived: "เก็บถาวร",
+  draft: "แบบร่าง",
+};
+
+/** Promotion Intelligence Overview — 4 luxury metric cards */
 function PromotionOverview({ stats }: { stats: { active: number; expiringSoon: number; scheduled: number; expired: number } }) {
   return (
     <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -38,38 +52,39 @@ function PromotionOverview({ stats }: { stats: { active: number; expiringSoon: n
         { key: "scheduled", label: "กำหนดเวลา", value: stats.scheduled },
         { key: "expired", label: "หมดอายุ", value: stats.expired },
       ].map(({ key, label, value }) => (
-        <div key={key} className="bg-[#FAFAFA] rounded-[12px] p-6 transition-transform duration-[90ms] ease-out hover:scale-[1.01]">
-          <p className="text-[32px] font-semibold text-neutral-900 tabular-nums leading-[1.2] tracking-[-0.01em]">{value}</p>
-          <p className="text-[13px] font-medium text-neutral-500 leading-[1.4] mt-2">{label}</p>
+        <div key={key} className="luxury-card p-6 transition-transform duration-200 ease-out hover:scale-[1.02]">
+          <p className="font-display text-3xl font-semibold text-mauve-800 tabular-nums leading-tight">{value}</p>
+          <p className="font-body text-sm font-medium text-mauve-400 mt-2">{label}</p>
         </div>
       ))}
     </section>
   );
 }
 
-/** List row: thumbnail, name, AI-detected procedure chips, expiring soon, usage, status dot, actions */
+/** Promotion card: cover, status badge, title, description, footer with dates + actions */
 function PromotionRow({
   item,
   branches,
   onEdit,
   onMutate,
+  index = 0,
 }: {
   item: Promotion;
   branches: Array<{ id: string; name: string }>;
   onEdit: () => void;
   onMutate: () => void;
+  index?: number;
 }) {
   const [loading, setLoading] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
   const hasCover = item.media?.[0]?.type === "image";
   const coverUrl = hasCover ? `/api/clinic/promotions/${item.id}/cover` : null;
-  const dotColor = STATUS_DOT_COLOR[item.status] ?? "#94A3B8";
   const branchNames = item.branchIds.map((id) => branches.find((b) => b.id === id)?.name ?? id).filter(Boolean);
-  const procedures = item.extractedProcedures ?? [];
   const endAtMs = item.endAt ? new Date(item.endAt).getTime() : 0;
   const expiringSoon = endAtMs > 0 && endAtMs <= Date.now() + 3 * 86400000;
 
-  const handleDelete = async () => {
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (!confirm("ลบโปรโมชั่นนี้?")) return;
     setActionError(null);
     setLoading(true);
@@ -85,7 +100,8 @@ function PromotionRow({
     }
   };
 
-  const handleArchive = async () => {
+  const handleArchive = async (e: React.MouseEvent) => {
+    e.stopPropagation();
     setActionError(null);
     setLoading(true);
     try {
@@ -105,88 +121,108 @@ function PromotionRow({
     }
   };
 
+  const badgeVariant =
+    item.status === "active" ? "success" :
+    item.status === "expired" ? "danger" :
+    item.status === "draft" ? "default" : "warning";
+  const statusLabel = STATUS_LABEL[item.status] ?? item.status;
+
   return (
-    <div
-      className="relative flex flex-col gap-0 py-3 px-4 rounded-[10px] bg-white hover:bg-[#F2F2F7] transition-all duration-[90ms] ease-out hover:scale-[1.01] min-h-0 leading-[1.4]"
-      style={{ transitionTimingFunction: "cubic-bezier(0.2, 0.8, 0.2, 1)" }}
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.06, duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+      whileHover={{ y: -4, transition: { duration: 0.2 } }}
+      className="luxury-card overflow-hidden group cursor-pointer"
+      onClick={onEdit}
     >
-      <div className="flex items-center gap-4 w-full min-w-0">
-      <div className="shrink-0 w-16 h-16 rounded-[10px] bg-neutral-100 overflow-hidden">
+      <div className="relative h-44 bg-gradient-to-br from-rg-200 to-rg-400 overflow-hidden">
         {coverUrl ? (
-          <img src={coverUrl} alt="" className="w-full h-full object-cover" />
+          <img
+            src={coverUrl}
+            alt={item.name || ""}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-[12px] text-neutral-400">ไม่มีรูป</div>
+          <div className="w-full h-full flex items-center justify-center">
+            <span className="text-5xl text-white/40">✦</span>
+          </div>
         )}
+        <div className="absolute top-3 right-3">
+          <Badge variant={badgeVariant} dot>
+            {statusLabel}
+          </Badge>
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-t from-mauve-900/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
       </div>
-      <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <p className="font-semibold text-neutral-800 text-[15px] truncate">{item.name || "—"}</p>
+      <div className="p-5">
+        <div className="flex flex-wrap items-center gap-2 mb-1">
+          <h3 className="font-display text-lg font-semibold text-mauve-800 truncate">
+            {item.name || "—"}
+          </h3>
           {item.extractedPrice != null && (
-            <span className="text-[12px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">฿{item.extractedPrice.toLocaleString()}</span>
+            <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">฿{item.extractedPrice.toLocaleString()}</span>
           )}
           {expiringSoon && item.status === "active" && (
             <span className="text-[11px] font-medium text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">หมดอายุเร็วๆ นี้</span>
           )}
         </div>
-        {procedures.length > 0 && (
-          <div className="flex flex-wrap gap-1 mt-1.5">
-            {procedures.slice(0, 4).map((proc, i) => (
-              <span key={i} className="text-[11px] text-neutral-600 bg-neutral-100 px-2 py-0.5 rounded-md">
-                {proc}
-              </span>
-            ))}
+        <p className="font-body text-xs text-mauve-400 line-clamp-2 mb-4">
+          {item.description || "—"}
+        </p>
+        <div className="flex items-center justify-between pt-3 border-t border-cream-200">
+          <div>
+            {item.endAt && (
+              <p className="font-body text-[10px] text-mauve-400">
+                หมดอายุ: {formatDate(item.endAt)}
+              </p>
+            )}
+            {(item.currentUsage != null || item.maxUsage != null) && (
+              <p className="font-body text-[10px] text-mauve-400 tabular-nums mt-0.5">
+                ใช้แล้ว {item.currentUsage ?? 0}{item.maxUsage != null ? ` / ${item.maxUsage}` : ""}
+              </p>
+            )}
           </div>
-        )}
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1">
-          {branchNames.length ? <span className="text-[12px] text-neutral-500">{branchNames.join(", ")}</span> : null}
-          <span className="text-[12px] text-neutral-500">หมดอายุ: {item.endAt ? formatDate(item.endAt) : "—"}</span>
-          {(item.currentUsage != null || item.maxUsage != null) && (
-            <span className="text-[12px] text-neutral-500 tabular-nums">
-              ใช้แล้ว {item.currentUsage ?? 0}{item.maxUsage != null ? ` / ${item.maxUsage}` : ""}
-            </span>
-          )}
-          <span className="flex items-center gap-1.5 text-[12px] text-neutral-600">
-            <span className="w-[6px] h-[6px] rounded-full shrink-0" style={{ backgroundColor: dotColor }} aria-hidden />
-            {item.status}
-          </span>
+          <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); onEdit(); }}
+              disabled={loading}
+              className="w-8 h-8 rounded-xl hover:bg-rg-100 text-mauve-400 hover:text-rg-600 flex items-center justify-center transition-all"
+              aria-label="แก้ไข"
+            >
+              ✎
+            </button>
+            {item.status !== "archived" && (
+              <button
+                type="button"
+                onClick={handleArchive}
+                disabled={loading}
+                className="w-8 h-8 rounded-xl hover:bg-cream-200 text-mauve-400 hover:text-mauve-600 flex items-center justify-center transition-all"
+                aria-label="เก็บถาวร"
+              >
+                📁
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={handleDelete}
+              disabled={loading}
+              className="w-8 h-8 rounded-xl hover:bg-red-50 text-mauve-400 hover:text-red-500 flex items-center justify-center transition-all"
+              aria-label="ลบ"
+            >
+              ✕
+            </button>
+          </div>
         </div>
       </div>
-      <div className="shrink-0 flex items-center gap-1.5">
-        <button
-          type="button"
-          className="h-[34px] px-3 rounded-[10px] text-[13px] font-medium bg-transparent text-neutral-800 hover:bg-[#F2F2F7] transition-colors duration-100 disabled:opacity-50"
-          onClick={onEdit}
-          disabled={loading}
-        >
-          แก้ไข
-        </button>
-        {item.status !== "archived" && (
-          <button
-            type="button"
-            className="h-[34px] px-3 rounded-[10px] text-[13px] font-medium text-neutral-600 hover:bg-[#F2F2F7] transition-colors duration-100 disabled:opacity-50"
-            onClick={handleArchive}
-            disabled={loading}
-          >
-            เก็บถาวร
-          </button>
-        )}
-        <button
-          type="button"
-          className="h-[34px] px-3 rounded-[10px] text-[13px] font-medium text-red-600 hover:bg-red-50/50 transition-colors duration-100 disabled:opacity-50"
-          onClick={handleDelete}
-          disabled={loading}
-        >
-          ลบ
-        </button>
-      </div>
-      </div>
       {actionError && (
-        <div className="mt-2 p-2 rounded-[8px] bg-red-50 border border-red-100 text-[12px] text-red-700 flex items-center justify-between gap-2">
+        <div className="mx-5 mb-5 p-2 rounded-2xl bg-red-50 border border-red-200 text-xs text-red-700 font-body flex items-center justify-between gap-2" role="alert">
           <span>{actionError}</span>
           <button type="button" onClick={() => setActionError(null)} className="text-red-600 hover:underline shrink-0">ปิด</button>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }
 
@@ -352,11 +388,11 @@ function CreateFromImageModal({
   }, [onClose]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40" onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="create-from-image-title">
-      <div className="bg-white rounded-[16px] shadow-xl max-w-[640px] w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-        <div className="p-6 border-b border-neutral-100">
-          <h2 id="create-from-image-title" className="text-[18px] font-semibold text-neutral-900">สร้างโปรโมชั่นจากรูป</h2>
-          <p className="text-[13px] text-neutral-500 mt-1">อัปโหลดรูปโปรโมชั่น — AI จะวิเคราะห์และเติมข้อมูลให้</p>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-mauve-900/30 backdrop-blur-sm" onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="create-from-image-title">
+      <div className="luxury-card max-w-[640px] w-full max-h-[90vh] overflow-y-auto border border-cream-300 shadow-luxury-lg" onClick={(e) => e.stopPropagation()}>
+        <div className="p-6 border-b border-cream-200">
+          <h2 id="create-from-image-title" className="font-display text-xl font-semibold text-mauve-800">สร้างโปรโมชั่นจากรูป</h2>
+          <p className="font-body text-sm text-mauve-400 mt-1">อัปโหลดรูปโปรโมชั่น — AI จะวิเคราะห์และเติมข้อมูลให้</p>
         </div>
         <div className="p-6 space-y-5">
           {error && (
@@ -388,17 +424,21 @@ function CreateFromImageModal({
                 )}
               </div>
               <div className="flex gap-2">
-                <button type="button" onClick={onClose} className="min-h-[40px] px-4 rounded-[10px] text-[14px] font-medium bg-transparent text-neutral-800 hover:bg-[#F2F2F7]">ยกเลิก</button>
+                <button type="button" onClick={onClose} className="min-h-[40px] px-4 rounded-[10px] text-[14px] font-medium bg-transparent text-neutral-800 hover:bg-cream-200">ยกเลิก</button>
                 <button type="button" onClick={handleUpload} disabled={!file} className="min-h-[40px] px-4 rounded-[10px] text-[14px] font-medium bg-black text-white hover:bg-neutral-800 disabled:opacity-50">อัปโหลดและวิเคราะห์</button>
               </div>
             </>
           )}
 
           {step === "analyzing" && (
-            <div className="py-8 flex flex-col items-center justify-center gap-4">
-              <span className="inline-block w-10 h-10 rounded-full border-2 border-neutral-300 border-t-neutral-700 animate-spin" aria-hidden />
-              <p className="text-[15px] font-medium text-neutral-700">AI is analyzing your promotion...</p>
-              <p className="text-[13px] text-neutral-500">กำลังดึงข้อมูลจากรูป</p>
+            <div className="py-8 flex flex-col items-center justify-center gap-4" aria-busy="true">
+              <div className="animate-pulse space-y-4 w-full max-w-xs">
+                <div className="h-8 bg-cream-200 rounded-2xl w-3/4 mx-auto" />
+                <div className="h-4 bg-cream-100 rounded-xl w-1/2 mx-auto" />
+                <div className="h-4 bg-cream-100 rounded-xl w-2/3 mx-auto" />
+              </div>
+              <p className="text-[15px] font-medium text-mauve-700">AI is analyzing your promotion...</p>
+              <p className="text-[13px] text-mauve-500">กำลังดึงข้อมูลจากรูป</p>
             </div>
           )}
 
@@ -409,16 +449,16 @@ function CreateFromImageModal({
                   <img src={imageDataUrl ?? previewUrl ?? ""} alt="" className="max-w-full max-h-[400px] w-auto h-auto object-contain" />
                 </div>
               )}
-              <div className="p-4 rounded-[12px] bg-[#FAFAFA] border border-neutral-100">
+              <div className="p-4 rounded-[12px] bg-cream-100 border border-neutral-100">
                 <p className="text-[12px] font-medium text-neutral-500 uppercase tracking-wide mb-3">AI Detected — แก้ไขได้</p>
                 <div className="space-y-3">
                   <div>
                     <label className="block text-[11px] text-neutral-500 mb-0.5">ชื่อ *</label>
-                    <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="w-full min-h-[36px] px-3 py-1.5 rounded-[8px] border border-[#E5E7EB] text-[14px]" placeholder="ชื่อโปรโมชั่น" />
+                    <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="w-full min-h-[36px] px-3 py-1.5 rounded-[8px] border border-cream-300 text-[14px]" placeholder="ชื่อโปรโมชั่น" />
                   </div>
                   <div>
                     <label className="block text-[11px] text-neutral-500 mb-0.5">คำอธิบาย</label>
-                    <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={2} className="w-full px-3 py-1.5 rounded-[8px] border border-[#E5E7EB] text-[14px]" placeholder="คำอธิบาย" />
+                    <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={2} className="w-full px-3 py-1.5 rounded-[8px] border border-cream-300 text-[14px]" placeholder="คำอธิบาย" />
                   </div>
                   <div>
                     <label className="block text-[11px] text-neutral-500 mb-1">Procedures</label>
@@ -434,11 +474,11 @@ function CreateFromImageModal({
                   <div className="flex gap-4 flex-wrap">
                     <div>
                       <label className="block text-[11px] text-neutral-500 mb-0.5">Price (฿)</label>
-                      <input type="number" min={0} value={extractedPrice} onChange={(e) => setExtractedPrice(e.target.value)} className="w-28 min-h-[36px] px-2 py-1 rounded-[8px] border border-[#E5E7EB] text-[14px]" placeholder="—" />
+                      <input type="number" min={0} value={extractedPrice} onChange={(e) => setExtractedPrice(e.target.value)} className="w-28 min-h-[36px] px-2 py-1 rounded-[8px] border border-cream-300 text-[14px]" placeholder="—" />
                     </div>
                     <div>
                       <label className="block text-[11px] text-neutral-500 mb-0.5">Discount (%)</label>
-                      <input type="number" min={0} max={100} value={extractedDiscount} onChange={(e) => setExtractedDiscount(e.target.value)} className="w-20 min-h-[36px] px-2 py-1 rounded-[8px] border border-[#E5E7EB] text-[14px]" placeholder="—" />
+                      <input type="number" min={0} max={100} value={extractedDiscount} onChange={(e) => setExtractedDiscount(e.target.value)} className="w-20 min-h-[36px] px-2 py-1 rounded-[8px] border border-cream-300 text-[14px]" placeholder="—" />
                     </div>
                   </div>
                   {extractedBenefits.length > 0 && (
@@ -479,7 +519,7 @@ function CreateFromImageModal({
                   <div className="flex flex-wrap gap-2">
                     {branches.map((b) => (
                       <label key={b.id} className="inline-flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" checked={branchIds.includes(b.id)} onChange={() => toggleBranch(b.id)} className="rounded border-[#E5E7EB]" />
+                        <input type="checkbox" checked={branchIds.includes(b.id)} onChange={() => toggleBranch(b.id)} className="rounded border-cream-300" />
                         <span className="text-[14px] text-neutral-800">{b.name}</span>
                       </label>
                     ))}
@@ -489,23 +529,23 @@ function CreateFromImageModal({
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[12px] font-medium text-neutral-500 mb-1">เริ่มต้น</label>
-                  <input type="datetime-local" value={startAt} onChange={(e) => setStartAt(e.target.value)} className="w-full min-h-[40px] px-3 py-2 rounded-[10px] border border-[#E5E7EB] text-[14px]" />
+                  <input type="datetime-local" value={startAt} onChange={(e) => setStartAt(e.target.value)} className="w-full min-h-[40px] px-3 py-2 rounded-[10px] border border-cream-300 text-[14px]" />
                 </div>
                 <div>
                   <label className="block text-[12px] font-medium text-neutral-500 mb-1">สิ้นสุด</label>
-                  <input type="datetime-local" value={endAt} onChange={(e) => setEndAt(e.target.value)} className="w-full min-h-[40px] px-3 py-2 rounded-[10px] border border-[#E5E7EB] text-[14px]" />
+                  <input type="datetime-local" value={endAt} onChange={(e) => setEndAt(e.target.value)} className="w-full min-h-[40px] px-3 py-2 rounded-[10px] border border-cream-300 text-[14px]" />
                 </div>
               </div>
               <div>
                 <label className="block text-[12px] font-medium text-neutral-500 mb-1">จำนวนครั้งที่ใช้ได้ (ไม่บังคับ)</label>
-                <input type="number" min={0} value={maxUsage} onChange={(e) => setMaxUsage(e.target.value)} className="w-32 min-h-[40px] px-3 py-2 rounded-[10px] border border-[#E5E7EB] text-[14px]" placeholder="ไม่จำกัด" />
+                <input type="number" min={0} value={maxUsage} onChange={(e) => setMaxUsage(e.target.value)} className="w-32 min-h-[40px] px-3 py-2 rounded-[10px] border border-cream-300 text-[14px]" placeholder="ไม่จำกัด" />
               </div>
               <label className="inline-flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" checked={visibleToAI} onChange={(e) => setVisibleToAI(e.target.checked)} className="rounded border-[#E5E7EB]" />
+                <input type="checkbox" checked={visibleToAI} onChange={(e) => setVisibleToAI(e.target.checked)} className="rounded border-cream-300" />
                 <span className="text-[14px] text-neutral-800">ให้ AI ค้นหาและแนะนำโปรนี้ในแชท</span>
               </label>
               <div className="flex gap-2 pt-2">
-                <button type="button" onClick={onClose} className="min-h-[40px] px-4 rounded-[10px] text-[14px] font-medium bg-transparent text-neutral-800 hover:bg-[#F2F2F7]">ยกเลิก</button>
+                <button type="button" onClick={onClose} className="min-h-[40px] px-4 rounded-[10px] text-[14px] font-medium bg-transparent text-neutral-800 hover:bg-cream-200">ยกเลิก</button>
                 <button type="submit" disabled={saving} className="min-h-[40px] px-4 rounded-[10px] text-[14px] font-medium bg-black text-white hover:bg-neutral-800 disabled:opacity-50">{saving ? "กำลังบันทึก..." : "บันทึกโปรโมชั่น"}</button>
               </div>
             </form>
@@ -649,8 +689,8 @@ function PromotionForm({
   );
 
   return (
-    <div className="bg-white rounded-[12px] border border-neutral-100 p-6 max-w-[720px]">
-      <h2 className="text-[17px] font-medium text-neutral-800 leading-[1.4] mb-6">
+    <div className="luxury-card p-6 max-w-[720px] border border-cream-300">
+      <h2 className="font-display text-xl font-semibold text-mauve-800 mb-6">
         {isEdit ? "แก้ไขโปรโมชั่น" : "สร้างโปรโมชั่นใหม่"}
       </h2>
       <form onSubmit={handleSubmit} className="space-y-5">
@@ -666,7 +706,7 @@ function PromotionForm({
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full min-h-[40px] px-3 py-2 rounded-[10px] border border-[#E5E7EB] text-[14px] text-neutral-800 bg-white focus:outline-none focus:ring-2 focus:ring-black/10 transition-shadow duration-100"
+            className="w-full min-h-[40px] px-3 py-2 rounded-[10px] border border-cream-300 text-[14px] text-neutral-800 bg-white focus:outline-none focus:ring-2 focus:ring-black/10 transition-shadow duration-100"
             placeholder="ชื่อโปรโมชั่น"
             required
           />
@@ -677,7 +717,7 @@ function PromotionForm({
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={3}
-            className="w-full min-h-[80px] px-3 py-2 rounded-[10px] border border-[#E5E7EB] text-[14px] text-neutral-800 bg-white focus:outline-none focus:ring-2 focus:ring-black/10 transition-shadow duration-100"
+            className="w-full min-h-[80px] px-3 py-2 rounded-[10px] border border-cream-300 text-[14px] text-neutral-800 bg-white focus:outline-none focus:ring-2 focus:ring-black/10 transition-shadow duration-100"
             placeholder="คำอธิบายโปรโมชั่น"
           />
         </div>
@@ -695,7 +735,7 @@ function PromotionForm({
                     type="checkbox"
                     checked={branchIds.includes(b.id)}
                     onChange={() => toggleBranch(b.id)}
-                    className="rounded border-[#E5E7EB]"
+                    className="rounded border-cream-300"
                   />
                   <span className="text-[14px] text-neutral-800">{b.name}</span>
                 </label>
@@ -710,7 +750,7 @@ function PromotionForm({
               type="datetime-local"
               value={startAt}
               onChange={(e) => setStartAt(e.target.value)}
-              className="w-full min-h-[40px] px-3 py-2 rounded-[10px] border border-[#E5E7EB] text-[14px] text-neutral-800 bg-white focus:outline-none focus:ring-2 focus:ring-black/10"
+              className="w-full min-h-[40px] px-3 py-2 rounded-[10px] border border-cream-300 text-[14px] text-neutral-800 bg-white focus:outline-none focus:ring-2 focus:ring-black/10"
             />
           </div>
           <div>
@@ -719,7 +759,7 @@ function PromotionForm({
               type="datetime-local"
               value={endAt}
               onChange={(e) => setEndAt(e.target.value)}
-              className="w-full min-h-[40px] px-3 py-2 rounded-[10px] border border-[#E5E7EB] text-[14px] text-neutral-800 bg-white focus:outline-none focus:ring-2 focus:ring-black/10"
+              className="w-full min-h-[40px] px-3 py-2 rounded-[10px] border border-cream-300 text-[14px] text-neutral-800 bg-white focus:outline-none focus:ring-2 focus:ring-black/10"
             />
           </div>
           <div>
@@ -728,7 +768,7 @@ function PromotionForm({
               type="datetime-local"
               value={autoArchiveAt}
               onChange={(e) => setAutoArchiveAt(e.target.value)}
-              className="w-full min-h-[40px] px-3 py-2 rounded-[10px] border border-[#E5E7EB] text-[14px] text-neutral-800 bg-white focus:outline-none focus:ring-2 focus:ring-black/10"
+              className="w-full min-h-[40px] px-3 py-2 rounded-[10px] border border-cream-300 text-[14px] text-neutral-800 bg-white focus:outline-none focus:ring-2 focus:ring-black/10"
             />
           </div>
         </div>
@@ -739,12 +779,12 @@ function PromotionForm({
             min={0}
             value={maxUsage}
             onChange={(e) => setMaxUsage(e.target.value)}
-            className="w-full min-h-[40px] px-3 py-2 rounded-[10px] border border-[#E5E7EB] text-[14px] text-neutral-800 bg-white focus:outline-none focus:ring-2 focus:ring-black/10"
+            className="w-full min-h-[40px] px-3 py-2 rounded-[10px] border border-cream-300 text-[14px] text-neutral-800 bg-white focus:outline-none focus:ring-2 focus:ring-black/10"
             placeholder="ไม่จำกัด"
           />
         </div>
         <label className="inline-flex items-center gap-2 cursor-pointer">
-          <input type="checkbox" checked={visibleToAI} onChange={(e) => setVisibleToAI(e.target.checked)} className="rounded border-[#E5E7EB]" />
+          <input type="checkbox" checked={visibleToAI} onChange={(e) => setVisibleToAI(e.target.checked)} className="rounded border-cream-300" />
           <span className="text-[14px] text-neutral-800">ให้ AI ค้นหาและแนะนำโปรนี้ให้ลูกค้าในแชท</span>
         </label>
         {isEdit && promotion && (
@@ -780,13 +820,13 @@ function PromotionForm({
               />
             </label>
             {analyzing && (
-              <p className="text-[13px] text-neutral-500 mt-2 flex items-center gap-2">
-                <span className="inline-block w-4 h-4 rounded-full border-2 border-neutral-300 border-t-neutral-600 animate-spin" aria-hidden />
-                AI is analyzing your promotion...
-              </p>
+              <div className="mt-2 space-y-2" aria-busy="true">
+                <div className="h-3 bg-cream-200 rounded-xl w-32 animate-pulse" />
+                <p className="text-[13px] text-mauve-500">AI is analyzing your promotion...</p>
+              </div>
             )}
             {lastExtracted && (lastExtracted.extractedProcedures?.length || lastExtracted.extractedPrice || lastExtracted.extractedBenefits?.length) && (
-              <div className="mt-3 p-3 rounded-[10px] bg-[#FAFAFA] border border-neutral-100">
+              <div className="mt-3 p-3 rounded-[10px] bg-cream-100 border border-neutral-100">
                 <p className="text-[12px] font-medium text-neutral-500 uppercase tracking-wide mb-2">AI detected</p>
                 {lastExtracted.extractedProcedures?.length ? (
                   <p className="text-[13px] text-neutral-700">Procedure: {lastExtracted.extractedProcedures.join(", ")}</p>
@@ -808,7 +848,7 @@ function PromotionForm({
           <button
             type="button"
             onClick={onCancel}
-            className="min-h-[40px] px-4 rounded-[10px] text-[14px] font-medium bg-transparent text-neutral-800 hover:bg-[#F2F2F7] transition-colors duration-100"
+            className="min-h-[40px] px-4 rounded-[10px] text-[14px] font-medium bg-transparent text-neutral-800 hover:bg-cream-200 transition-colors duration-100"
           >
             ยกเลิก
           </button>
@@ -873,159 +913,171 @@ export default function PromotionsPage() {
     mutateList();
   }, [mutateStats, mutateList]);
 
+  const statusPills: { value: PromotionStatus | "all"; label: string }[] = [
+    { value: "all", label: "ทั้งหมด" },
+    { value: "active", label: "กำลังใช้งาน" },
+    { value: "expired", label: "หมดอายุ" },
+    { value: "draft", label: "ฉบับร่าง" },
+  ];
+
   return (
-    <div className="min-h-screen bg-white font-sans antialiased relative">
-      <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_50%_-10%,rgba(0,0,0,0.025),transparent_60%)]" aria-hidden />
+    <div className="min-h-screen bg-cream-100/50 font-sans antialiased relative">
       <div className="relative max-w-[1440px] mx-auto px-4 md:px-6">
         <PageHeader
-          title="Promotions"
-          description="สร้างโปรโมชั่น จัดการสื่อ และให้ AI ใช้ตอบลูกค้าอัตโนมัติ"
-          aiAnalyze
+          title="โปรโมชัน"
+          subtitle="จัดการโปรโมชันและข้อเสนอพิเศษของคลินิก"
+          actions={
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="sm" onClick={() => mutate()} title="โหลดใหม่">
+                โหลดใหม่
+              </Button>
+              <Button variant="secondary" size="sm" onClick={() => setShowCreateFromImage(true)}>
+                จากรูป
+              </Button>
+              <Button
+                variant="primary"
+                size="sm"
+                shimmer
+                onClick={() => { setEditingItem(null); setShowForm(true); }}
+              >
+                + สร้างโปรโมชัน
+              </Button>
+            </div>
+          }
         />
 
         {statsLoading && (
           <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8" aria-busy="true">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="bg-[#FAFAFA] rounded-[12px] p-6 h-[120px] animate-pulse" />
+              <div key={i} className="luxury-card p-6 h-[100px] rounded-2xl bg-cream-200 animate-pulse" />
             ))}
           </section>
         )}
         {statsFailed && (
-          <section className="mb-8 p-6 rounded-[12px] bg-red-50 border border-red-100">
-            <p className="text-[14px] font-medium text-red-800">โหลดสถิติไม่สำเร็จ</p>
-            <p className="text-[13px] text-red-600 mt-1">{statsError?.message ?? "เกิดข้อผิดพลาด"}</p>
-            <button type="button" onClick={() => mutateStats()} className="mt-3 min-h-[36px] px-3 rounded-[10px] text-[13px] font-medium bg-red-600 text-white hover:bg-red-700">ลองใหม่</button>
+          <section className="mb-8 p-6 rounded-2xl bg-red-50 border border-red-200">
+            <p className="font-body text-sm font-medium text-red-800">โหลดสถิติไม่สำเร็จ</p>
+            <p className="font-body text-sm text-red-600 mt-1">{statsError?.message ?? "เกิดข้อผิดพลาด"}</p>
+            <Button type="button" size="sm" onClick={() => mutateStats()} className="mt-3">ลองใหม่</Button>
           </section>
         )}
         {!statsLoading && !statsFailed && (
           <PromotionOverview stats={stats ?? { active: 0, expiringSoon: 0, scheduled: 0, expired: 0 }} />
         )}
 
-        <section className="bg-[#FAFAFA] rounded-[12px] p-6 mb-8">
-          <div className="bg-white rounded-[12px] p-6">
-            <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
-              <div>
-                <p className="text-[12px] font-medium text-neutral-500 uppercase tracking-wide">โปรโมชั่นทั้งหมด</p>
-                <h2 className="text-[17px] font-medium text-neutral-800 leading-[1.4] mt-0.5">รายการโปรโมชั่น</h2>
-              </div>
-              <div className="flex flex-wrap items-center gap-2">
+        <section className="mb-8">
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="flex flex-wrap items-center gap-3 mb-6"
+          >
+            <div className="flex items-center gap-1 p-1 bg-cream-200 rounded-2xl">
+              {statusPills.map((opt) => (
                 <button
+                  key={opt.value}
                   type="button"
-                  onClick={() => mutate()}
-                  className="min-h-[36px] px-3 py-2 rounded-[10px] text-[13px] font-medium bg-transparent text-neutral-600 border border-neutral-200 hover:bg-[#F2F2F7] transition-colors"
-                  title="โหลดใหม่"
+                  onClick={() => setStatusFilter(opt.value)}
+                  className={cn(
+                    "px-4 py-2 rounded-xl text-sm font-body font-medium transition-all duration-200",
+                    statusFilter === opt.value
+                      ? "bg-white text-mauve-700 shadow-luxury"
+                      : "text-mauve-400 hover:text-mauve-600"
+                  )}
                 >
-                  โหลดใหม่
+                  {opt.label}
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setShowCreateFromImage(true)}
-                  className="min-h-[40px] px-4 rounded-[10px] text-[14px] font-medium bg-black text-white hover:bg-neutral-800 transition-colors duration-100"
-                >
-                  + Create Promotion from Image
-                </button>
-                <button
-                  type="button"
-                  onClick={() => { setEditingItem(null); setShowForm(true); }}
-                  className="min-h-[40px] px-4 rounded-[10px] text-[14px] font-medium bg-transparent text-neutral-800 border border-neutral-300 hover:bg-[#F2F2F7] transition-colors duration-100"
-                >
-                  Create manually
-                </button>
-              </div>
+              ))}
             </div>
-            <div className="flex flex-wrap gap-3 mb-4">
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value as PromotionStatus | "all")}
-                className="min-h-[36px] px-3 py-2 rounded-[10px] border border-[#E5E7EB] text-[13px] text-neutral-800 bg-white focus:outline-none focus:ring-2 focus:ring-black/10"
-                aria-label="สถานะ"
-              >
-                {STATUS_OPTIONS.map((o) => (
-                  <option key={o.value} value={o.value}>{o.label}</option>
-                ))}
-              </select>
-              <select
-                value={branchFilter}
-                onChange={(e) => setBranchFilter(e.target.value)}
-                className="min-h-[36px] px-3 py-2 rounded-[10px] border border-[#E5E7EB] text-[13px] text-neutral-800 bg-white focus:outline-none focus:ring-2 focus:ring-black/10"
-                aria-label="สาขา"
-              >
-                <option value="all">ทุกสาขา</option>
-                {branches.map((b) => (
-                  <option key={b.id} value={b.id}>{b.name}</option>
-                ))}
-              </select>
-              <select
-                value={targetGroupFilter}
-                onChange={(e) => setTargetGroupFilter((e.target.value || "") as PromotionTargetGroup | "")}
-                className="min-h-[36px] px-3 py-2 rounded-[10px] border border-[#E5E7EB] text-[13px] text-neutral-800 bg-white focus:outline-none focus:ring-2 focus:ring-black/10"
-                aria-label="กลุ่มเป้าหมาย"
-              >
-                <option value="">ทุกกลุ่ม</option>
-                <option value="new">ลูกค้าใหม่</option>
-                <option value="existing">ลูกค้าปัจจุบัน</option>
-                <option value="all">ทุกคน</option>
-              </select>
-              <input
-                type="search"
+            <select
+              value={branchFilter}
+              onChange={(e) => setBranchFilter(e.target.value)}
+              className="h-11 px-4 rounded-2xl font-body text-sm text-mauve-600 bg-white border border-cream-300 focus:outline-none focus:ring-2 focus:ring-rg-300/50 transition-all"
+              aria-label="สาขา"
+            >
+              <option value="all">ทุกสาขา</option>
+              {branches.map((b) => (
+                <option key={b.id} value={b.id}>{b.name}</option>
+              ))}
+            </select>
+            <select
+              value={targetGroupFilter}
+              onChange={(e) => setTargetGroupFilter((e.target.value || "") as PromotionTargetGroup | "")}
+              className="h-11 px-4 rounded-2xl font-body text-sm text-mauve-600 bg-white border border-cream-300 focus:outline-none focus:ring-2 focus:ring-rg-300/50 transition-all"
+              aria-label="กลุ่มเป้าหมาย"
+            >
+              <option value="">ทุกกลุ่ม</option>
+              <option value="new">ลูกค้าใหม่</option>
+              <option value="existing">ลูกค้าปัจจุบัน</option>
+              <option value="all">ทุกคน</option>
+            </select>
+            <div className="flex-1 min-w-[200px]">
+              <Input
+                placeholder="ค้นหาโปรโมชัน..."
+                icon={<span className="text-sm">⌕</span>}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="ค้นชื่อโปรโมชั่น..."
-                className="min-h-[36px] px-3 py-2 rounded-[10px] border border-[#E5E7EB] text-[13px] text-neutral-800 bg-white focus:outline-none focus:ring-2 focus:ring-black/10 w-full min-w-[180px] max-w-[240px]"
+                className="bg-white"
                 aria-label="ค้นชื่อโปรโมชั่น"
               />
             </div>
-            {listFailed && (
-              <div className="py-8 px-4 rounded-[12px] bg-red-50 border border-red-100 text-center">
-                <p className="text-[14px] font-medium text-red-800">โหลดรายการไม่สำเร็จ</p>
-                <p className="text-[13px] text-red-600 mt-1">{listError?.message ?? "เกิดข้อผิดพลาด กรุณาลองใหม่"}</p>
-                <button
-                  type="button"
-                  onClick={() => mutateList()}
-                  className="mt-4 min-h-[40px] px-4 rounded-[10px] text-[14px] font-medium bg-red-600 text-white hover:bg-red-700 transition-colors"
-                >
-                  ลองใหม่
-                </button>
-              </div>
-            )}
-            {!listData && !listFailed && (
-              <div className="space-y-3 py-8" aria-busy="true">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-20 rounded-[10px] bg-[#F5F5F7] animate-pulse" />
-                ))}
-              </div>
-            )}
-            {listData && items.length === 0 && !listFailed && (
-              <p className="text-[14px] text-neutral-500 py-8 text-center">ยังไม่มีโปรโมชั่น</p>
-            )}
-            {listData && items.length > 0 && displayedItems.length === 0 && !listFailed && (
-              <p className="text-[14px] text-neutral-500 py-8 text-center">ไม่พบโปรโมชั่นที่ตรงกับคำค้น</p>
-            )}
-            {listData && items.length > 0 && displayedItems.length > 0 && (
-              <div className="space-y-3">
-                {displayedItems.map((p) => (
-                  <PromotionRow
-                    key={p.id}
-                    item={p}
-                    branches={branches}
-                    onEdit={() => { setEditingItem(p); setShowForm(true); }}
-                    onMutate={mutate}
-                  />
-                ))}
-                {canLoadMore && (
-                  <div className="pt-4 flex justify-center">
-                    <button
-                      type="button"
-                      onClick={() => setListLimit(100)}
-                      className="min-h-[40px] px-4 rounded-[10px] text-[14px] font-medium bg-transparent text-neutral-700 border border-neutral-300 hover:bg-[#F2F2F7] transition-colors"
-                    >
-                      โหลดเพิ่ม
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
+          </motion.div>
+          {listFailed && (
+            <div className="py-8 px-4 rounded-2xl bg-red-50 border border-red-200 text-center luxury-card">
+              <p className="font-body text-sm font-medium text-red-800">โหลดรายการไม่สำเร็จ</p>
+              <p className="font-body text-sm text-red-600 mt-1">{listError?.message ?? "เกิดข้อผิดพลาด กรุณาลองใหม่"}</p>
+              <Button type="button" size="sm" onClick={() => mutateList()} className="mt-4">ลองใหม่</Button>
+            </div>
+          )}
+          {!listData && !listFailed && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5" aria-busy="true">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="h-72 rounded-2xl bg-cream-200 animate-pulse" />
+              ))}
+            </div>
+          )}
+          {listData && items.length === 0 && !listFailed && (
+            <EmptyState
+              icon={<span className="text-3xl">✦</span>}
+              title="ยังไม่มีโปรโมชัน"
+              description="สร้างโปรโมชันแรกเพื่อดึงดูดลูกค้า"
+              action={
+                <Button variant="primary" shimmer onClick={() => { setEditingItem(null); setShowForm(true); }}>
+                  + สร้างโปรโมชัน
+                </Button>
+              }
+            />
+          )}
+          {listData && items.length > 0 && displayedItems.length === 0 && !listFailed && (
+            <EmptyState
+              icon={<span className="text-3xl">✦</span>}
+              title="ไม่พบโปรโมชัน"
+              description="ไม่พบโปรโมชั่นที่ตรงกับคำค้น"
+              action={
+                <Button variant="ghost" size="sm" onClick={() => setSearchQuery("")}>ล้างการค้นหา</Button>
+              }
+            />
+          )}
+          {listData && items.length > 0 && displayedItems.length > 0 && !listFailed && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+              {displayedItems.map((p, i) => (
+                <PromotionRow
+                  key={p.id}
+                  item={p}
+                  branches={branches}
+                  onEdit={() => { setEditingItem(p); setShowForm(true); }}
+                  onMutate={mutate}
+                  index={i}
+                />
+              ))}
+            </div>
+          )}
+          {listData && items.length > 0 && displayedItems.length > 0 && canLoadMore && !listFailed && (
+            <div className="pt-6 flex justify-center">
+              <Button type="button" variant="ghost" size="sm" onClick={() => setListLimit(100)}>
+                โหลดเพิ่ม
+              </Button>
+            </div>
+          )}
         </section>
 
         {showCreateFromImage && (

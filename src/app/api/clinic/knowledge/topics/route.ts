@@ -50,7 +50,7 @@ async function getAuth(request: NextRequest) {
   if (!requireRole(user.role, ["owner", "manager", "staff"])) {
     return { error: NextResponse.json({ error: "จำกัดสิทธิ์: คุณไม่มีสิทธิ์เข้าถึงข้อมูล Knowledge" }, { status: 403 }) };
   }
-  return { orgId, userId: user.id ?? session.userId ?? "", user };
+  return { orgId, userId: session.user_id ?? "", user };
 }
 
 export async function GET(request: NextRequest) {

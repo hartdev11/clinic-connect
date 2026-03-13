@@ -1,10 +1,17 @@
 /**
  * E7.1–E7.8 — createCheckoutSession + Proration & Upgrade mid-cycle
+ * Phase 17 — Billing idempotency
  */
 import { NextRequest, NextResponse } from "next/server";
+import type Stripe from "stripe";
 import { getSessionFromCookies } from "@/lib/auth-session";
 import { getOrgIdFromClinicId, getSubscriptionByOrgId } from "@/lib/clinic-data";
 import { getStripe } from "@/lib/stripe";
+import { getCouponByCode } from "@/lib/coupons";
+import {
+  checkBillingIdempotency,
+  setBillingIdempotencyResult,
+} from "@/lib/billing-idempotency";
 
 export const dynamic = "force-dynamic";
 
@@ -60,9 +67,41 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const plan = body.plan as string;
+    const couponCode = typeof body.couponCode === "string" ? body.couponCode.trim() : "";
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
     const successUrl = body.successUrl ?? `${baseUrl}/clinic/settings?checkout=success&session_id={CHECKOUT_SESSION_ID}`;
     const cancelUrl = body.cancelUrl ?? `${baseUrl}/clinic/settings?checkout=cancelled`;
+
+    let stripeCouponId: string | null = null;
+    let trialDays = 0;
+    if (couponCode) {
+      const coupon = await getCouponByCode(couponCode);
+      if (!coupon || !coupon.isActive) {
+        return NextResponse.json({ error: "คูปองไม่ถูกต้องหรือหมดอายุ" }, { status: 400 });
+      }
+      const now = new Date();
+      if (new Date(coupon.validFrom) > now || new Date(coupon.validUntil) < now) {
+        return NextResponse.json({ error: "คูปองหมดอายุแล้ว" }, { status: 400 });
+      }
+      if (coupon.maxTotalUses > 0 && coupon.currentUses >= coupon.maxTotalUses) {
+        return NextResponse.json({ error: "คูปองถูกใช้ครบแล้ว" }, { status: 400 });
+      }
+      const stripe = getStripe();
+      if (coupon.discountType === "free_trial") {
+        trialDays = Math.max(0, Math.floor(coupon.discountValue));
+      } else {
+        const couponParams =
+          coupon.discountType === "percentage"
+            ? { percent_off: Math.min(100, Math.max(0, coupon.discountValue)) }
+            : { amount_off: Math.min(9999999, Math.max(0, Math.round(coupon.discountValue * 100))), currency: "thb" as const };
+        const created = await stripe.coupons.create({
+          ...couponParams,
+          name: coupon.couponCode,
+          metadata: { source: "clinic_connect" },
+        });
+        stripeCouponId = created.id;
+      }
+    }
 
     const planConfig = PLANS[plan];
     if (!planConfig?.priceId) {
@@ -77,16 +116,31 @@ export async function POST(request: NextRequest) {
     const canUpgrade = stripeSubId && subscription?.status === "active";
 
     if (canUpgrade && subscription?.plan !== plan) {
+      const period = `upgrade-${plan}-${new Date().toISOString().slice(0, 7)}`; // YYYY-MM
+      const idem = await checkBillingIdempotency(orgId, period);
+      if (idem.duplicate && idem.result) {
+        return NextResponse.json(idem.result);
+      }
       await upgradeSubscription(stripeSubId, planConfig.priceId, orgId, plan);
-      return NextResponse.json({
+      const upgradeResult = {
         upgraded: true,
         plan,
         message: "อัปเกรดสำเร็จ — Stripe จะคิดเงินส่วนต่าง (proration) ทันที",
+      };
+      await setBillingIdempotencyResult(orgId, period, upgradeResult);
+      return NextResponse.json({
+        ...upgradeResult,
       });
     }
 
+    const period = `checkout-${plan}-${new Date().toISOString().slice(0, 13)}`; // YYYY-MM-DDTHH
+    const idem = await checkBillingIdempotency(orgId, period);
+    if (idem.duplicate && idem.result) {
+      return NextResponse.json(idem.result);
+    }
+
     const stripe = getStripe();
-    const checkoutSession = await stripe.checkout.sessions.create({
+    const sessionParams: Stripe.Checkout.SessionCreateParams = {
       mode: "subscription",
       payment_method_types: ["card"],
       line_items: [
@@ -98,13 +152,17 @@ export async function POST(request: NextRequest) {
       success_url: successUrl,
       cancel_url: cancelUrl,
       client_reference_id: orgId,
-      metadata: { org_id: orgId, plan },
+      metadata: { org_id: orgId, plan, coupon_code: couponCode || "" },
       subscription_data: {
         metadata: { org_id: orgId, plan },
+        ...(trialDays > 0 ? { trial_period_days: trialDays } : {}),
       },
-    });
-
-    return NextResponse.json({ url: checkoutSession.url, sessionId: checkoutSession.id });
+      ...(stripeCouponId ? { discounts: [{ coupon: stripeCouponId }] } : {}),
+    };
+    const checkoutSession = await stripe.checkout.sessions.create(sessionParams);
+    const result = { url: checkoutSession.url, sessionId: checkoutSession.id };
+    await setBillingIdempotencyResult(orgId, period, result);
+    return NextResponse.json(result);
   } catch (err) {
     console.error("POST /api/clinic/checkout:", err);
     return NextResponse.json(

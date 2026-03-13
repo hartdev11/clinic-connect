@@ -1,7 +1,8 @@
 /**
- * Run 6 Analytics Agents แบบขนาน
+ * Run Analytics Agents แบบขนาน
+ * Phase 6: 6 base + 4 specialized (sales, followup, objection, referral)
  * รวมผลเป็น AggregatedAnalyticsContext
- * Target: <250ms total (แต่ละตัว <200ms, พร้อมกัน)
+ * Target: <350ms total
  */
 import {
   runBookingAgent,
@@ -10,6 +11,11 @@ import {
   runFinanceAgent,
   runKnowledgeAgent,
   runFeedbackAgent,
+  runSalesAgent,
+  runFollowupAgent,
+  runObjectionHandlerAgent,
+  runReferralAgent,
+  runManagerRouting,
 } from "./agents";
 import { log } from "@/lib/logger";
 import type { AnalyticsContext } from "./types";
@@ -20,23 +26,54 @@ export async function runAllAnalytics(
 ): Promise<AggregatedAnalyticsContext> {
   const start = Date.now();
 
-  const [booking, promotion, customer, finance, knowledge, feedback] =
-    await Promise.all([
-      runBookingAgent(ctx),
-      runPromotionAgent(ctx),
-      runCustomerAgent(ctx),
-      runFinanceAgent(ctx),
-      runKnowledgeAgent(ctx),
-      runFeedbackAgent(ctx),
-    ]);
+  const [
+    booking,
+    promotion,
+    customer,
+    finance,
+    knowledge,
+    feedback,
+    sales,
+    followup,
+    objection,
+    referral,
+  ] = await Promise.all([
+    runBookingAgent(ctx),
+    runPromotionAgent(ctx),
+    runCustomerAgent(ctx),
+    runFinanceAgent(ctx),
+    runKnowledgeAgent(ctx),
+    runFeedbackAgent(ctx),
+    runSalesAgent(ctx),
+    runFollowupAgent(ctx),
+    runObjectionHandlerAgent(ctx),
+    runReferralAgent(ctx),
+  ]);
 
   const totalAnalyticsMs = Date.now() - start;
+  const aggregated: AggregatedAnalyticsContext = {
+    booking,
+    promotion,
+    customer,
+    finance,
+    knowledge,
+    feedback,
+    sales,
+    followup,
+    objection,
+    referral,
+    totalAnalyticsMs,
+  };
+
+  const managerRouting = runManagerRouting(ctx.userMessage ?? "", aggregated);
+  aggregated._managerRoute = managerRouting.primaryAgent;
 
   if (process.env.NODE_ENV === "development") {
     log.info("AI Analytics completed", {
       totalAnalyticsMs,
       correlationId: ctx.correlationId,
       org_id: ctx.org_id,
+      managerRoute: managerRouting.primaryAgent,
     });
   }
 
@@ -52,13 +89,7 @@ export async function runAllAnalytics(
   };
 
   return {
-    booking,
-    promotion,
-    customer,
-    finance,
-    knowledge,
-    feedback,
-    totalAnalyticsMs,
+    ...aggregated,
     _retrievalConfidence: knowledgeExtended._retrievalConfidence,
     _lowConfidence: knowledgeExtended._lowConfidence,
     _retrievalMode: knowledgeExtended._retrievalMode,

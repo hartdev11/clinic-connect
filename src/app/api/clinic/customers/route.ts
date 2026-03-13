@@ -43,16 +43,25 @@ export async function GET(request: NextRequest) {
     }
     const limit = Math.min(Number(searchParams.get("limit")) || 20, 100);
     const startAfter = searchParams.get("startAfter") ?? undefined;
+    const search = searchParams.get("search")?.trim().toLowerCase() ?? "";
     const allBranches = searchParams.get("allBranches") === "true";
     const sourceParam = searchParams.get("source");
     const validSource = ["line", "facebook", "instagram", "tiktok", "web"].includes(sourceParam || "")
       ? (sourceParam as "line" | "facebook" | "instagram" | "tiktok" | "web")
       : undefined;
+    const sortBy = searchParams.get("sortBy");
+    const validSortBy = sortBy === "leadScore" || sortBy === "lastChatAt" ? sortBy : undefined;
+    const leadFilter = searchParams.get("leadFilter");
+    const validLeadFilter = leadFilter === "hot" || leadFilter === "warm" || leadFilter === "cold" ? leadFilter : undefined;
+    const fetchLimit = search || validLeadFilter || validSortBy ? Math.min(limit * 4, 100) : limit;
     const { items, lastId } = await getCustomers(orgId, {
       branchId: allBranches ? undefined : (branchId ?? undefined),
-      limit,
+      limit: fetchLimit,
       startAfterId: startAfter,
       source: validSource,
+      search: search || undefined,
+      sortBy: validSortBy,
+      leadFilter: validLeadFilter,
     });
     return { response: NextResponse.json({ items, lastId }), orgId, branchId };
   } catch (err) {

@@ -5,6 +5,35 @@
  * Inject through knowledge agent only — do not modify orchestrator.
  */
 import { searchKnowledge } from "@/lib/knowledge-vector";
+
+/**
+ * ขยาย query สำหรับ body part — ปาก→lip filler, คาง→chin filler
+ * เพื่อให้ RAG ดึงผลตรงประเด็น (ไม่ดึง เลเซอร์ รีจูรัน ที่ไม่เกี่ยวกับปาก)
+ */
+export function expandRagQueryForBodyPart(message: string): string {
+  const m = message.toLowerCase().trim();
+  const expansions: string[] = [];
+  if (/ปาก|ทำปาก|ฉีดปาก|ปากอิ่ม|เติมปาก|เสริมปาก/.test(m)) {
+    expansions.push("lip filler ฟิลเลอร์ปาก lip filler ปาก");
+  }
+  if (/คาง|ทำคาง|คางเหลี่ยม|เสริมคาง|ฉีดคาง/.test(m)) {
+    expansions.push("chin filler ฟิลเลอร์คาง คางเหลี่ยม");
+  }
+  if (/จมูก|ทำจมูก|เสริมจมูก|แก้จมูก|ฟิลเลอร์จมูก/.test(m)) {
+    expansions.push("nose surgery เสริมจมูก ฟิลเลอร์จมูก");
+  }
+  if (/โหนกแก้ม|แก้ม|ทำแก้ม|ฉีดแก้ม|เสริมแก้ม/.test(m)) {
+    expansions.push("cheek filler ฟิลเลอร์แก้ม โหนกแก้ม");
+  }
+  if (/ใต้ตา|ร่องแก้ม|ร่องน้ำตา/.test(m)) {
+    expansions.push("under eye filler ฟิลเลอร์ใต้ตา ร่องแก้ม");
+  }
+  if (/กราม|ขากรรไกร|ทำกราม/.test(m)) {
+    expansions.push("jaw filler ฟิลเลอร์กราม jawline");
+  }
+  if (expansions.length === 0) return message;
+  return `${message} ${expansions.join(" ")}`;
+}
 import type { SearchKnowledgeResult } from "@/lib/knowledge-vector";
 
 const MAX_CHUNKS = 5;
@@ -70,13 +99,18 @@ export interface RetrievedChunk {
 
 /**
  * Retrieve knowledge context for org + query with hybrid weighted scoring.
- * Filter: orgId, status == active. Max 5 chunks.
+ * Filter: orgId, status == active. Max 5 chunks. Phase 14: cache.
  */
 export async function retrieveKnowledgeContext(
   orgId: string,
   query: string
 ): Promise<RetrievedChunk[]> {
-  const raw = await searchKnowledge(query, {
+  const expandedQuery = expandRagQueryForBodyPart(query);
+  const { getCachedRagResults, setCachedRagResults } = await import("@/lib/rag-cache");
+  const cached = await getCachedRagResults<RetrievedChunk[]>(orgId, expandedQuery, "topics");
+  if (cached !== null) return cached;
+
+  const raw = await searchKnowledge(expandedQuery, {
     org_id: orgId,
     is_active: true,
   }, FETCH_TOP_K);
@@ -90,7 +124,7 @@ export async function retrieveKnowledgeContext(
     const category = (r.metadata?.category as string) ?? "";
 
     let exactTopic = 0;
-    if (exactTopicMatch(query, topic)) exactTopic = EXACT_TOPIC_MATCH_BOOST;
+    if (exactTopicMatch(expandedQuery, topic)) exactTopic = EXACT_TOPIC_MATCH_BOOST;
 
     let categoryBoost = 0;
     if (priceBoost && category === "price") categoryBoost = CATEGORY_MATCH_BOOST;
@@ -109,5 +143,7 @@ export async function retrieveKnowledgeContext(
   });
 
   scored.sort((a, b) => b.finalScore - a.finalScore);
-  return scored.slice(0, MAX_CHUNKS);
+  const result = scored.slice(0, MAX_CHUNKS);
+  void setCachedRagResults(orgId, expandedQuery, result, "topics");
+  return result;
 }

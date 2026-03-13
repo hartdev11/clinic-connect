@@ -14,7 +14,7 @@ export default function KnowledgeBrainRedirectPage() {
   }, [router]);
   return (
     <div className="flex min-h-[40vh] items-center justify-center">
-      <p className="text-surface-500">กำลังนำคุณไปหน้าจัดการข้อมูลที่ AI ใช้ตอบลูกค้า...</p>
+      <p className="font-body text-mauve-500">กำลังนำคุณไปหน้าจัดการข้อมูลที่ AI ใช้ตอบลูกค้า...</p>
     </div>
   );
 }

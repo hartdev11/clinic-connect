@@ -57,7 +57,7 @@ async function executeCustomerAnalytics(
   const { items: customers } = customersResult;
   const keyFindings: string[] = [];
   const riskFlags: string[] = [];
-  let recommendation: string | null = null;
+  const recommendation: string | null = null;
 
   keyFindings.push(`new_customers_today:${stats.newCustomers}`);
 

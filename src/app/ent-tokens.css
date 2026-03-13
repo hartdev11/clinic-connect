@@ -1,0 +1,221 @@
+/**
+ * Clinic Connect — Luxury Medical-Tech Design System
+ * Full semantic token set. No hard-coded colors in components.
+ * Apply to .ent-theme wrapper. See docs/THEME-ENFORCEMENT.md
+ */
+
+.ent-theme,
+[data-theme="enterprise"] {
+  /* ─── Core: Canvas & Surfaces ─────────────────────────────────────────── */
+  --ent-bg: #f6f4f1;
+  --ent-bg-bottom: #ebe8e4;
+  --ent-bg-overlay: radial-gradient(
+    ellipse 90% 60% at 20% 0%,
+    rgba(244, 232, 224, 0.35) 0%,
+    transparent 55%
+  );
+  --ent-surface-1: #faf9f7;
+  --ent-surface-2: #ffffff;
+  --ent-surface-3: #fdfcfa;
+
+  /* ─── Borders & Dividers ──────────────────────────────────────────────── */
+  --ent-border: rgba(44, 42, 38, 0.08);
+  --ent-border-hover: rgba(44, 42, 38, 0.14);
+  --ent-divider: rgba(44, 42, 38, 0.06);
+
+  /* ─── Text ────────────────────────────────────────────────────────────── */
+  --ent-text-primary: #2c2a26;
+  --ent-text-secondary: #6b6560;
+  --ent-text-muted: #9c958d;
+  --ent-text-inverse: #ffffff;
+
+  /* ─── Brand / Accent ──────────────────────────────────────────────────── */
+  --ent-accent: #a8926e;
+  --ent-accent-hover: #927a52;
+  --ent-accent-soft: rgba(168, 146, 110, 0.12);
+  --ent-accent-secondary: #5b8a72;
+
+  /* ─── Status (semantic) ────────────────────────────────────────────────── */
+  --ent-success: #4a7c59;
+  --ent-success-soft: rgba(74, 124, 89, 0.12);
+  --ent-warning: #c4903a;
+  --ent-warning-soft: rgba(196, 144, 58, 0.12);
+  --ent-danger: #b85450;
+  --ent-danger-soft: rgba(184, 84, 80, 0.12);
+  --ent-info: #5b7a9e;
+  --ent-info-soft: rgba(91, 122, 158, 0.12);
+
+  /* ─── Interaction ────────────────────────────────────────────────────── */
+  --ent-hover-surface: rgba(44, 42, 38, 0.04);
+  --ent-focus-ring: rgba(168, 146, 110, 0.4);
+  --ent-disabled-bg: rgba(44, 42, 38, 0.04);
+  --ent-disabled-text: #9c958d;
+
+  /* ─── Overlay (modals, backdrops) ──────────────────────────────────────── */
+  --ent-overlay: rgba(44, 42, 38, 0.4);
+
+  /* ─── Typography ──────────────────────────────────────────────────────── */
+  --ent-font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --ent-font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --ent-text-xs: 0.75rem;
+  --ent-text-sm: 0.875rem;
+  --ent-text-base: 1rem;
+  --ent-text-lg: 1.125rem;
+  --ent-text-xl: 1.25rem;
+  --ent-text-2xl: 1.5rem;
+  --ent-text-3xl: 1.875rem;
+
+  /* ─── Spacing ─────────────────────────────────────────────────────────── */
+  --ent-space-1: 4px;
+  --ent-space-2: 8px;
+  --ent-space-3: 12px;
+  --ent-space-4: 16px;
+  --ent-space-5: 20px;
+  --ent-space-6: 24px;
+  --ent-space-8: 32px;
+  --ent-space-10: 40px;
+  --ent-space-12: 48px;
+  --ent-max-w: 1440px;
+  --ent-content-w: 1200px;
+  --ent-sidebar-w: 256px;
+  --ent-sidebar-collapsed: 72px;
+  --ent-topbar-h: 56px;
+
+  /* ─── Shadows (soft, warm undertone) ───────────────────────────────────── */
+  --ent-shadow-sm: 0 1px 2px rgba(44, 42, 38, 0.04);
+  --ent-shadow-md: 0 4px 12px -2px rgba(44, 42, 38, 0.06), 0 2px 4px -2px rgba(44, 42, 38, 0.04);
+  --ent-shadow-lg: 0 12px 28px -4px rgba(44, 42, 38, 0.08), 0 4px 12px -4px rgba(44, 42, 38, 0.04);
+  --ent-shadow-card: 0 1px 3px rgba(44, 42, 38, 0.04), 0 1px 2px -1px rgba(44, 42, 38, 0.03);
+  --ent-shadow-card-hover: 0 8px 24px -4px rgba(44, 42, 38, 0.06), 0 2px 8px -2px rgba(44, 42, 38, 0.04);
+  --ent-shadow-dropdown: 0 8px 24px -4px rgba(44, 42, 38, 0.08), 0 2px 8px -2px rgba(44, 42, 38, 0.04);
+  --ent-shadow-modal: 0 24px 48px -12px rgba(44, 42, 38, 0.12), 0 8px 16px -8px rgba(44, 42, 38, 0.06);
+
+  /* ─── Motion ──────────────────────────────────────────────────────────── */
+  --ent-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --ent-duration-fast: 150ms;
+  --ent-duration: 200ms;
+  --ent-duration-slow: 250ms;
+
+  /* ─── Radius ──────────────────────────────────────────────────────────── */
+  --ent-radius-sm: 6px;
+  --ent-radius-md: 8px;
+  --ent-radius-lg: 12px;
+  --ent-radius-xl: 16px;
+
+  /* ─── Density (comfortable default) ────────────────────────────────────── */
+  --ent-density-row: 44px;
+  --ent-density-card-padding: 16px;
+  --ent-density-section: 24px;
+  --ent-density-input-h: 40px;
+  --ent-density-button-h: 40px;
+}
+
+.ent-theme[data-density="compact"],
+[data-theme="enterprise"][data-density="compact"] {
+  --ent-density-row: 36px;
+  --ent-density-card-padding: 12px;
+  --ent-density-section: 16px;
+  --ent-density-input-h: 36px;
+  --ent-density-button-h: 34px;
+}
+
+.ent-theme[data-density="spacious"],
+[data-theme="enterprise"][data-density="spacious"] {
+  --ent-density-row: 52px;
+  --ent-density-card-padding: 24px;
+  --ent-density-section: 32px;
+  --ent-density-input-h: 44px;
+  --ent-density-button-h: 44px;
+}
+
+/* ─── Layered background (luxury) ───────────────────────────────────────── */
+.ent-theme.ent-theme-luxury-bg,
+[data-theme="enterprise"].ent-theme-luxury-bg {
+  background: linear-gradient(180deg, var(--ent-bg) 0%, var(--ent-bg-bottom) 100%);
+  background-attachment: local;
+}
+
+.ent-theme.ent-theme-luxury-bg::before,
+[data-theme="enterprise"].ent-theme-luxury-bg::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: var(--ent-bg-overlay);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ent-theme.ent-theme-luxury-bg > *,
+[data-theme="enterprise"].ent-theme-luxury-bg > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── Enterprise Fluid Data Canvas ─────────────────────────────────────── */
+.ent-theme .ent-page,
+[data-theme="enterprise"] .ent-page {
+  width: 100%;
+  padding: var(--ent-space-6) var(--ent-space-8);
+}
+
+.ent-theme .ent-grid,
+[data-theme="enterprise"] .ent-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--ent-space-6);
+}
+
+.ent-theme .ent-grid-gap-8,
+[data-theme="enterprise"] .ent-grid-gap-8 {
+  gap: var(--ent-space-8);
+}
+
+/* ─── Luxury card (elevated surface) ─────────────────────────────────────── */
+.ent-theme .ent-card,
+[data-theme="enterprise"] .ent-card {
+  background: var(--ent-surface-2);
+  border: 1px solid var(--ent-border);
+  border-radius: var(--ent-radius-lg);
+  box-shadow: var(--ent-shadow-card);
+  transition: box-shadow var(--ent-duration) var(--ent-ease), border-color var(--ent-duration) var(--ent-ease);
+}
+
+.ent-theme .ent-card:hover,
+[data-theme="enterprise"] .ent-card:hover {
+  box-shadow: var(--ent-shadow-card-hover);
+  border-color: var(--ent-border-hover);
+}
+
+/* ─── Frosted panel (glass-like) ─────────────────────────────────────────── */
+.ent-theme .ent-panel-frosted,
+[data-theme="enterprise"] .ent-panel-frosted {
+  background: color-mix(in srgb, var(--ent-surface-2) 72%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--ent-border);
+  border-radius: var(--ent-radius-lg);
+  box-shadow: var(--ent-shadow-card);
+}
+
+/* ─── Focus-visible ring (accessibility) ──────────────────────────────────── */
+.ent-theme [data-ent-focusable]:focus-visible,
+[data-theme="enterprise"] [data-ent-focusable]:focus-visible {
+  outline: 2px solid var(--ent-focus-ring);
+  outline-offset: 2px;
+}
+
+.ent-theme button:focus-visible,
+.ent-theme a:focus-visible,
+.ent-theme [role="button"]:focus-visible,
+.ent-theme input:focus-visible,
+.ent-theme select:focus-visible,
+.ent-theme textarea:focus-visible,
+[data-theme="enterprise"] button:focus-visible,
+[data-theme="enterprise"] a:focus-visible,
+[data-theme="enterprise"] [role="button"]:focus-visible,
+[data-theme="enterprise"] input:focus-visible,
+[data-theme="enterprise"] select:focus-visible,
+[data-theme="enterprise"] textarea:focus-visible {
+  outline: 2px solid var(--ent-focus-ring);
+  outline-offset: 2px;
+}

@@ -10,7 +10,14 @@ import {
   getUnlabeledFeedbackCount,
   getChatsWoW,
   getBookingsWoW,
+  getHotLeads,
+  getHotLeadsCount,
+  getSubscriptionByOrgId,
 } from "@/lib/clinic-data";
+import { getCurrentMonthConversationsUsed } from "@/lib/ai-usage-daily";
+import { listPendingHandoffSessions } from "@/lib/handoff-data";
+import { PLAN_CONVERSATIONS_LIMIT } from "@/types/subscription";
+import type { OrgPlan } from "@/types/organization";
 import { getEffectiveUser, requireBranchAccess } from "@/lib/rbac";
 import { isOrgCircuitOpen } from "@/lib/org-circuit-breaker";
 import { runWithObservability } from "@/lib/observability/run-with-observability";
@@ -56,6 +63,11 @@ export async function GET(request: NextRequest) {
       unlabeledFeedbackCount,
       chatsWoW,
       bookingsWoW,
+      hotLeads,
+      subDoc,
+      usedConvs,
+      pendingHandoffs,
+      hotLeadsCount,
     ] = await Promise.all([
       getDashboardStats(orgId, branchId ?? undefined),
       getDashboardBookingsByDate(orgId, branchId ?? undefined),
@@ -66,6 +78,11 @@ export async function GET(request: NextRequest) {
       getUnlabeledFeedbackCount(orgId),
       getChatsWoW(orgId),
       getBookingsWoW(orgId, branchId ?? undefined),
+      getHotLeads(orgId, { branchId: branchId ?? undefined, limit: 5 }),
+      getSubscriptionByOrgId(orgId),
+      getCurrentMonthConversationsUsed(orgId),
+      listPendingHandoffSessions(orgId).then((a) => a.length),
+      getHotLeadsCount(orgId, branchId),
     ]);
 
     const aiAlerts: DashboardAlert[] = [];
@@ -95,6 +112,10 @@ export async function GET(request: NextRequest) {
       });
     }
 
+    const plan = (subDoc?.plan ?? "starter") as OrgPlan;
+    const limit = PLAN_CONVERSATIONS_LIMIT[plan] ?? PLAN_CONVERSATIONS_LIMIT.starter;
+    const usage_percentage = limit > 0 ? Math.round((usedConvs / limit) * 10000) / 100 : 0;
+
     return {
       response: NextResponse.json({
         stats,
@@ -107,6 +128,10 @@ export async function GET(request: NextRequest) {
         unlabeledFeedbackCount,
         chatsWoW,
         bookingsWoW,
+        hotLeads,
+        usage_percentage,
+        pending_handoffs: pendingHandoffs,
+        hot_leads_count: hotLeadsCount,
       }),
       orgId,
       branchId,

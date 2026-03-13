@@ -15,8 +15,9 @@ import {
   upsertLineCustomer,
 } from "@/lib/clinic-data";
 import { getLineChannelByOrgId } from "@/lib/line-channel-data";
-import { usePipeline, use7AgentChat } from "@/lib/feature-flags";
+import { isPipelineEnabled, is7AgentChatEnabled } from "@/lib/feature-flags";
 import { chatOrchestrate } from "@/lib/ai/orchestrator";
+import { triggerHandoff } from "@/lib/handoff-trigger";
 import { toSignedUrlsForLine } from "@/lib/promotion-storage";
 
 export const dynamic = "force-dynamic";
@@ -129,12 +130,19 @@ export async function POST(
 
     void (async () => {
       try {
+        const BLOCKED_MSG = "บริการถูกระงับชั่วคราว กรุณาติดต่อผู้ดูแลระบบ";
+        const sub = await getSubscriptionByOrgId(orgId);
+        if (sub?.aiBlocked) {
+          await sendLineReply(replyToken, BLOCKED_MSG, channelToken);
+          return;
+        }
+
         let replyText: string;
         let intent: { intent?: string; service?: string; area?: string } | undefined;
         let correlationId: string | undefined;
 
-        const shouldUse7Agent = use7AgentChat();
-        const shouldUsePipeline = usePipeline();
+        const shouldUse7Agent = is7AgentChatEnabled();
+        const shouldUsePipeline = isPipelineEnabled();
 
         let mediaUrls: string[] | undefined;
         if (shouldUse7Agent) {
@@ -149,6 +157,24 @@ export async function POST(
           mediaUrls = result.media;
           intent = { intent: "general_chat" };
           correlationId = result.correlationId;
+          // Phase 12/15: Trigger handoff when low_ai_confidence or medical
+          if (result.handoffTriggered && userId) {
+            const ht = result.handoffTriggered;
+            const triggerMsg =
+              ht.triggerType === "low_ai_confidence"
+                ? `⚠️ AI ไม่แน่ใจ (confidence: ${Math.round((ht.confidence ?? 0) * 100)}%) — ข้อความลูกค้า: ${userText.slice(0, 80)}`
+                : ht.triggerType === "medical"
+                  ? `คำถามทางการแพทย์ — ลูกค้า: ${userText.slice(0, 80)}`
+                  : userText.slice(0, 100);
+            triggerHandoff({
+              orgId,
+              lineUserId: userId,
+              triggerType: ht.triggerType as import("@/types/handoff").HandoffTriggerType,
+              triggerMessage: triggerMsg,
+            }).catch((err) => {
+              if (isDevelopment) console.warn("[LINE Webhook] triggerHandoff error:", (err as Error)?.message?.slice(0, 60));
+            });
+          }
         } else if (shouldUsePipeline) {
           let subscriptionPlan: string | undefined;
           try {
@@ -167,6 +193,18 @@ export async function POST(
           replyText = result.reply?.trim() || "";
           intent = result.intent ?? undefined;
           if (result.media && result.media.length > 0) mediaUrls = result.media;
+
+          // Phase 7: Create handoff session when escalation
+          if (result.handoffTriggered && userId) {
+            triggerHandoff({
+              orgId,
+              lineUserId: userId,
+              triggerType: result.handoffTriggered.triggerType as import("@/types/handoff").HandoffTriggerType,
+              triggerMessage: userText,
+            }).catch((err) => {
+              if (isDevelopment) console.warn("[LINE Webhook] triggerHandoff error:", (err as Error)?.message?.slice(0, 60));
+            });
+          }
         } else {
           replyText = (await chatAgentReply(userText))?.trim() || "";
         }
@@ -199,6 +237,14 @@ export async function POST(
           }).catch((err) => {
             if (isDevelopment) {
               console.warn("[LINE Webhook] Feedback error:", (err as Error)?.message?.slice(0, 60));
+            }
+          });
+        }
+        if (userId && userText) {
+          const { updateCustomerLeadScore } = await import("@/lib/ai/lead-score-updater");
+          updateCustomerLeadScore(orgId, userId, userText).catch((err) => {
+            if (isDevelopment) {
+              console.warn("[LINE Webhook] Lead score update error:", (err as Error)?.message?.slice(0, 60));
             }
           });
         }

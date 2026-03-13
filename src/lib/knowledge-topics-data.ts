@@ -78,7 +78,7 @@ function toVersion(id: string, d: Record<string, unknown>): KnowledgeVersion {
     createdBy: (d.createdBy as string) ?? "",
     createdAt: toISO(d.createdAt as Timestamp),
     status: (d.status as KnowledgeVersionStatus) ?? "draft",
-    dataClassification: (d.dataClassification as string) ?? KNOWLEDGE_DATA_CLASSIFICATION,
+    dataClassification: ((d.dataClassification as string) ?? KNOWLEDGE_DATA_CLASSIFICATION) as typeof KNOWLEDGE_DATA_CLASSIFICATION,
   };
 }
 
@@ -88,7 +88,7 @@ export async function listKnowledgeTopics(
   opts?: { search?: string; limit?: number }
 ): Promise<KnowledgeTopicListItem[]> {
   const limit = Math.min(opts?.limit ?? 100, MAX_TOPICS_PER_ORG);
-  let q = topicsRef(orgId).orderBy("updatedAt", "desc").limit(limit);
+  const q = topicsRef(orgId).orderBy("updatedAt", "desc").limit(limit);
 
   const topicsSnap = await q.get();
   let topics = topicsSnap.docs.map((d) => toTopic(d.id, d.data()));

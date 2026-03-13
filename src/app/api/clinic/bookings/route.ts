@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionFromCookies } from "@/lib/auth-session";
 import { getOrgIdFromClinicId, getBookings, createBookingAtomic, getBranchesByOrgId } from "@/lib/clinic-data";
+import { scheduleBookingReminder } from "@/lib/booking-notification";
+import { dispatchPartnerWebhooks } from "@/lib/partner-webhook-dispatch";
 import { getEffectiveUser, requireBranchAccess, requireRole } from "@/lib/rbac";
 import { isSlotAvailable } from "@/lib/slot-engine";
 import type { BookingCreate, BookingSource, BookingChannel } from "@/types/clinic";
@@ -71,7 +73,19 @@ export async function POST(request: NextRequest) {
     if ("error" in result) {
       return NextResponse.json({ error: "ช่วงเวลานี้ไม่ว่าง", code: "SLOT_TAKEN" }, { status: 409 });
     }
-    return { response: NextResponse.json({ id: result.id, success: true }), orgId, branchId: branchId ?? branch?.id ?? null };
+    const bookingId = result.id;
+    const bookingDateTime = new Date(data.scheduledAt);
+    await scheduleBookingReminder(bookingId, bookingDateTime, orgId, {
+      customerId: data.customerId ?? undefined,
+    }).catch((err) => console.warn("[Booking] scheduleBookingReminder:", (err as Error)?.message));
+    dispatchPartnerWebhooks(orgId, "booking.created", {
+      bookingId,
+      customerName: data.customerName,
+      service: data.service,
+      scheduledAt: data.scheduledAt,
+      branchName: data.branchName,
+    }).catch((e) => console.warn("[Booking] partner webhook:", (e as Error)?.message?.slice(0, 50)));
+    return { response: NextResponse.json({ id: bookingId, success: true }), orgId, branchId: branchId ?? branch?.id ?? null };
   } catch (err) {
     console.error("POST /api/clinic/bookings:", err);
     return NextResponse.json(

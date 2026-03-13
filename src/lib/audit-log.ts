@@ -15,7 +15,11 @@ export type AuditEvent =
   | "plan_downgrade"
   | "manual_override"
   | "manual_reply"
-  | "failed_auth";
+  | "failed_auth"
+  | "address_phone_verified"
+  | "franchise_join_approved"
+  | "franchise_join_rejected"
+  | "topup_completed";
 
 export interface AuditLogPayload {
   event: AuditEvent;

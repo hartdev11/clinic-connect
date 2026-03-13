@@ -44,6 +44,8 @@ export interface LogAIActivityInput {
   performance_breach?: boolean;
   /** World-class: A/B prompt variant สำหรับวัดผล */
   prompt_variant?: string;
+  /** Phase 12: Low-confidence handoff — extra metadata */
+  extra?: Record<string, unknown>;
 }
 
 /** บันทึก AI activity — fire-and-forget */
@@ -78,6 +80,7 @@ export async function logAIActivity(input: LogAIActivityInput): Promise<void> {
       generation_cost_estimate: input.generation_cost_estimate,
       performance_breach: input.performance_breach ?? false,
       prompt_variant: input.prompt_variant ?? null,
+      ...(input.extra && { extra: input.extra }),
       created_at: new Date(),
     });
   } catch (err) {

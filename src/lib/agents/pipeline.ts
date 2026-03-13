@@ -74,6 +74,10 @@ export async function runPipeline(
   memory?: { interest?: string[]; customer_stage?: string; sentiment?: string; follow_up_needed?: boolean } | null;
   /** Enterprise: รูปโปรโมชั่น (public HTTPS เท่านั้น) — ส่งแชท LINE เมื่อ promotion_inquiry */
   media?: string[];
+  /** Phase 7: เมื่อ escalation → webhook สร้าง handoff_session */
+  handoffTriggered?: { triggerType: string; target?: string };
+  /** Phase 11 — AI blocked when quota exceeded */
+  blocked?: boolean;
 }> {
   const orgId = pipelineOptions?.org_id ?? "";
   const channel = pipelineOptions?.channel ?? "default";
@@ -82,6 +86,26 @@ export async function runPipeline(
   const normalized = normalizeLineMessage(userText);
   const text = normalized.message.trim();
   
+  // Phase 11: AI Blocked — quota exceeded
+  if (orgId) {
+    const { getSubscriptionByOrgId } = await import("@/lib/clinic-data");
+    const sub = await getSubscriptionByOrgId(orgId);
+    if (sub?.aiBlocked) {
+      return {
+        reply: "บริการถูกระงับชั่วคราว กรุณาติดต่อผู้ดูแลระบบ",
+        blocked: true,
+      };
+    }
+  }
+
+  // Phase 7: AI Paused — skip pipeline when handoff active
+  if (orgId && userId) {
+    const { isConversationAiPaused } = await import("@/lib/handoff-data");
+    if (await isConversationAiPaused(orgId, userId)) {
+      return { reply: "", intent: null, state: previousState };
+    }
+  }
+
   // 🔒 GLOBAL OVERRIDE RULES (รันก่อนทุก agent)
   // RULE 1: Empty / meaningless input
   if (text.length < 2) {
@@ -308,7 +332,7 @@ export async function runPipeline(
     currentState.area &&
     currentState.area !== "unknown"
   ) {
-    const { templateRefinement } = await import("./compose-templates");
+    const { templateRefinement, templateHesitation } = await import("./compose-templates");
     
     // ✅ เก็บ preference จาก refinement message (ตามโครงสร้าง PreferenceState)
     const lower = text.toLowerCase();
@@ -325,9 +349,10 @@ export async function runPipeline(
     else if (/หวาน/.test(lower)) style = "หวาน";
     else if (/ละมุน/.test(lower)) style = "ละมุน";
     
-    // Mapping concern (ปัญหาที่กังวล)
-    if (/กลัว|กังวล/.test(lower)) {
-      concern = lower.match(/(กลัว|กังวล)[^\s]*/)?.[0] || "กังวล";
+    // Mapping concern (ปัญหาที่กังวล) — เมื่อลูกค้าแจ้ง concern (กลัวเจ็บ, กังวล ฯลฯ)
+    // → ใช้ templateHesitation แทน templateRefinement เพื่อตอบตรงบริบท
+    if (/กลัว|กังวล|เจ็บ/.test(lower)) {
+      concern = lower.match(/(กลัว|กังวล|เจ็บ)[^\s]*/)?.[0] || "กังวล";
     }
     
     // Mapping intensity (ความชัด / ไม่เวอร์)
@@ -335,7 +360,10 @@ export async function runPipeline(
     else if (/ชัด|เด่น|ชัดเจน/.test(lower)) intensity = "ชัด";
     else if (/กลาง|พอดี/.test(lower)) intensity = "กลาง";
     
-    const reply = templateRefinement(currentState, normalized.message);
+    // ถ้าเป็น concern (กลัว/กังวล) → ใช้ templateHesitation ตอบตรงบริบท
+    const reply = concern
+      ? templateHesitation(currentState, normalized.message)
+      : templateRefinement(currentState, normalized.message);
     
     // อัปเดต recentMessages และ preference แต่ไม่เปลี่ยน service/area/stage
     const refinementState: ConversationState = {
@@ -654,25 +682,42 @@ export async function runPipeline(
     };
   }
 
-  // Agent E: Escalation (rule-based)
-  const escalation = checkEscalation(intentResult.intent);
-  if (escalation.handoff) {
-    if (process.env.NODE_ENV === "development") {
-      console.log("[Agent E Escalation] handoff to:", escalation.target);
+  // Agent E: Escalation — Enterprise multi-signal confidence + rate limit
+  const escalation = checkEscalation(intentResult.intent, text);
+  const historyAsMessages = updatedState.recentMessages.map((c) => ({ content: c, role: "user" as const }));
+  const confidence = (await import("@/lib/ai/handoff-confidence")).calculateHandoffConfidence(text, historyAsMessages);
+  const shouldHandoffByConfidence = (await import("@/lib/ai/handoff-confidence")).shouldTriggerHandoff(confidence);
+  const shouldHandoff = escalation.handoff || shouldHandoffByConfidence;
+
+  if (shouldHandoff) {
+    const customerId = userId ?? `anon_${orgId}`;
+    const rateLimit = await import("@/lib/ai/handoff-rate-limit").then((m) =>
+      m.checkHandoffRateLimit(customerId)
+    );
+    if (!rateLimit.allowed) {
+      if (process.env.NODE_ENV === "development") {
+        console.log("[Agent E] Handoff blocked by rate limit:", rateLimit.reason);
+      }
+    } else {
+      if (process.env.NODE_ENV === "development") {
+        console.log("[Agent E Escalation] handoff:", escalation.handoff ? "intent" : "confidence", "triggerType:", confidence.triggerType ?? escalation.triggerType);
+      }
+      const handoffState: ConversationState = {
+        ...updatedState,
+        stage: "waiting_admin",
+      };
+      if (userId) {
+        saveSessionState(orgId, channel, userId, handoffState);
+      }
+      const triggerType = shouldHandoffByConfidence ? confidence.triggerType : (escalation.triggerType ?? "angry_customer");
+      const target = triggerType === "medical" || triggerType === "complex_medical" ? "doctor" : "admin";
+      return {
+        reply: HANDOFF_MESSAGE,
+        intent: intentResult,
+        state: handoffState,
+        handoffTriggered: { triggerType, target },
+      };
     }
-    // อัปเดต state เป็น waiting_admin (bot หยุดพูด)
-    const handoffState: ConversationState = {
-      ...updatedState,
-      stage: "waiting_admin",
-    };
-    if (userId) {
-      saveSessionState(orgId, channel, userId, handoffState);
-    }
-    return { 
-      reply: HANDOFF_MESSAGE, 
-      intent: intentResult,
-      state: handoffState 
-    };
   }
 
   // ⚠️ ถ้า state เป็น waiting_admin → bot หยุดพูด (ไม่ตอบ)

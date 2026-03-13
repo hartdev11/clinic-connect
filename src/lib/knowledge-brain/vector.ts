@@ -39,8 +39,12 @@ function buildEmbeddableText(ctx: StructuredKnowledgeContext): string {
   return parts.filter(Boolean).join(" ");
 }
 
-/** Create embedding */
+/** Create embedding (Phase 14: cache-first) */
 export async function embedKnowledgeText(text: string): Promise<number[]> {
+  const { getCachedEmbedding, setCachedEmbedding } = await import("@/lib/rag-cache");
+  const cached = await getCachedEmbedding(text, EMBEDDING_MODEL);
+  if (cached) return cached;
+
   const openai = getOpenAI();
   if (!openai) throw new Error("OPENAI_API_KEY required");
   const res = await openai.embeddings.create({
@@ -50,6 +54,7 @@ export async function embedKnowledgeText(text: string): Promise<number[]> {
   });
   const vec = res.data[0]?.embedding;
   if (!vec) throw new Error("No embedding returned");
+  void setCachedEmbedding(text, vec, EMBEDDING_MODEL);
   return vec;
 }
 
@@ -148,6 +153,30 @@ export async function deleteClinicKnowledgeFromVector(orgId: string, clinicId: s
   }
 }
 
+/**
+ * Phase 14: Hard tenant isolation — paranoid check: NEVER return results from wrong org.
+ */
+function filterByTenantIsolation<T extends { metadata?: Record<string, unknown> }>(
+  results: T[],
+  expectedOrgId: string
+): T[] {
+  const filtered: T[] = [];
+  for (const r of results) {
+    const meta = r.metadata as Record<string, unknown> | undefined;
+    const foundOrgId = meta?.org_id ?? meta?.orgId;
+    if (foundOrgId !== undefined && foundOrgId !== null && String(foundOrgId) !== expectedOrgId) {
+      console.error("TENANT_ISOLATION_VIOLATION", {
+        expected: expectedOrgId,
+        found: String(foundOrgId),
+        resultId: (r as { id?: string }).id,
+      });
+      continue;
+    }
+    filtered.push(r);
+  }
+  return filtered;
+}
+
 /** Phase 2 #16: Search result with similarity_score for confidence layer */
 export interface KnowledgeSearchHit {
   id: string;
@@ -157,7 +186,7 @@ export interface KnowledgeSearchHit {
   knowledge_version?: number;
 }
 
-/** Search — clinic namespace ก่อน, fallback global. Circuit breaker: skip when Pinecone open */
+/** Search — clinic namespace ก่อน, fallback global. Circuit breaker: skip when Pinecone open. Phase 14: cache */
 export async function searchKnowledgeBrain(
   orgId: string,
   query: string,
@@ -166,6 +195,10 @@ export async function searchKnowledgeBrain(
   if (isVectorSearchDisabled()) {
     return [];
   }
+
+  const { getCachedRagResults, setCachedRagResults } = await import("@/lib/rag-cache");
+  const cached = await getCachedRagResults<KnowledgeSearchHit[]>(orgId, query, "kb");
+  if (cached !== null) return cached.slice(0, topK);
 
   const embedding = await embedKnowledgeText(query);
   const index = getKnowledgeIndex();
@@ -216,8 +249,12 @@ export async function searchKnowledgeBrain(
       if (combined.length >= topK) break;
       if (!combined.some((o) => o.id === g.id)) combined.push(g);
     }
+
+    const verified = filterByTenantIsolation(combined, orgId);
+    const result = verified.slice(0, topK);
+    void setCachedRagResults(orgId, query, result, "kb");
     recordProviderSuccess("pinecone");
-    return combined.slice(0, topK);
+    return result;
   } catch (err) {
     recordProviderFailure("pinecone");
     console.warn("[KnowledgeBrain] Vector search failed:", (err as Error)?.message?.slice(0, 80));

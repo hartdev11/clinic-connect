@@ -10,8 +10,8 @@ export default function FeedbackPage() {
     router.replace("/clinic/customers?tab=feedback");
   }, [router]);
   return (
-    <div className="flex items-center justify-center min-h-[200px] text-surface-500">
-      กำลังเปลี่ยนไปยัง Customers & Chat...
+    <div className="flex items-center justify-center min-h-[200px] font-body text-sm text-mauve-500">
+      กำลังเปลี่ยนไปยัง Customers &amp; Chat...
     </div>
   );
 }

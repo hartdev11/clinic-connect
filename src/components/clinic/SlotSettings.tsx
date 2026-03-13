@@ -7,10 +7,8 @@
  * - วันปิด (blackout_dates)
  */
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { Card, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { SectionHeader } from "@/components/layout/SectionHeader";
 import { RequireRole } from "@/components/rbac/RequireRole";
 import useSWR from "swr";
 import type { DayOfWeek } from "@/types/clinic";
@@ -41,16 +39,12 @@ const DAY_KEYS: DayOfWeek[] = [
 export function SlotSettings() {
   return (
     <RequireRole allowed={["owner", "manager"]}>
-      <section>
-        <SectionHeader
-          title="การตั้งค่าคิวและสล็อต"
-          description="เวลาทำการสาขา ตารางแพทย์ วันปิด — ใช้ควบคุม slot ว่างสำหรับการจอง"
-        />
+      <div className="space-y-6">
         <EnsureBranchHours />
         <BranchHoursSettings />
         <DoctorSchedulesSettings />
         <BlackoutDatesSettings />
-      </section>
+      </div>
     </RequireRole>
   );
 }
@@ -93,18 +87,16 @@ function EnsureBranchHours() {
   };
 
   return (
-    <Card padding="lg" className="mb-6">
-      <CardHeader
-        title="เตรียมระบบ"
-        subtitle="สร้างเวลาทำการเริ่มต้น (จ–ศ 09:00–18:00, ส 09:00–14:00, อา ปิด) ให้ทุกสาขา"
-      />
+    <div className="luxury-card p-6">
+      <h3 className="font-display text-lg font-semibold text-mauve-800 mb-2">เตรียมระบบ</h3>
+      <p className="font-body text-sm text-mauve-500 mb-4">สร้างเวลาทำการเริ่มต้น (จ–ศ 09:00–18:00, ส 09:00–14:00, อา ปิด) ให้ทุกสาขา</p>
       <div className="flex items-center gap-4">
         <Button onClick={handleEnsure} disabled={loading}>
           {loading ? "กำลังดำเนินการ..." : "สร้างเวลาทำการให้ทุกสาขา"}
         </Button>
-        {message && <span className="text-sm text-surface-600">{message}</span>}
+        {message && <span className="font-body text-sm text-mauve-600">{message}</span>}
       </div>
-    </Card>
+    </div>
   );
 }
 
@@ -117,13 +109,11 @@ function BranchHoursSettings() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   return (
-    <Card padding="lg" className="mb-6">
-      <CardHeader
-        title="เวลาเปิด–ปิดสาขา"
-        subtitle="กำหนดช่วงเวลาทำการและความยาวคิว (นาที) ของแต่ละสาขา"
-      />
+    <div className="luxury-card p-6">
+      <h3 className="font-display text-lg font-semibold text-mauve-800 mb-2">เวลาทำการ</h3>
+      <p className="font-body text-sm text-mauve-500 mb-5">กำหนดช่วงเวลาทำการและความยาวคิว (นาที) ของแต่ละสาขา</p>
       {branches.length === 0 ? (
-        <p className="text-sm text-surface-500 py-4">ยังไม่มีสาขา</p>
+        <p className="font-body text-sm text-mauve-500 py-4">ยังไม่มีสาขา</p>
       ) : (
         <div className="space-y-3">
           {branches.map((b) => (
@@ -138,7 +128,7 @@ function BranchHoursSettings() {
           ))}
         </div>
       )}
-    </Card>
+    </div>
   );
 }
 
@@ -203,20 +193,20 @@ function BranchHoursForm({
   };
 
   return (
-    <div className="rounded-xl border border-surface-200 overflow-hidden">
+    <div className="rounded-2xl border border-cream-200 overflow-hidden">
       <button
         type="button"
-        className="w-full flex justify-between items-center p-4 text-left hover:bg-surface-50"
+        className="w-full flex justify-between items-center p-4 text-left hover:bg-cream-50 font-body font-medium text-mauve-800"
         onClick={onToggle}
       >
-        <span className="font-medium text-surface-900">{branchName}</span>
-        <span className="text-surface-500">{expanded ? "▲" : "▼"}</span>
+        <span>{branchName}</span>
+        <span className="text-mauve-400">{expanded ? "▲" : "▼"}</span>
       </button>
       {expanded && (
-        <div className="p-4 border-t border-surface-200 space-y-4 bg-surface-50/50">
-          {error && <p className="text-sm text-red-600">{error}</p>}
-          <div className="grid grid-cols-2 gap-2 text-sm">
-            <div className="col-span-2 font-medium">ความยาวคิว (นาที)</div>
+        <div className="p-4 border-t border-cream-200 space-y-4 bg-cream-50/50">
+          {error && <p className="font-body text-sm text-red-600">{error}</p>}
+          <div className="grid grid-cols-2 gap-2 font-body text-sm">
+            <div className="col-span-2 font-medium text-mauve-700">ความยาวคิว (นาที)</div>
             <div>
               <Input
                 type="number"
@@ -230,7 +220,7 @@ function BranchHoursForm({
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {DAY_KEYS.map((day) => (
               <div key={day} className="space-y-1">
-                <label className="text-xs font-medium text-surface-600">{DAY_LABELS[day]}</label>
+                <label className="font-body text-xs font-medium text-mauve-600">{DAY_LABELS[day]}</label>
                 {form[day] ? (
                   <div className="flex gap-1">
                     <Input
@@ -258,10 +248,10 @@ function BranchHoursForm({
                   </div>
                 ) : (
                   <div className="flex items-center gap-2">
-                    <span className="text-surface-500 text-sm">ปิด</span>
+                    <span className="font-body text-mauve-400 text-sm">ปิด</span>
                     <button
                       type="button"
-                      className="text-xs text-primary-600"
+                      className="font-body text-xs text-rg-600"
                       onClick={() =>
                         setForm((f) => ({
                           ...f,
@@ -276,7 +266,7 @@ function BranchHoursForm({
                 {form[day] && (
                   <button
                     type="button"
-                    className="text-xs text-surface-500 hover:text-red-600"
+                    className="font-body text-xs text-mauve-400 hover:text-red-600"
                     onClick={() => setForm((f) => ({ ...f, [day]: null }))}
                   >
                     ปิดวันนี้
@@ -285,8 +275,8 @@ function BranchHoursForm({
               </div>
             ))}
           </div>
-          <div className="flex gap-2">
-            <Button size="sm" onClick={handleSave} disabled={loading}>
+          <div className="flex justify-end pt-4">
+            <Button size="sm" onClick={handleSave} disabled={loading} shimmer>
               {loading ? "กำลังบันทึก..." : "บันทึก"}
             </Button>
           </div>
@@ -316,16 +306,16 @@ function DoctorSchedulesSettings() {
   const [editingId, setEditingId] = useState<string | null>(null);
 
   return (
-    <Card padding="lg" className="mb-6">
-      <CardHeader
-        title="ตารางแพทย์"
-        subtitle="วันเข้า ช่วงเวลา บริการที่ทำได้ — ใช้กรอง slot ตามแพทย์และหัตถการ"
-        action={
-          <Button variant="outline" size="sm" onClick={() => setShowAdd(true)}>
-            + เพิ่มแพทย์
-          </Button>
-        }
-      />
+    <div className="luxury-card p-6">
+      <div className="flex flex-wrap items-start justify-between gap-4 pb-3 border-b border-cream-200">
+        <div>
+          <h3 className="font-display text-lg font-semibold text-mauve-800">ตารางแพทย์</h3>
+          <p className="font-body text-sm text-mauve-500 mt-0.5">วันเข้า ช่วงเวลา บริการที่ทำได้ — ใช้กรอง slot ตามแพทย์และหัตถการ</p>
+        </div>
+        <Button variant="outline" size="sm" onClick={() => setShowAdd(true)}>
+          + เพิ่มแพทย์
+        </Button>
+      </div>
       {showAdd && (
         <AddDoctorScheduleForm
           onClose={() => setShowAdd(false)}
@@ -335,22 +325,22 @@ function DoctorSchedulesSettings() {
           }}
         />
       )}
-      <div className="space-y-2">
+      <div className="space-y-2 mt-4">
         {items.length === 0 ? (
-          <p className="text-sm text-surface-500 py-4">ยังไม่มีตารางแพทย์ — ระบบจะใช้เวลาสาขา</p>
+          <p className="font-body text-sm text-mauve-500 py-4">ยังไม่มีตารางแพทย์ — ระบบจะใช้เวลาสาขา</p>
         ) : (
           items.map((s) => (
-            <div key={s.id} className="rounded-lg border border-surface-200 overflow-hidden">
-              <div className="flex justify-between items-center p-3 bg-surface-50">
+            <div key={s.id} className="rounded-2xl border border-cream-200 overflow-hidden">
+              <div className="flex justify-between items-center p-3 bg-cream-50">
                 <div>
-                  <span className="font-medium">{s.doctor_name || s.doctor_id}</span>
-                  <span className="text-sm text-surface-500 ml-2">
+                  <span className="font-body font-medium text-mauve-800">{s.doctor_name || s.doctor_id}</span>
+                  <span className="font-body text-sm text-mauve-500 ml-2">
                     {s.work_start}–{s.work_end} ({s.work_days?.length ?? 5} วัน)
                   </span>
                   {(s.procedures?.length ?? 0) > 0 && (
                     <div className="flex flex-wrap gap-1 mt-1">
                       {s.procedures!.map((p) => (
-                        <span key={p} className="text-xs px-1.5 py-0.5 rounded bg-primary-100 text-primary-700">
+                        <span key={p} className="font-body text-xs px-1.5 py-0.5 rounded-lg bg-rg-100 text-rg-700">
                           {p}
                         </span>
                       ))}
@@ -393,7 +383,7 @@ function DoctorSchedulesSettings() {
           ))
         )}
       </div>
-    </Card>
+    </div>
   );
 }
 
@@ -720,16 +710,16 @@ function BlackoutDatesSettings() {
   const [showAdd, setShowAdd] = useState(false);
 
   return (
-    <Card padding="lg">
-      <CardHeader
-        title="วันปิด"
-        subtitle="วันหยุด ซ่อมบำรุง — วันเหล่านี้จะไม่มี slot ว่าง"
-        action={
-          <Button variant="outline" size="sm" onClick={() => setShowAdd(true)}>
-            + เพิ่มวันปิด
-          </Button>
-        }
-      />
+    <div className="luxury-card p-6">
+      <div className="flex flex-wrap items-start justify-between gap-4 pb-3 border-b border-cream-200">
+        <div>
+          <h3 className="font-display text-lg font-semibold text-mauve-800">วันปิด</h3>
+          <p className="font-body text-sm text-mauve-500 mt-0.5">วันหยุด ซ่อมบำรุง — วันเหล่านี้จะไม่มี slot ว่าง</p>
+        </div>
+        <Button variant="outline" size="sm" onClick={() => setShowAdd(true)}>
+          + เพิ่มวันปิด
+        </Button>
+      </div>
       {showAdd && (
         <AddBlackoutForm
           onClose={() => setShowAdd(false)}
@@ -739,16 +729,16 @@ function BlackoutDatesSettings() {
           }}
         />
       )}
-      <div className="space-y-2">
+      <div className="space-y-2 mt-4">
         {items.length === 0 ? (
-          <p className="text-sm text-surface-500 py-4">ยังไม่มีวันปิด</p>
+          <p className="font-body text-sm text-mauve-500 py-4">ยังไม่มีวันปิด</p>
         ) : (
           items.map((b) => (
             <BlackoutItem key={b.id} item={b} onDelete={mutate} />
           ))
         )}
       </div>
-    </Card>
+    </div>
   );
 }
 

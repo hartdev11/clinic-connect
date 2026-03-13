@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebase-admin";
 import { hashPassword } from "@/lib/auth";
 import { FieldValue } from "firebase-admin/firestore";
+import { getPurchaseRecordByLicenseKey } from "@/lib/purchase-record";
+import { PURCHASE_COLLECTION } from "@/types/purchase";
 
 const COLLECTIONS = {
   organizations: "organizations",
@@ -67,6 +69,30 @@ export async function POST(request: NextRequest) {
     const normalizedEmail = email.trim().toLowerCase();
     const keyTrimmed = licenseKey.trim();
 
+    const purchaseRecord = await getPurchaseRecordByLicenseKey(keyTrimmed);
+    if (!purchaseRecord) {
+      return NextResponse.json(
+        { error: "License Key ไม่ถูกต้อง" },
+        { status: 400 }
+      );
+    }
+    const purchaseDoc = await db
+      .collection(PURCHASE_COLLECTION)
+      .doc(purchaseRecord.id)
+      .get();
+    if (purchaseDoc.exists && purchaseDoc.data()?.used === true) {
+      return NextResponse.json(
+        { error: "License Key นี้ถูกใช้งานแล้ว" },
+        { status: 400 }
+      );
+    }
+    if (purchaseRecord.email !== normalizedEmail) {
+      return NextResponse.json(
+        { error: "อีเมลไม่ตรงกับที่ซื้อแพ็กเกจ" },
+        { status: 400 }
+      );
+    }
+
     // E1.7 — ตรวจซ้ำ: email ใน users (org-first) หรือ clinics (legacy)
     const existingUser = await db
       .collection(COLLECTIONS.users)
@@ -114,6 +140,7 @@ export async function POST(request: NextRequest) {
       const orgRef = db.collection(COLLECTIONS.organizations).doc();
       const branchRef = db.collection(COLLECTIONS.branches).doc();
       const userRef = db.collection(COLLECTIONS.users).doc();
+      const purchaseRef = db.collection(PURCHASE_COLLECTION).doc(purchaseRecord.id);
 
       tx.set(orgRef, {
         name: clinicName.trim(),
@@ -142,6 +169,11 @@ export async function POST(request: NextRequest) {
         role: "owner",
         default_branch_id: branchRef.id,
         createdAt: now,
+        updatedAt: now,
+      });
+
+      tx.update(purchaseRef, {
+        used: true,
         updatedAt: now,
       });
 

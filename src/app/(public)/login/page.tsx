@@ -1,11 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { Card } from "@/components/ui/Card";
+import { AuthLayout } from "@/components/layout/AuthLayout";
+
+type AgencyBrand = { id: string; name: string; logoUrl?: string | null; primaryColor?: string | null };
 
 export default function LoginPage() {
   const router = useRouter();
@@ -14,6 +17,18 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [agency, setAgency] = useState<AgencyBrand | null>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const host = window.location.host;
+    fetch(`/api/public/agency-by-domain?host=${encodeURIComponent(host)}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.agency) setAgency(data.agency);
+      })
+      .catch(() => {});
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,17 +83,32 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-6 py-16">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-surface-800">เข้าสู่ระบบ</h1>
-          <p className="mt-2 text-surface-600">
-            ระบบหลังบ้านคลินิก — ต้องมี License Key จากแพ็กเกจที่ซื้อ
+    <AuthLayout
+      title={agency?.name ? `เข้าสู่ระบบ ${agency.name}` : "ยินดีต้อนรับกลับ"}
+      subtitle="เข้าสู่ระบบเพื่อจัดการคลินิกของคุณด้วยระบบ AI อัจฉริยะ"
+      quote="ความงามที่แท้จริงเริ่มต้นจากการดูแลที่ใส่ใจ"
+      quoteAuthor="— Clinic Connect Philosophy"
+      logoUrl={agency?.logoUrl ?? undefined}
+      primaryColor={agency?.primaryColor ?? undefined}
+      brandName={agency?.name ?? undefined}
+    >
+      <div className="space-y-6">
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="mb-8"
+        >
+          <h1 className="font-display text-3xl font-semibold text-mauve-800 mb-1">
+            เข้าสู่ระบบ
+          </h1>
+          <p className="text-sm font-body text-mauve-400">
+            ยินดีต้อนรับกลับสู่ Clinic Connect
           </p>
-        </div>
+        </motion.div>
 
-        <Card padding="lg">
-          <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="animate-fade-slide-up stagger-1">
             <Input
               label="License Key (คีย์จากแพ็กเกจ)"
               type="text"
@@ -87,6 +117,8 @@ export default function LoginPage() {
               onChange={(e) => setLicenseKey(e.target.value)}
               autoComplete="off"
             />
+          </div>
+          <div className="animate-fade-slide-up stagger-2">
             <Input
               label="อีเมล"
               type="email"
@@ -94,6 +126,8 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
+          </div>
+          <div className="animate-fade-slide-up stagger-3">
             <Input
               label="รหัสผ่าน"
               type="password"
@@ -101,35 +135,46 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
+          </div>
 
-            {error && (
-              <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
-                {error}
-              </p>
-            )}
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center gap-2 p-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm font-body"
+              role="alert"
+            >
+              <span>⚠</span> {error}
+            </motion.div>
+          )}
 
+          <div className="animate-fade-slide-up stagger-4">
             <Button
               type="submit"
-              fullWidth
+              variant="primary"
               size="lg"
+              shimmer
               loading={loading}
               disabled={loading}
+              className="w-full"
             >
               เข้าสู่ระบบ
             </Button>
-          </form>
+          </div>
+        </form>
 
-          <p className="mt-8 text-center text-sm text-surface-500">
-            ยังไม่มีบัญชี?{" "}
-            <Link
-              href="/register"
-              className="font-medium text-primary-600 hover:text-primary-700"
-            >
-              สมัครคลินิก
-            </Link>
-          </p>
-        </Card>
+        <div className="divider-rg my-2" aria-hidden />
+
+        <p className="text-center text-sm font-body text-mauve-400">
+          ยังไม่มีบัญชี?{" "}
+          <Link
+            href="/register"
+            className="text-rg-500 hover:text-rg-600 underline-offset-4 hover:underline font-medium transition-colors"
+          >
+            สมัครคลินิก
+          </Link>
+        </p>
       </div>
-    </div>
+    </AuthLayout>
   );
 }

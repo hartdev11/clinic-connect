@@ -10,6 +10,7 @@ import { listGlobalServices, listClinicServices, listClinicFaq } from "@/lib/uni
 import { getPromotionStats, getOrgProfile } from "@/lib/clinic-data";
 import { isPlatformManagedMode } from "@/lib/feature-flags";
 import type { UnifiedKnowledgeStatus } from "@/types/unified-knowledge";
+import type { OrgPlan } from "@/types/organization";
 import { runWithObservability } from "@/lib/observability/run-with-observability";
 
 export const dynamic = "force-dynamic";
@@ -70,7 +71,7 @@ export async function GET(request: NextRequest) {
           active_count: promoStats.active,
           expiry_warnings: promoStats.expiringSoon,
         },
-        platform_managed_mode: isPlatformManagedMode(plan),
+        platform_managed_mode: isPlatformManagedMode(plan as OrgPlan | undefined),
         ai_status: warningCount > 0 ? "issue" : "ready",
       };
 

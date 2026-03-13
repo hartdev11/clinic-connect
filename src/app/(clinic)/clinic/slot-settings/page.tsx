@@ -1,15 +1,14 @@
 "use client";
 
-import { PageHeader } from "@/components/layout/PageHeader";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { SlotSettings } from "@/components/clinic/SlotSettings";
 
 export default function SlotSettingsPage() {
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <PageHeader
-        title="การตั้งค่าคิวและสล็อต"
-        description="เวลาทำการสาขา ตารางแพทย์ วันปิด — ควบคุม slot ว่างสำหรับการจองแบบ Enterprise"
-        aiAnalyze
+        title="ตั้งค่าสล็อต"
+        subtitle="จัดการเวลาทำการและสล็อตการจองของคลินิก"
       />
       <SlotSettings />
     </div>

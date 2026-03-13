@@ -1,6 +1,5 @@
 /**
- * GET /api/admin/knowledge-health — Phase 2 #19
- * Knowledge Health Dashboard metrics
+ * GET /api/admin/knowledge-health — Phase 2 #19, Phase 14: knowledge gaps + RAG quality
  */
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdminSession } from "@/lib/admin-guard";
@@ -8,6 +7,16 @@ import { db } from "@/lib/firebase-admin";
 import { computeClinicKnowledgeHealthScore } from "@/lib/knowledge-brain";
 
 export const dynamic = "force-dynamic";
+
+function getLast7Days(): string[] {
+  const days: string[] = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    days.push(d.toISOString().slice(0, 10));
+  }
+  return days;
+}
 
 function toISO(t: unknown): string {
   if (typeof t === "string") return t;
@@ -150,6 +159,43 @@ export async function GET(request: NextRequest) {
 
     const healthScore = orgId ? await computeClinicKnowledgeHealthScore(orgId) : null;
 
+    /** Phase 14: Knowledge gaps — queries RAG couldn't answer (last 7 days) */
+    const knowledgeGaps: Array<{ query: string; count: number; date: string }> = [];
+    if (orgId) {
+      const days = getLast7Days();
+      for (const date of days) {
+        const gapsSnap = await db
+          .collection("organizations")
+          .doc(orgId)
+          .collection("metrics")
+          .doc(date)
+          .collection("knowledge_gaps")
+          .get();
+        for (const g of gapsSnap.docs) {
+          const d = g.data();
+          knowledgeGaps.push({
+            query: String(d.query ?? ""),
+            count: Number(d.count ?? 1),
+            date,
+          });
+        }
+      }
+      knowledgeGaps.sort((a, b) => b.count - a.count);
+    }
+
+    /** Phase 14: RAG quality from ai_activity_logs */
+    let relevanceSum = 0;
+    let relevanceCount = 0;
+    for (const doc of logsSnap.docs) {
+      const r = doc.data().retrieval_confidence;
+      if (typeof r === "number") {
+        relevanceSum += r;
+        relevanceCount++;
+      }
+    }
+    const avgRelevanceScore = relevanceCount > 0 ? relevanceSum / relevanceCount : 0;
+    const lowScoreWarning = lowConfidenceRatePct > 20;
+
     return NextResponse.json({
       knowledge_health_score: healthScore?.knowledge_health_score ?? null,
       health_metric: healthScore,
@@ -161,6 +207,11 @@ export async function GET(request: NextRequest) {
       },
       low_confidence_rate_pct: Math.round(lowConfidenceRatePct * 10) / 10,
       by_org: orgId ? byOrg.get(orgId) ?? null : Object.fromEntries(byOrg),
+      knowledge_gaps: knowledgeGaps.slice(0, 50),
+      rag_quality: {
+        avg_relevance_score: Math.round(avgRelevanceScore * 100) / 100,
+        low_score_warning: lowScoreWarning,
+      },
     });
   } catch (err) {
     console.error("GET /api/admin/knowledge-health:", err);

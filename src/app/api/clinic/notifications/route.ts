@@ -10,7 +10,9 @@ import {
   getUnlabeledFeedbackCount,
   getPromotionsExpiringSoon,
   getDashboardStats,
+  getSubscriptionByOrgId,
 } from "@/lib/clinic-data";
+import { db } from "@/lib/firebase-admin";
 import { isOrgCircuitOpen } from "@/lib/org-circuit-breaker";
 import { getDailyLLMCost } from "@/lib/llm-metrics";
 import { getEffectiveUser, requireBranchAccess } from "@/lib/rbac";
@@ -30,6 +32,8 @@ export type Notification = {
   actionUrl?: string;
   count?: number;
   timestamp: string;
+  /** Stored only; computed items have no read field */
+  read?: boolean;
 };
 
 export async function GET(request: NextRequest) {
@@ -59,6 +63,8 @@ export async function GET(request: NextRequest) {
       dailyCost,
       promotionsExpiring,
       stats,
+      subscription,
+      storedNotifSnap,
     ] = await Promise.all([
       getPendingBookingsCount(orgId, branchId ?? undefined),
       isOrgCircuitOpen(orgId),
@@ -66,6 +72,14 @@ export async function GET(request: NextRequest) {
       getDailyLLMCost(orgId),
       getPromotionsExpiringSoon(orgId, branchId ?? undefined, 7),
       getDashboardStats(orgId, branchId ?? undefined),
+      getSubscriptionByOrgId(orgId),
+      db
+        .collection("organizations")
+        .doc(orgId)
+        .collection("notifications")
+        .orderBy("createdAt", "desc")
+        .limit(50)
+        .get(),
     ]);
 
     const limitBaht = Number(process.env.MAX_DAILY_LLM_COST_BAHT ?? 0);
@@ -96,6 +110,39 @@ export async function GET(request: NextRequest) {
         title: "AI ถูกปิดชั่วคราว",
         message: "Circuit breaker เปิดอยู่ กรุณาลองใหม่ใน 10 นาที",
         timestamp: now,
+      });
+    }
+    if (subscription?.aiBlocked) {
+      notifications.push({
+        id: "quota-exceeded",
+        type: "quota_exceeded",
+        severity: "urgent",
+        title: "โควต้า AI หมดแล้ว",
+        message: "บริการ AI ถูกระงับชั่วคราว กรุณาติดต่อผู้ดูแลระบบ",
+        actionUrl: "/clinic/settings",
+        timestamp: now,
+      });
+    }
+
+    // Stored notifications (quota_warning, handoff_pending, etc.)
+    for (const doc of storedNotifSnap.docs) {
+      const d = doc.data();
+      const type = (d.type as string) ?? "";
+      const severity = ((d.severity as string) ?? "info") as NotificationSeverity;
+      const title = (d.title as string) ?? (d.message as string) ?? "";
+      const message = (d.message as string) ?? "";
+      const createdAt = d.createdAt?.toDate?.()?.toISOString?.() ?? now;
+      const read = d.read === true;
+      const skipType = ["quota_exceeded"];
+      if (skipType.includes(type)) continue;
+      notifications.push({
+        id: `stored-${doc.id}`,
+        type,
+        severity: ["urgent", "warning", "info"].includes(severity) ? severity : "info",
+        title,
+        message,
+        timestamp: createdAt,
+        read,
       });
     }
 
@@ -173,4 +220,41 @@ export async function GET(request: NextRequest) {
     );
   }
   });
+}
+
+/** PATCH — Mark all stored notifications as read */
+export async function PATCH(request: NextRequest) {
+  const session = await getSessionFromCookies();
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  try {
+    const orgId = session.org_id ?? (await getOrgIdFromClinicId(session.clinicId));
+    if (!orgId) return NextResponse.json({ error: "Organization not found" }, { status: 404 });
+
+    const snap = await db
+      .collection("organizations")
+      .doc(orgId)
+      .collection("notifications")
+      .orderBy("createdAt", "desc")
+      .limit(100)
+      .get();
+
+    const { FieldValue } = await import("firebase-admin/firestore");
+    const batch = db.batch();
+    let updated = 0;
+    for (const doc of snap.docs) {
+      if (doc.data().read !== true) {
+        batch.update(doc.ref, { read: true, readAt: FieldValue.serverTimestamp() });
+        updated++;
+      }
+    }
+    if (updated > 0) await batch.commit();
+
+    return NextResponse.json({ ok: true, updated });
+  } catch (err) {
+    console.error("PATCH /api/clinic/notifications:", err);
+    return NextResponse.json(
+      { error: process.env.NODE_ENV === "development" ? String(err) : "Server error" },
+      { status: 500 }
+    );
+  }
 }

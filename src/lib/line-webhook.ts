@@ -50,8 +50,6 @@ export function verifyLineSignature(
     // ใช้ timingSafeEqual เพื่อป้องกัน timing attack
     // แต่ต้อง decode base64 ก่อน
     let sigBuf: Buffer;
-    let expBuf: Buffer;
-    
     try {
       sigBuf = Buffer.from(sigNormalized, "base64");
     } catch {
@@ -61,8 +59,8 @@ export function verifyLineSignature(
       }
       return sigNormalized === expNormalized;
     }
-    
-    expBuf = Buffer.from(expNormalized, "base64");
+
+    const expBuf = Buffer.from(expNormalized, "base64");
     
     if (sigBuf.length !== expBuf.length) {
       if (process.env.NODE_ENV === "development") {

@@ -55,7 +55,7 @@ async function executeFinanceAnalytics(
 
   const keyFindings: string[] = [];
   const riskFlags: string[] = [];
-  let recommendation: string | null = null;
+  const recommendation: string | null = null;
 
   // ใช้ categorical ไม่ใช่ตัวเลข — Role Manager ห้ามเอ่ยตัวเลขกับลูกค้า
   keyFindings.push(`revenue_trend:${stats.revenueThisMonth >= stats.revenueLastMonth ? "UP" : "DOWN"}`);

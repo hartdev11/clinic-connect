@@ -14,6 +14,7 @@ export function useRequireRole(allowed: UserRole[]): boolean {
   const { currentUser } = useClinicContext();
   return useMemo(() => {
     if (!currentUser?.role) return false;
+    if (currentUser.role === "super_admin") return true;
     return allowed.includes(currentUser.role);
   }, [currentUser?.role, allowed]);
 }
@@ -28,6 +29,7 @@ export function useEffectiveRoleAtBranch(branchId: string | null): UserRole | nu
   return useMemo(() => {
     if (!currentUser) return null;
     if (!targetBranchId) return currentUser.role;
+    if (currentUser.role === "super_admin") return "super_admin";
     if (currentUser.role === "owner") return "owner";
     if (currentUser.branch_roles?.[targetBranchId]) {
       return currentUser.branch_roles[targetBranchId] as UserRole;
@@ -49,6 +51,7 @@ export function useRequireBranchAccess(branchId: string | null): boolean {
   return useMemo(() => {
     if (!currentUser) return false;
     if (!targetBranchId) return true;
+    if (currentUser.role === "super_admin") return true;
     if (currentUser.role === "owner") return true;
     if (currentUser.branch_roles?.[targetBranchId]) return true;
     const hasBranchRoles = currentUser.branch_roles && Object.keys(currentUser.branch_roles).length > 0;
@@ -63,7 +66,10 @@ export function useRequireBranchAccess(branchId: string | null): boolean {
  */
 export function useIsOwner(): boolean {
   const { currentUser } = useClinicContext();
-  return useMemo(() => currentUser?.role === "owner", [currentUser?.role]);
+  return useMemo(
+    () => currentUser?.role === "owner" || currentUser?.role === "super_admin",
+    [currentUser?.role]
+  );
 }
 
 /**
@@ -73,6 +79,6 @@ export function useIsOwnerOrManager(): boolean {
   const { currentUser } = useClinicContext();
   return useMemo(() => {
     const role = currentUser?.role;
-    return role === "owner" || role === "manager";
+    return role === "super_admin" || role === "owner" || role === "manager";
   }, [currentUser?.role]);
 }

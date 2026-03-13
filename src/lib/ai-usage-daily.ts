@@ -15,6 +15,35 @@ function dailyRef(orgId: string, date: string) {
 }
 
 /**
+ * Phase 22 — Merge explicit cost (e.g. from CoreBrain/Gemini).
+ * Use when cost is computed from Gemini pricing, not OpenAI.
+ */
+export async function mergeAIUsageDailyWithExplicitCost(
+  orgId: string,
+  costThb: number,
+  tokensUsed: number,
+  workloadType: AIWorkloadType = "customer_chat"
+): Promise<void> {
+  const { FieldValue } = await import("firebase-admin/firestore");
+  const date = getTodayKeyBangkok();
+  const ref = dailyRef(orgId, date);
+
+  const payload: Record<string, unknown> = {
+    orgId,
+    date,
+    totalTokens: FieldValue.increment(tokensUsed),
+    totalCost: FieldValue.increment(costThb),
+    lastUpdated: FieldValue.serverTimestamp(),
+    [`byWorkloadType.${workloadType}.tokens`]: FieldValue.increment(tokensUsed),
+    [`byWorkloadType.${workloadType}.cost`]: FieldValue.increment(costThb),
+  };
+  if (workloadType === "customer_chat") {
+    payload["byWorkloadType.customer_chat.calls"] = FieldValue.increment(1);
+  }
+  await ref.set(payload, { merge: true });
+}
+
+/**
  * Merge usage into org's daily doc. Called from recordLLMUsage.
  */
 export async function mergeAIUsageDaily(
@@ -38,6 +67,9 @@ export async function mergeAIUsageDaily(
   };
   if (workloadType === "knowledge_assist") {
     payload["byWorkloadType.knowledge_assist.calls"] = FieldValue.increment(1);
+  }
+  if (workloadType === "customer_chat") {
+    payload["byWorkloadType.customer_chat.calls"] = FieldValue.increment(1);
   }
   await ref.set(payload, { merge: true });
 }
@@ -93,6 +125,60 @@ export function getKnowledgeAssistRateLimit(orgId: string): Promise<{ count: num
 }
 
 /**
+ * Get current month's conversation count (customer_chat calls) for an org.
+ * Phase 11 — Quota check job. Doc ids are YYYY-MM-DD.
+ */
+export async function getCurrentMonthConversationsUsed(orgId: string): Promise<number> {
+  const today = getTodayKeyBangkok();
+  const [y, m] = today.split("-");
+  const daysInMonth = new Date(parseInt(y, 10), parseInt(m, 10), 0).getDate();
+  const dates: string[] = [];
+  for (let d = 1; d <= daysInMonth; d++) {
+    const ds = `${y}-${m}-${String(d).padStart(2, "0")}`;
+    if (ds <= today) dates.push(ds);
+  }
+  const counts = await Promise.all(
+    dates.map(async (date) => {
+      const doc = await dailyRef(orgId, date).get();
+      if (!doc.exists) return 0;
+      const data = doc.data()!;
+      const bw = data.byWorkloadType as Record<string, { calls?: number }> | undefined;
+      return typeof bw?.customer_chat?.calls === "number" ? bw.customer_chat.calls : 0;
+    })
+  );
+  return counts.reduce((a, b) => a + b, 0);
+}
+
+/**
+ * Phase 20B — Reset conversations_used for current month (emergency use).
+ * Zeros out customer_chat.calls in ai_usage_daily for each day this month.
+ */
+export async function resetCurrentMonthConversationsUsage(orgId: string): Promise<void> {
+  const today = getTodayKeyBangkok();
+  const [y, m] = today.split("-");
+  const daysInMonth = new Date(parseInt(y, 10), parseInt(m, 10), 0).getDate();
+  const dates: string[] = [];
+  for (let d = 1; d <= daysInMonth; d++) {
+    const ds = `${y}-${m}-${String(d).padStart(2, "0")}`;
+    if (ds <= today) dates.push(ds);
+  }
+  const { FieldValue } = await import("firebase-admin/firestore");
+  for (const date of dates) {
+    const ref = dailyRef(orgId, date);
+    const doc = await ref.get();
+    if (doc.exists && doc.data()?.byWorkloadType?.customer_chat) {
+      await ref.set(
+        {
+          "byWorkloadType.customer_chat.calls": 0,
+          lastUpdated: FieldValue.serverTimestamp(),
+        },
+        { merge: true }
+      );
+    }
+  }
+}
+
+/**
  * List org ids (for admin cost monitor).
  */
 export async function getOrgIdsWithUsageInRange(
@@ -130,7 +216,7 @@ export async function getLast7DaysUsage(orgId: string): Promise<OrgUsageRow["dai
  */
 export async function listOrgsWithUsageLast7Days(): Promise<OrgUsageRow[]> {
   const today = getTodayKeyBangkok();
-  const startDate = dateKeyDaysAgo(6);
+  const startDate = getDateKeyBangkokDaysAgo(6);
   const orgIds = await getOrgIdsWithUsageInRange(startDate, today);
   const rows: OrgUsageRow[] = await Promise.all(
     orgIds.map(async (orgId) => {

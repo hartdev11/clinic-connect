@@ -14,8 +14,12 @@ const EMBEDDING_MODEL = "text-embedding-3-small";
 /** เมื่อเปลี่ยน model ต้อง bump version — ใช้ namespace ใหม่หรือ re-embed */
 export const EMBEDDING_VERSION = "text-embedding-3-small-v1";
 
-/** E3.5 — สร้าง embedding จากข้อความ */
+/** E3.5 — สร้าง embedding จากข้อความ (Phase 14: cache-first) */
 export async function embedText(text: string): Promise<number[]> {
+  const { getCachedEmbedding, setCachedEmbedding } = await import("@/lib/rag-cache");
+  const cached = await getCachedEmbedding(text, EMBEDDING_MODEL);
+  if (cached) return cached;
+
   const openai = getOpenAI();
   if (!openai) {
     throw new Error("OPENAI_API_KEY is required for embeddings");
@@ -26,6 +30,7 @@ export async function embedText(text: string): Promise<number[]> {
   });
   const embedding = res.data[0]?.embedding;
   if (!embedding) throw new Error("No embedding returned");
+  void setCachedEmbedding(text, embedding, EMBEDDING_MODEL);
   return embedding;
 }
 
@@ -100,12 +105,55 @@ export async function upsertKnowledgeVersionToVector(
   });
 }
 
+/** Phase 16: Upsert learned knowledge (source: human_handoff) */
+export async function upsertLearnedKnowledgeToVector(
+  orgId: string,
+  docId: string,
+  topic: string,
+  category: string,
+  content: string,
+  meta?: { handoffId?: string; confidence?: number }
+): Promise<void> {
+  const version: KnowledgeVersionForVector = { topic, category, content, summary: [topic] };
+  const text = [content].join("\n").slice(0, 8191);
+  const embedding = await embedText(text);
+  const index = getKnowledgeIndex();
+  const ns = index.namespace(getEmbeddingNamespace());
+  const id = `${orgId}_learned_${docId}`;
+  const metadata: Record<string, string | number | boolean> = {
+    level: "org",
+    org_id: orgId,
+    topic,
+    category,
+    content: content.slice(0, 2000),
+    is_active: true,
+    source: "human_handoff",
+    embedding_version: EMBEDDING_VERSION,
+    ...(meta?.handoffId && { handoff_id: meta.handoffId }),
+    ...(typeof meta?.confidence === "number" && { confidence: meta.confidence }),
+  };
+  await ns.upsert({
+    records: [{ id, values: embedding, metadata }],
+  });
+}
+
+/** Phase 16: Remove learned knowledge from Pinecone. */
+export async function deleteLearnedKnowledgeFromVector(
+  orgId: string,
+  docId: string
+): Promise<void> {
+  const index = getKnowledgeIndex();
+  const ns = index.namespace(getEmbeddingNamespace());
+  const id = `${orgId}_learned_${docId}`;
+  await ns.deleteOne({ id });
+}
+
 /** Remove topic vector when topic is deleted (multi-tenant safe). */
 export async function deleteKnowledgeVectorById(orgId: string, topicId: string): Promise<void> {
   const index = getKnowledgeIndex();
   const ns = index.namespace(getEmbeddingNamespace());
   const id = `${orgId}_${topicId}`;
-  await ns.deleteOne(id);
+  await ns.deleteOne({ id });
 }
 
 /** E4.1 — context สำหรับ pyramid filter */
@@ -177,6 +225,32 @@ export function buildKnowledgePyramidFilter(
   return undefined;
 }
 
+/**
+ * Phase 14: Hard tenant isolation — paranoid check: NEVER return results from wrong org.
+ * If metadata.org_id exists and !== expected orgId → DROP and log.
+ */
+function filterByTenantIsolation<T extends { metadata?: Record<string, unknown> }>(
+  results: T[],
+  expectedOrgId: string | undefined
+): T[] {
+  if (!expectedOrgId) return results;
+  const filtered: T[] = [];
+  for (const r of results) {
+    const meta = r.metadata as Record<string, unknown> | undefined;
+    const foundOrgId = meta?.org_id ?? meta?.orgId;
+    if (foundOrgId !== undefined && foundOrgId !== null && String(foundOrgId) !== expectedOrgId) {
+      console.error("TENANT_ISOLATION_VIOLATION", {
+        expected: expectedOrgId,
+        found: String(foundOrgId),
+        resultId: (r as { id?: string }).id,
+      });
+      continue;
+    }
+    filtered.push(r);
+  }
+  return filtered;
+}
+
 /** E3.7–E3.8 — ค้นหา knowledge พร้อม filters */
 export interface SearchKnowledgeFilters {
   org_id?: string;
@@ -213,11 +287,13 @@ export async function searchKnowledge(
     filter: Object.keys(filter).length > 0 ? filter : undefined,
   });
 
-  return (res.matches ?? []).map((m) => ({
+  const results = (res.matches ?? []).map((m) => ({
     id: m.id ?? "",
     score: m.score,
     metadata: m.metadata as Record<string, unknown> | undefined,
   }));
+
+  return filterByTenantIsolation(results, filters?.org_id);
 }
 
 /** E4.1 — ค้นหา knowledge ด้วย pyramid filter ตาม context */
@@ -246,9 +322,11 @@ export async function searchKnowledgeWithPyramid(
     filter,
   });
 
-  return (res.matches ?? []).map((m) => ({
+  const results = (res.matches ?? []).map((m) => ({
     id: m.id ?? "",
     score: m.score,
     metadata: m.metadata as Record<string, unknown> | undefined,
   }));
+
+  return filterByTenantIsolation(results, context.org_id);
 }

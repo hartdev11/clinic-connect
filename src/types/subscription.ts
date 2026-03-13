@@ -12,6 +12,14 @@ export const PLAN_MAX_BRANCHES: Record<OrgPlan, number> = {
   enterprise: 999,
 };
 
+/** E6.10 — จำกัด conversations ต่อเดือนต่อ plan */
+export const PLAN_CONVERSATIONS_LIMIT: Record<OrgPlan, number> = {
+  starter: 500,
+  professional: 2000,
+  multi_branch: 8000,
+  enterprise: 50000,
+};
+
 export type SubscriptionStatus = "active" | "past_due" | "cancelled" | "trialing";
 
 export interface Subscription {
@@ -23,6 +31,10 @@ export interface Subscription {
   current_period_start: string; // ISO
   current_period_end: string; // ISO
   stripe_subscription_id?: string | null; // E7 — ผูกกับ Stripe
+  /** Phase 11 — AI blocked when quota exceeded */
+  aiBlocked?: boolean;
+  /** Phase 11 — Last date (YYYY-MM-DD) quota warning was sent */
+  quota_warning_sent_at?: string | null;
   createdAt: string;
   updatedAt: string;
 }

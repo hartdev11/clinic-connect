@@ -61,8 +61,8 @@ export async function migrateOrgToUnifiedKnowledge(
     return result;
   }
 
-  let existingServices = await listClinicServices(orgId, { limit: 500 });
-  let existingFaq = await listClinicFaq(orgId, 500);
+  const existingServices = await listClinicServices(orgId, { limit: 500 });
+  const existingFaq = await listClinicFaq(orgId, 500);
 
   try {
     // 1) knowledge_topics → clinic_services (category !== faq) or clinic_faq (category === faq)

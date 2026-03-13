@@ -1,13 +1,13 @@
 /**
  * Agent B — Policy & Medical Safety Guard
  * หน้าที่: กันความเสี่ยง / กฎหมาย / การแพทย์
- * Rule-based (ไม่ใช้ AI)
+ * Phase 15: AI response safety → @/lib/ai/safety-compliance (hybrid 3-layer + rewriter)
  */
 import type { SafetyResult } from "./types";
 import type { IntentType } from "./types";
 
 /**
- * Rule-based Safety Check
+ * Rule-based Safety Check (intent-based)
  * ถ้า intent เป็น medical_question → ส่งต่อแพทย์
  * นอกนั้น → ตอบได้
  */

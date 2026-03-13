@@ -1,4 +1,19 @@
 /**
+ * Schedule 24h reminder via BullMQ.
+ * Call after booking created/updated.
+ */
+import { scheduleBookingReminder as enqueueReminder } from "@/lib/booking-reminder-queue";
+
+export async function scheduleBookingReminder(
+  bookingId: string,
+  bookingDateTime: Date,
+  orgId: string,
+  opts?: { lineUserId?: string; customerId?: string }
+): Promise<string | null> {
+  return enqueueReminder(bookingId, bookingDateTime, orgId, opts);
+}
+
+/**
  * Enterprise: ระบบแจ้งเตือนการยืนยันนัด — Multi-Channel Ready
  *
  * กฎสำคัญ:
@@ -50,6 +65,21 @@ function formatTime(iso: string): string {
 }
 
 /**
+ * สร้างข้อความปฏิเสธการจอง — AI แจ้งลูกค้าผ่านช่องทางที่จองมา
+ */
+export function buildRejectionMessage(booking: Booking, rejectReason: string): string {
+  const lines: string[] = [
+    "ขออภัย เราขอปฏิเสธการจองในครั้งนี้",
+    "",
+    `เหตุผล: ${rejectReason.trim() || "กรุณาติดต่อคลินิกเพื่อสอบถามรายละเอียด"}`,
+    "",
+    "หากต้องการจองใหม่ กรุณาติดต่อหรือส่งข้อความเข้ามาได้ครับ",
+  ];
+  const text = lines.join("\n");
+  return text.length <= MAX_TEXT_LENGTH ? text : text.slice(0, MAX_TEXT_LENGTH - 3) + "...";
+}
+
+/**
  * สร้างข้อความยืนยันนัดตาม spec — ใช้ได้ทุก channel
  * รูปแบบ: หัวข้อ ✅ / รายละเอียด (ชื่อ, หัตถการ, วันที่, เวลา, สาขา, แพทย์) / หมายเหตุ / ปิดท้าย
  */
@@ -82,6 +112,15 @@ export function buildConfirmationMessage(booking: Booking): string {
 }
 
 // ─── Sender by Channel ────────────────────────────────────────────────────
+
+/** Send raw text via LINE push (used by reminder worker) */
+export async function sendLinePushMessage(
+  orgId: string,
+  lineUserId: string,
+  text: string
+): Promise<{ ok: boolean; error?: string }> {
+  return sendViaLine(orgId, lineUserId, text);
+}
 
 async function sendViaLine(orgId: string, chatUserId: string, text: string): Promise<{ ok: boolean; error?: string }> {
   let accessToken: string | null = null;
@@ -189,5 +228,37 @@ export async function sendBookingConfirmation(input: SendConfirmationInput): Pro
 
   await updateBooking(orgId, bookingId, updates);
 
+  return result;
+}
+
+// ─── Rejection Flow ────────────────────────────────────────────────────────
+
+export interface SendRejectionInput {
+  orgId: string;
+  bookingId: string;
+  booking: Booking;
+  rejectReason: string;
+}
+
+/**
+ * ส่งข้อความปฏิเสธการจองให้ลูกค้าผ่านช่องทางที่จองมา
+ * เรียกเมื่อ admin กดปฏิเสธ + กรอกเหตุผล
+ */
+export async function sendBookingRejection(input: SendRejectionInput): Promise<{
+  ok: boolean;
+  error?: string;
+}> {
+  const { orgId, bookingId, booking, rejectReason } = input;
+
+  if (!booking.chatUserId || !booking.channel) {
+    return { ok: false, error: "chatUserId or channel missing" };
+  }
+
+  if (!NOTIFYABLE_CHANNELS.includes(booking.channel as (typeof NOTIFYABLE_CHANNELS)[number])) {
+    return { ok: false, error: `Channel ${booking.channel} is not notifyable` };
+  }
+
+  const text = buildRejectionMessage(booking, rejectReason);
+  const result = await sendViaChannel(orgId, booking.channel, booking.chatUserId, text);
   return result;
 }

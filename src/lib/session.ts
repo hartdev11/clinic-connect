@@ -1,4 +1,5 @@
 import * as jose from "jose";
+import type { UserRole } from "@/types/organization";
 
 const COOKIE_NAME = "clinic_session";
 const JWT_EXPIRY = "7d";
@@ -18,6 +19,7 @@ export interface TokenPayload {
   org_id?: string | null;
   branch_id?: string | null;
   user_id?: string | null;
+  role?: UserRole | null;
 }
 
 /** ผลจาก verify — org_id อาจเป็น null (legacy token) */
@@ -25,6 +27,7 @@ export type VerifiedPayload = Omit<TokenPayload, "org_id"> & {
   org_id: string | null;
   branch_id: string | null;
   user_id: string | null;
+  role: UserRole | null;
 };
 
 export async function createToken(payload: TokenPayload): Promise<string> {
@@ -36,6 +39,7 @@ export async function createToken(payload: TokenPayload): Promise<string> {
   if (payload.org_id) claims.org_id = payload.org_id;
   if (payload.branch_id) claims.branch_id = payload.branch_id;
   if (payload.user_id) claims.user_id = payload.user_id;
+  if (payload.role) claims.role = payload.role;
   return new jose.SignJWT(claims)
     .setProtectedHeader({ alg: "HS256" })
     .setExpirationTime(JWT_EXPIRY)
@@ -57,6 +61,7 @@ export async function verifyToken(token: string): Promise<VerifiedPayload | null
       org_id: org_id || null,
       branch_id: (payload.branch_id as string) || null,
       user_id: (payload.user_id as string) || null,
+      role: (payload.role as UserRole) || null,
     };
   } catch {
     return null;

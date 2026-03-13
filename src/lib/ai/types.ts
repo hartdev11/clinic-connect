@@ -35,7 +35,7 @@ export interface AnalyticsContext {
   userMessage?: string | null;
 }
 
-/** ผลรวมจาก 6 Analytics Agents — ส่งให้ Role Manager */
+/** ผลรวมจาก Analytics Agents — ส่งให้ Role Manager (Phase 6: + sales, followup, objection, referral) */
 export interface AggregatedAnalyticsContext {
   booking: AnalyticsAgentOutput;
   promotion: AnalyticsAgentOutput;
@@ -43,6 +43,13 @@ export interface AggregatedAnalyticsContext {
   finance: AnalyticsAgentOutput; // internal only — ห้ามส่งลูกค้า
   knowledge: AnalyticsAgentOutput;
   feedback: AnalyticsAgentOutput;
+  /** Phase 6: specialized agents */
+  sales?: AnalyticsAgentOutput;
+  followup?: AnalyticsAgentOutput;
+  objection?: AnalyticsAgentOutput;
+  referral?: AnalyticsAgentOutput;
+  /** Phase 6: manager routing hint */
+  _managerRoute?: "sales" | "booking" | "question" | "objection" | "referral" | "followup" | "default";
   /** เวลารวมทั้งหมด (ms) สำหรับ monitoring */
   totalAnalyticsMs: number;
   /** Enterprise: Cross-Agent Reasoning insights */

@@ -19,12 +19,15 @@ function isWrapped(res: ResponseLike): res is { response: NextResponse; orgId?: 
 export async function runWithObservability(
   route: string,
   request: Request,
-  handler: () => Promise<ResponseLike>
+  handler: () => Promise<ResponseLike | undefined>
 ): Promise<NextResponse> {
   const method = request.method ?? "GET";
   const start = startTimer();
   try {
     const result = await handler();
+    if (result === undefined) {
+      return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    }
     const response = isWrapped(result) ? result.response : result;
     const status = response.status;
     const orgId = isWrapped(result) ? result.orgId : undefined;

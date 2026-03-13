@@ -1,6 +1,7 @@
 import { getApps, initializeApp, cert, type App } from "firebase-admin/app";
 import { getFirestore, type Firestore } from "firebase-admin/firestore";
 import { getStorage, type Storage } from "firebase-admin/storage";
+import fs from "fs";
 import path from "path";
 
 let _adminApp: App | null = null;
@@ -19,7 +20,6 @@ export function getFirebaseAdmin(): App {
   // ทางเลือก 1: ใช้ path ไปยังไฟล์ JSON
   const serviceAccountPath = process.env.FIREBASE_SERVICE_ACCOUNT_PATH;
   if (serviceAccountPath) {
-    const fs = require("fs");
     const absolutePath = path.isAbsolute(serviceAccountPath)
       ? serviceAccountPath
       : path.join(process.cwd(), serviceAccountPath);

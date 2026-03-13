@@ -146,3 +146,43 @@ export function shouldSummarize(memory: CustomerMemory | null): boolean {
 }
 
 export { SUMMARIZE_EVERY_MESSAGES };
+
+/** Phase 6: getCustomerPersona — re-export from customer-persona */
+export {
+  getCustomerPersona,
+  getPersonaToneInstructions,
+  type PersonaType,
+  type CustomerPersonaInput,
+} from "./customer-persona";
+
+/** Phase 6: Resolve persona for orchestrator — fetches available data, uses defaults */
+import type { CustomerPersonaInput, PersonaType } from "./customer-persona";
+import { getCustomerPersona, getPersonaToneInstructions } from "./customer-persona";
+
+export async function resolveCustomerPersona(
+  orgId: string,
+  userId: string | null
+): Promise<{ persona: PersonaType; toneInstructions: string }> {
+  const input: CustomerPersonaInput = {};
+  if (userId) {
+    const memory = await getCustomerMemory(orgId, userId);
+    if (memory) {
+      const bp = memory.booking_pattern;
+      input.firstVisit = !bp?.last_booking_at;
+      input.totalSpend = 0; // Would need invoice aggregation
+    }
+  }
+  try {
+    const orgDoc = await db.collection("organizations").doc(orgId).get();
+    const aiConfig = orgDoc.exists ? orgDoc.data()?.ai_config : undefined;
+    const settings = aiConfig?.settings;
+    input.clinicStyle = settings?.clinic_style ?? "friendly";
+  } catch {
+    input.clinicStyle = "friendly";
+  }
+  const persona = getCustomerPersona(input);
+  return {
+    persona,
+    toneInstructions: getPersonaToneInstructions(persona),
+  };
+}

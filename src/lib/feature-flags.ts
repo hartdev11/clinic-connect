@@ -32,7 +32,7 @@ export function isPlatformManagedMode(orgPlan?: OrgPlan): boolean {
 /**
  * ใช้ multi-agent pipeline แทน chat agent เดิม
  */
-export function usePipeline(): boolean {
+export function isPipelineEnabled(): boolean {
   return process.env.CHAT_USE_PIPELINE?.trim().toLowerCase() === "true";
 }
 
@@ -41,6 +41,14 @@ export function usePipeline(): boolean {
  * เมื่อเปิด: ใช้แทน pipeline/chatAgent
  * ต้องมี LINE_ORG_ID เพื่อดึง analytics
  */
-export function use7AgentChat(): boolean {
+export function is7AgentChatEnabled(): boolean {
   return process.env.CHAT_USE_7_AGENT?.trim().toLowerCase() === "true";
+}
+
+/**
+ * Franchise: ยืนยันที่อยู่และเบอร์โทรศัพท์ (FRANCHISE-MODEL-SPEC)
+ * เปิดได้ผ่าน env ADDRESS_PHONE_VERIFICATION_ENABLED=true
+ */
+export function isAddressPhoneVerificationEnabled(): boolean {
+  return process.env.ADDRESS_PHONE_VERIFICATION_ENABLED?.trim().toLowerCase() === "true";
 }

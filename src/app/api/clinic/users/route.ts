@@ -9,7 +9,8 @@ import {
 import type { UserRole } from "@/types/organization";
 import { getEffectiveUser, requireRole } from "@/lib/rbac";
 import { hashPassword } from "@/lib/auth";
-import crypto from "crypto";
+import { createStaffInvite } from "@/lib/invites";
+import { sendStaffInviteEmail } from "@/lib/email";
 import { runWithObservability } from "@/lib/observability/run-with-observability";
 
 export const dynamic = "force-dynamic";
@@ -106,25 +107,29 @@ export async function POST(request: NextRequest) {
       if (sanitizedBranchIds.length === 0) sanitizedBranchIds = null;
     }
 
-    const tempPassword = crypto.randomBytes(8).toString("base64url");
-    const passwordHash = await hashPassword(tempPassword);
-
-    const userId = await createUser({
-      org_id: orgId,
+    const token = await createStaffInvite(orgId, {
       email: normalizedEmail,
-      passwordHash,
       role: userRole,
       branch_ids: sanitizedBranchIds,
       branch_roles: sanitizedBranchRoles,
-      default_branch_id:
-        sanitizedBranchRoles ? Object.keys(sanitizedBranchRoles)[0] ?? null : sanitizedBranchIds?.[0] ?? null,
     });
+
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL?.trim() ?? "http://localhost:3000";
+    const inviteLink = `${baseUrl.replace(/\/$/, "")}/accept-invite?token=${encodeURIComponent(token)}`;
+
+    const emailResult = await sendStaffInviteEmail({ to: normalizedEmail, inviteLink });
+    if (!emailResult.success) {
+      return {
+        response: NextResponse.json({
+          error: "ส่งอีเมลไม่สำเร็จ: " + (emailResult.error ?? "กรุณาตรวจสอบการตั้งค่า RESEND_API_KEY"),
+        }, { status: 500 }),
+        orgId,
+      };
+    }
 
     return { response: NextResponse.json({
       success: true,
-      userId,
-      tempPassword,
-      message: "กรุณาแจ้งรหัสชั่วคราวให้ผู้ใช้ (แสดงครั้งเดียว)",
+      message: "ส่งลิงก์เชิญทางอีเมลแล้ว — ผู้ใช้มี 48 ชม. ในการตั้งรหัสผ่าน",
     }), orgId };
   } catch (err) {
     console.error("POST /api/clinic/users:", err);
