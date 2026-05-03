@@ -27,7 +27,6 @@ export async function GET(request: NextRequest) {
 
   try {
     const logCol = db.collection("organizations").doc(orgId).collection("learning_log");
-    const learnedCol = db.collection("organizations").doc(orgId).collection("learned_knowledge");
 
     if (tab === "approved") {
       const snap = await logCol

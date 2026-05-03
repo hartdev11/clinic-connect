@@ -5,6 +5,7 @@
 import { NextResponse } from "next/server";
 import { getSessionFromCookies } from "@/lib/auth-session";
 import { getOrgIdFromClinicId } from "@/lib/clinic-data";
+import { getEffectiveUser, requireRole } from "@/lib/rbac";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +15,10 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   try {
+    const user = await getEffectiveUser(session);
+    if (!requireRole(user.role, ["owner", "super_admin"])) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
     const sessionOrgId = session.org_id ?? (await getOrgIdFromClinicId(session.clinicId));
     const lineOrgId = process.env.LINE_ORG_ID?.trim() || null;
 

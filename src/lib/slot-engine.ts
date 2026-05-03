@@ -11,16 +11,6 @@ import {
 } from "@/lib/clinic-data";
 import type { DayOfWeek } from "@/types/clinic";
 
-const DAY_INDEX: Record<DayOfWeek, number> = {
-  sunday: 0,
-  monday: 1,
-  tuesday: 2,
-  wednesday: 3,
-  thursday: 4,
-  friday: 5,
-  saturday: 6,
-};
-
 const DAY_KEYS: DayOfWeek[] = [
   "sunday",
   "monday",
@@ -108,12 +98,6 @@ export function slotOverlapsBooking(
   const bookStart = new Date(bookingScheduledAt).getTime();
   const bookEnd = bookStart + bookingDurationMinutes * 60 * 1000;
   return slotStartMs < bookEnd && slotEndMs > bookStart;
-}
-
-/** เช็คว่าเวลาอยู่ในช่วงหรือไม่ (HH:mm format) */
-function timeInRange(t: string, open: string, close: string): boolean {
-  const m = timeToMinutes(t);
-  return m >= timeToMinutes(open) && m < timeToMinutes(close);
 }
 
 /** ช่วยตรวจว่า booking 占用 slot ของแพทย์นี้หรือไม่ */

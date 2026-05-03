@@ -123,6 +123,25 @@ type DashboardResponse = {
   }>;
 };
 
+type PhaseKOwnerResponse = {
+  overview?: {
+    total_revenue?: number;
+    total_bookings?: number;
+    total_sessions?: number;
+  };
+  top_procedures?: Array<{
+    service_name?: string;
+    procedure_name?: string;
+    procedure?: string;
+    name?: string;
+    revenue?: number;
+    total_revenue?: number;
+    bookings?: number;
+    total_bookings?: number;
+    count?: number;
+  }>;
+};
+
 export default function ClinicDashboardPage() {
   const { branch_id, currentOrg } = useClinicContext();
   const [branchFilter, setBranchFilter] = React.useState<string | null>(null);
@@ -149,6 +168,11 @@ export default function ClinicDashboardPage() {
     ai_assisted_revenue?: number;
     booking_conversion_rate?: number;
   }>(overviewKey, apiFetcher, { revalidateOnFocus: true, dedupingInterval: 30_000 });
+  const { data: phaseKData } = useSWR<PhaseKOwnerResponse>(
+    "/api/dashboard/owner",
+    apiFetcher,
+    { revalidateOnFocus: true, dedupingInterval: 30_000, keepPreviousData: true }
+  );
 
   const branchesKey = "/api/clinic/branches";
   const { data: branchesData } = useSWR<{ items: Array<{ id: string; name: string }> }>(
@@ -208,7 +232,7 @@ export default function ClinicDashboardPage() {
     }
   }, []);
 
-  const d = data?.stats ?? {
+  const localStats = data?.stats ?? {
     chatsToday: 0,
     newCustomers: 0,
     bookingsToday: 0,
@@ -216,15 +240,35 @@ export default function ClinicDashboardPage() {
     revenueThisMonth: 0,
     revenueLastMonth: 0,
   };
+  const hasPhaseKLiveData = !!phaseKData?.overview;
+  const d = {
+    ...localStats,
+    revenueThisMonth:
+      hasPhaseKLiveData && typeof phaseKData?.overview?.total_revenue === "number"
+        ? phaseKData.overview.total_revenue
+        : localStats.revenueThisMonth,
+    bookingsToday:
+      hasPhaseKLiveData && typeof phaseKData?.overview?.total_bookings === "number"
+        ? phaseKData.overview.total_bookings
+        : localStats.bookingsToday,
+    chatsToday:
+      hasPhaseKLiveData && typeof phaseKData?.overview?.total_sessions === "number"
+        ? phaseKData.overview.total_sessions
+        : localStats.chatsToday,
+  };
   const revenueLast = d.revenueLastMonth || 1;
   const revenueChangeRaw =
     ((d.revenueThisMonth - d.revenueLastMonth) / revenueLast) * 100;
   const revenueChange = Math.round(revenueChangeRaw * 10) / 10;
-  const bookingsByDate = data?.bookingsByDate ?? [];
-  const chartData = data?.chartData ?? {
-    revenueByDay: [],
-    activityByDay: [],
-  };
+  const bookingsByDate = useMemo(() => data?.bookingsByDate ?? [], [data?.bookingsByDate]);
+  const chartData = useMemo(
+    () =>
+      data?.chartData ?? {
+        revenueByDay: [],
+        activityByDay: [],
+      },
+    [data?.chartData]
+  );
   const hasRevenueData = chartData.revenueByDay.some((r) => r.revenue > 0);
   const hasActivityData = chartData.activityByDay.some(
     (a) => a.chats > 0 || a.bookings > 0
@@ -249,7 +293,38 @@ export default function ClinicDashboardPage() {
       ? Math.round(((bookingsWoW.thisWeek - bookingsWoW.lastWeek) / bookingsWoW.lastWeek) * 100 * 10) / 10
       : null;
 
+  const phaseKProcedurePieData = useMemo(() => {
+    const procedures = phaseKData?.top_procedures ?? [];
+    return procedures
+      .map((item) => {
+        const name =
+          item.service_name ??
+          item.procedure_name ??
+          item.procedure ??
+          item.name ??
+          "";
+        const value =
+          typeof item.total_revenue === "number"
+            ? item.total_revenue
+            : typeof item.revenue === "number"
+              ? item.revenue
+              : typeof item.total_bookings === "number"
+                ? item.total_bookings
+                : typeof item.bookings === "number"
+                  ? item.bookings
+                  : typeof item.count === "number"
+                    ? item.count
+                    : 0;
+        return { name: name.trim(), value };
+      })
+      .filter((x) => x.name && x.value > 0)
+      .slice(0, 6);
+  }, [phaseKData?.top_procedures]);
+
   const pieData = useMemo(() => {
+    if (phaseKProcedurePieData.length > 0) {
+      return phaseKProcedurePieData;
+    }
     const promo = data?.activePromotionsCount ?? 0;
     return [
       { name: "แชทวันนี้", value: d.chatsToday },
@@ -259,6 +334,7 @@ export default function ClinicDashboardPage() {
       { name: "โปรโมชัน", value: promo },
     ].filter((x) => x.value > 0);
   }, [
+    phaseKProcedurePieData,
     d.chatsToday,
     d.newCustomers,
     d.bookingsToday,
@@ -357,7 +433,7 @@ export default function ClinicDashboardPage() {
               {todayLabel}
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center justify-start sm:justify-end gap-2 sm:gap-3">
             <BranchSelector value={branchFilter} onChange={setBranchFilter} />
             {realtime.isLive && (
               <span className="flex items-center gap-1 text-xs font-medium text-rg-500" title="Real-time updates">
@@ -365,10 +441,15 @@ export default function ClinicDashboardPage() {
                 LIVE
               </span>
             )}
+            {hasPhaseKLiveData && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 text-xs font-medium">
+                Live ✓
+              </span>
+            )}
             {formattedFetchedAt && (
               <span
                 className={cn(
-                  "text-xs tabular-nums font-body",
+                  "hidden sm:inline text-xs tabular-nums font-body",
                   isStale ? "text-amber-600 font-medium" : "text-mauve-400"
                 )}
                 aria-live="polite"
@@ -399,58 +480,8 @@ export default function ClinicDashboardPage() {
 
         <div className="divider-rg mb-8" aria-hidden />
 
-        {/* Hot Leads Widget */}
-        {(data?.hotLeads?.length ?? 0) > 0 && (
-          <motion.section
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="mb-8"
-          >
-            <h2 className="font-display text-lg font-semibold text-mauve-800 mb-4 flex items-center gap-2">
-              🔥 Hot Leads
-            </h2>
-            <div className="luxury-card p-4">
-              <div className="flex flex-wrap gap-4">
-                {data!.hotLeads!.map((lead) => (
-                  <Link
-                    key={lead.id}
-                    href={`/clinic/customers?select=${encodeURIComponent(lead.id)}`}
-                    className="flex items-center gap-3 p-3 rounded-2xl bg-cream-100/60 hover:bg-cream-200/60 transition-colors min-w-0 max-w-[280px]"
-                  >
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-rg-300 to-rg-500 flex items-center justify-center text-white font-display font-semibold flex-shrink-0 overflow-hidden">
-                      {lead.pictureUrl ? (
-                        <img
-                          src={lead.pictureUrl}
-                          alt=""
-                          className="w-full h-full object-cover"
-                          referrerPolicy="no-referrer"
-                        />
-                      ) : (
-                        (lead.name || "?").charAt(0).toUpperCase()
-                      )}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="font-body font-medium text-mauve-800 truncate">{lead.name || "ลูกค้า"}</p>
-                      <p className="text-xs text-mauve-500">
-                        Score {(lead.leadScore ?? 0).toFixed(2)} •
-                        {lead.lastChatAt
-                          ? ` ล่าสุด ${new Date(lead.lastChatAt).toLocaleString("th-TH", { dateStyle: "short", timeStyle: "short" })}`
-                          : " —"}
-                      </p>
-                    </div>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-[color:var(--ent-danger)]/10 text-[var(--ent-danger)] flex-shrink-0">
-                      🔥
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </motion.section>
-        )}
-
         {/* KPI Stat Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6 gap-4 mb-8">
           <StatCard
             label="รายได้เดือนนี้"
             value={new Intl.NumberFormat("th-TH", { style: "currency", currency: "THB", maximumFractionDigits: 0 }).format(d.revenueThisMonth)}
@@ -541,7 +572,7 @@ export default function ClinicDashboardPage() {
         </div>
 
         {/* Phase 21: Revenue KPI Row 2 */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-8">
           {!overview ? (
             Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="luxury-card p-6 animate-pulse">
@@ -597,7 +628,7 @@ export default function ClinicDashboardPage() {
                 ? `${overview.booking_conversion_rate}%`
                 : "—"
             }
-            subtext="Hot Leads → Booking"
+            subtext="Conversion ไปสู่การจอง"
             icon={<ChartBarIcon className="w-6 h-6 text-[var(--ent-accent)]" />}
             delay={0.24}
           />
@@ -828,7 +859,6 @@ export default function ClinicDashboardPage() {
           alerts={buildSmartAlerts({
             usage_percentage: data?.usage_percentage,
             pending_handoffs: realtime.isLive ? realtime.pendingHandoffs : data?.pending_handoffs,
-            hot_leads_count: realtime.isLive ? realtime.hotLeadsCount : data?.hot_leads_count,
             booking_conversion_rate: overview?.booking_conversion_rate,
           })}
         />
@@ -1158,10 +1188,10 @@ export default function ClinicDashboardPage() {
 
             <div className="luxury-card p-5 sm:p-6 overflow-hidden">
               <h3 className="text-sm font-medium text-mauve-800">
-                สัดส่วนกิจกรรม (จาก KPI)
+                {phaseKProcedurePieData.length > 0 ? "Top Procedures (Phase K)" : "สัดส่วนกิจกรรม (จาก KPI)"}
               </h3>
               <p className="text-xs text-mauve-400 mt-0.5">
-                แชท · ลูกค้าใหม่ · จอง · โปรโมชัน
+                {phaseKProcedurePieData.length > 0 ? "อ้างอิงข้อมูลจาก /api/dashboard/owner" : "แชท · ลูกค้าใหม่ · จอง · โปรโมชัน"}
               </p>
               <div className="mt-4 w-full min-h-[240px] h-60 flex items-center justify-center">
                 {pieData.length === 0 ? (

@@ -28,7 +28,8 @@ export async function getOrgAgencyId(orgId: string): Promise<string | null> {
 export async function recordCommission(
   orgId: string,
   subscriptionId: string,
-  amount: number
+  amount: number,
+  opts?: { externalRef?: string; correlationId?: string }
 ): Promise<string | null> {
   const agencyId = await getOrgAgencyId(orgId);
   if (!agencyId) return null;
@@ -39,6 +40,14 @@ export async function recordCommission(
   const commissionAmount = Math.round(amount * rate);
 
   const { FieldValue } = await import("firebase-admin/firestore");
+  if (opts?.externalRef) {
+    const duplicate = await db
+      .collection(COMMISSIONS_COL)
+      .where("externalRef", "==", opts.externalRef)
+      .limit(1)
+      .get();
+    if (!duplicate.empty) return duplicate.docs[0].id;
+  }
 
   const docRef = await db.collection(COMMISSIONS_COL).add({
     agencyId,
@@ -47,6 +56,8 @@ export async function recordCommission(
     amount,
     commissionAmount,
     status: "paid",
+    externalRef: opts?.externalRef ?? null,
+    correlationId: opts?.correlationId ?? null,
     createdAt: FieldValue.serverTimestamp(),
   });
 
@@ -64,7 +75,8 @@ export async function recordCommission(
  */
 export async function reverseCommission(
   commissionId: string,
-  reason?: string
+  reason?: string,
+  opts?: { correlationId?: string }
 ): Promise<boolean> {
   const docRef = db.collection(COMMISSIONS_COL).doc(commissionId);
   const doc = await docRef.get();
@@ -84,6 +96,7 @@ export async function reverseCommission(
     status: "reversed",
     reversedAt: now,
     reverseReason: reason ?? null,
+    correlationId: opts?.correlationId ?? null,
     updatedAt: FieldValue.serverTimestamp(),
   });
 

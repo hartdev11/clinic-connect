@@ -49,6 +49,12 @@ export async function GET(request: NextRequest) {
     }
     const user = await getEffectiveUser(session);
     const branchId = request.nextUrl.searchParams.get("branchId") ?? session.branch_id ?? null;
+    if ((user.role === "manager" || user.role === "staff") && !branchId) {
+      return NextResponse.json(
+        { error: "กรุณาเลือกสาขาก่อนดูการแจ้งเตือน (จำกัดสิทธิ์ตามสาขา)" },
+        { status: 403 }
+      );
+    }
     if (!requireBranchAccess(user.role, user.branch_ids, user.branch_roles, branchId)) {
       return NextResponse.json(
         { error: "จำกัดสิทธิ์: คุณไม่มีสิทธิ์เข้าถึงสาขานี้" },
@@ -223,7 +229,7 @@ export async function GET(request: NextRequest) {
 }
 
 /** PATCH — Mark all stored notifications as read */
-export async function PATCH(request: NextRequest) {
+export async function PATCH() {
   const session = await getSessionFromCookies();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {

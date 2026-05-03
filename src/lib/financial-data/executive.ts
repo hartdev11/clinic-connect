@@ -6,7 +6,6 @@
 import { db } from "@/lib/firebase-admin";
 import { getRevenueFromPaidInvoices } from "@/lib/financial-data";
 import { satangToBaht } from "@/lib/money";
-import type { Timestamp } from "firebase-admin/firestore";
 
 const COLLECTIONS = {
   invoices: "invoices",
@@ -90,13 +89,6 @@ function readSatang(d: Record<string, unknown>, key: string, fallbackKey?: strin
   if (typeof v === "number" && Number.isInteger(v)) return v;
   if (fallbackKey != null && d[fallbackKey] != null) return Math.round(Number(d[fallbackKey]) * 100);
   return 0;
-}
-
-function toISO(t: Timestamp | Date | { toDate?: () => Date } | string): string {
-  if (typeof t === "string") return t;
-  if (t instanceof Date) return t.toISOString();
-  const d = t && typeof (t as { toDate?: () => Date }).toDate === "function" ? (t as { toDate: () => Date }).toDate() : null;
-  return d ? d.toISOString() : String(t);
 }
 
 /**

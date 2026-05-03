@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 
 type Clinic = {
   id: string;
@@ -11,15 +13,43 @@ type Clinic = {
   imageUrl?: string;
 };
 
-const clinics: Clinic[] = [];
-
 export default function ClinicsPage() {
-  const loading = false;
+  const [clinics, setClinics] = useState<Clinic[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    void (async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch("/api/public/clinics", { credentials: "include" });
+        const data = (await res.json().catch(() => ({}))) as { items?: Clinic[]; error?: string };
+        if (!alive) return;
+        if (!res.ok) {
+          setClinics([]);
+          setError(data.error ?? "โหลดข้อมูลคลินิกไม่สำเร็จ");
+          return;
+        }
+        setClinics(Array.isArray(data.items) ? data.items : []);
+      } catch {
+        if (!alive) return;
+        setClinics([]);
+        setError("โหลดข้อมูลคลินิกไม่สำเร็จ");
+      } finally {
+        if (alive) setLoading(false);
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-cream-100">
       <div
-        className="relative overflow-hidden py-16 px-6 text-center"
+        className="relative overflow-hidden py-16 px-4 sm:px-6 text-center"
         style={{
           background: "linear-gradient(145deg, var(--cream-100) 0%, var(--cream-200) 50%, var(--cream-300) 100%)",
         }}
@@ -40,7 +70,16 @@ export default function ClinicsPage() {
         </motion.div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-6 py-12">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
+        {error && !loading && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="luxury-card p-5 mb-6 border border-red-200 bg-red-50/60"
+          >
+            <p className="font-body text-sm text-red-700">{error}</p>
+          </motion.div>
+        )}
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -85,9 +124,11 @@ export default function ClinicsPage() {
               >
                 <div className="relative h-40 bg-gradient-to-br from-rg-200 to-rg-400 overflow-hidden">
                   {clinic.imageUrl ? (
-                    <img
+                    <Image
                       src={clinic.imageUrl}
                       alt={clinic.name}
+                      fill
+                      unoptimized
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   ) : null}

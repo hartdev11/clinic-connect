@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -39,7 +39,7 @@ export default function HandoffHistoryPage() {
   const [triggerFilter, setTriggerFilter] = useState("");
   const [exporting, setExporting] = useState(false);
 
-  const fetchHistory = () => {
+  const fetchHistory = useCallback(() => {
     setLoading(true);
     const params = new URLSearchParams();
     if (from) params.set("from", from);
@@ -53,11 +53,11 @@ export default function HandoffHistoryPage() {
       })
       .catch(() => setItems([]))
       .finally(() => setLoading(false));
-  };
+  }, [from, to, triggerFilter]);
 
   useEffect(() => {
     fetchHistory();
-  }, []);
+  }, [fetchHistory]);
 
   const resolvedItems = items.filter((i) => i.status === "resolved");
   const avgWait =

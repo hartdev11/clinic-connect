@@ -10,6 +10,7 @@ import { parseAnalyticsRange, type AnalyticsDateRange } from "@/lib/analytics-da
 export type AnalyticsContext = {
   orgId: string;
   branchId: string | null;
+  allowedBranchIds: string[] | null;
   range: AnalyticsDateRange;
 };
 
@@ -27,6 +28,22 @@ export async function getAnalyticsContext(
   const user = await getEffectiveUser(session);
   const searchParams = request.nextUrl.searchParams;
   const branchId = searchParams.get("branchId") ?? session.branch_id ?? null;
+  const allowedBranchIds =
+    user.role === "owner" || user.role === "super_admin"
+      ? null
+      : user.branch_ids && user.branch_ids.length > 0
+        ? user.branch_ids
+        : user.branch_roles && Object.keys(user.branch_roles).length > 0
+          ? Object.keys(user.branch_roles)
+          : [];
+  if ((user.role === "manager" || user.role === "staff") && !branchId) {
+    return {
+      response: NextResponse.json(
+        { error: "กรุณาเลือกสาขาก่อนดู Analytics (จำกัดสิทธิ์ตามสาขา)" },
+        { status: 403 }
+      ),
+    };
+  }
   if (!requireBranchAccess(user.role, user.branch_ids, user.branch_roles, branchId)) {
     return {
       response: NextResponse.json(
@@ -40,6 +57,6 @@ export async function getAnalyticsContext(
   const customTo = searchParams.get("to") ?? undefined;
   const range = parseAnalyticsRange(rangeParam, customFrom, customTo);
   return {
-    context: { orgId, branchId, range },
+    context: { orgId, branchId, allowedBranchIds, range },
   };
 }

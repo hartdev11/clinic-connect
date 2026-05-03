@@ -37,6 +37,7 @@ export async function triggerHandoff(input: TriggerHandoffInput): Promise<string
   }
 
   const conversationId = `${orgId}_${lineUserId}`;
+  const correlationId = `handoff_${sessionIdSafe(orgId, lineUserId, Date.now())}`;
   const sessionId = await createHandoffSession(orgId, {
     conversationId,
     customerId,
@@ -74,7 +75,11 @@ export async function triggerHandoff(input: TriggerHandoffInput): Promise<string
     customerName,
     triggerType,
     triggerMessage: triggerMessage.slice(0, 100),
-  }).catch((e) => console.warn("[Handoff] partner webhook:", (e as Error)?.message?.slice(0, 50)));
+  }, { correlationId }).catch((e) => console.warn("[Handoff] partner webhook:", (e as Error)?.message?.slice(0, 50)));
 
   return sessionId;
+}
+
+function sessionIdSafe(orgId: string, lineUserId: string, ts: number): string {
+  return `${orgId}_${lineUserId}_${ts}`.replace(/[^a-zA-Z0-9_-]/g, "_");
 }

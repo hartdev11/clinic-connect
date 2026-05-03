@@ -3,12 +3,10 @@ import { getSessionFromCookies } from "@/lib/auth-session";
 import {
   getOrgIdFromClinicId,
   getUsersByOrgId,
-  createUser,
   getBranchesByOrgId,
 } from "@/lib/clinic-data";
 import type { UserRole } from "@/types/organization";
 import { getEffectiveUser, requireRole } from "@/lib/rbac";
-import { hashPassword } from "@/lib/auth";
 import { createStaffInvite } from "@/lib/invites";
 import { sendStaffInviteEmail } from "@/lib/email";
 import { runWithObservability } from "@/lib/observability/run-with-observability";

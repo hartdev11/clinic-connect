@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useState, useMemo, useCallback, useEffect, useRef } from "react";
+import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import useSWR from "swr";
 import { motion, AnimatePresence } from "framer-motion";
@@ -84,18 +85,6 @@ const SOURCE_LABEL: Record<string, string> = {
 /** Workspace tabs — state-based rendering only */
 type WorkspaceTab = "today" | "calendar" | "all" | "reports";
 
-/** Visual tokens: Background #FFFFFF, Surface #F7F8FA, Border #E5E7EB, Primary text #111827, Secondary #6B7280. Spacing 4/8/12/16/24/32. Radius 8–12px. */
-const statusColors: Record<string, "default" | "success" | "warning" | "info" | "error"> = {
-  pending: "warning",
-  confirmed: "success",
-  in_progress: "info",
-  completed: "info",
-  "no-show": "error",
-  cancelled: "default",
-  pending_admin_confirm: "warning",
-  reschedule_pending_admin: "warning",
-  cancel_requested: "default",
-};
 
 const STATUS_LABEL: Record<string, string> = {
   pending: "รอยืนยัน",
@@ -137,18 +126,6 @@ function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString("th-TH", { day: "numeric", month: "short", year: "numeric" });
 }
 
-/** Status accent — semantic tokens only */
-const statusAccentColor: Record<string, string> = {
-  pending: "var(--ent-warning)",
-  confirmed: "var(--ent-success)",
-  in_progress: "var(--ent-info)",
-  completed: "var(--cream-400)",
-  "no-show": "var(--ent-danger)",
-  cancelled: "var(--cream-400)",
-  pending_admin_confirm: "var(--ent-warning)",
-  reschedule_pending_admin: "var(--ent-warning)",
-  cancel_requested: "var(--cream-400)",
-};
 
 /** Reject dialog — กรอกเหตุผล แล้ว AI ส่งข้อความแจ้งลูกค้าอัตโนมัติ */
 function RejectDialog({
@@ -392,7 +369,7 @@ function QueueWorkbench({
     total: number;
   }>(`/api/clinic/bookings/queue?${queueParams}`, apiFetcher, { refreshInterval: 10000 });
 
-  const queueItems = queueData?.items ?? [];
+  const queueItems = useMemo(() => queueData?.items ?? [], [queueData]);
   const [expandedDoctor, setExpandedDoctor] = useState<string | null>(null);
 
   const byDoctor = useMemo(() => {
@@ -688,7 +665,7 @@ function WeekView({
 
   return (
     <div className="overflow-x-auto -mx-2">
-      <div className="min-w-[700px]">
+      <div className="min-w-[520px] sm:min-w-[640px]">
         <div className="grid grid-cols-8 gap-px border border-cream-200 rounded-2xl overflow-hidden">
           <div className="bg-cream-100 p-2 font-body text-xs font-medium text-mauve-500" />
           {weekDays.map((d) => (
@@ -701,15 +678,15 @@ function WeekView({
         </div>
         <div className="max-h-[400px] overflow-y-auto border border-t-0 border-cream-200 rounded-b-2xl">
           {slots.map((slotStart) => (
-            <div key={slotStart} className="grid grid-cols-8 gap-px min-h-[36px]">
-              <div className="bg-cream-50 p-1 font-body text-[10px] text-mauve-500 flex items-center">{slotStart}</div>
+            <div key={slotStart} className="grid grid-cols-8 gap-px min-h-[34px] sm:min-h-[36px]">
+              <div className="bg-cream-50 px-1 py-0.5 sm:p-1 font-body text-[9px] sm:text-[10px] text-mauve-500 flex items-center">{slotStart}</div>
               {weekDays.map((dateStr) => {
                 const bookings = getBookingsForSlot(dateStr, slotStart);
                 return (
                   <div
                     key={`${dateStr}-${slotStart}`}
                     className={cn(
-                      "p-1 min-h-[36px] border-b border-cream-100 cursor-pointer hover:bg-cream-50/80 transition-colors",
+                      "p-0.5 sm:p-1 min-h-[34px] sm:min-h-[36px] border-b border-cream-100 cursor-pointer hover:bg-cream-50/80 transition-colors",
                       bookings.length > 0 && "bg-cream-50"
                     )}
                     onClick={() => {
@@ -720,7 +697,7 @@ function WeekView({
                     {bookings.map((b) => (
                       <div
                         key={b.id}
-                        className={cn("rounded-lg px-2 py-1 text-[10px] truncate border", getBookingBlockColor(b.status))}
+                        className={cn("rounded-lg px-1.5 sm:px-2 py-1 text-[9px] sm:text-[10px] truncate border", getBookingBlockColor(b.status))}
                         onClick={(e) => { e.stopPropagation(); onBookingClick(b); }}
                       >
                         {b.customerName}
@@ -1034,7 +1011,7 @@ function BookingPageContent() {
   if (channelFilter !== "all") reportParams.set("channel", channelFilter);
 
   const listCacheKey = `/api/clinic/bookings?${listParams}`;
-  const { data: listData, mutate: mutateList } = useSWR<{ items: BookingItem[]; lastId?: string | null; hasMore?: boolean }>(
+  const { data: listData, isLoading: listLoading, mutate: mutateList } = useSWR<{ items: BookingItem[]; lastId?: string | null; hasMore?: boolean }>(
     listCacheKey,
     apiFetcher
   );
@@ -1068,7 +1045,7 @@ function BookingPageContent() {
       setLastId(null);
     }
   }, [lastId, branchFilter, channelFilter, statusFilter, branch_id]);
-  const { data: reportData } = useSWR<{
+  const { data: reportData, isLoading: reportLoading } = useSWR<{
     totalCount: number;
     totalAmount: number;
     byChannel: Array<{ channel: string; count: number; amount: number }>;
@@ -1104,7 +1081,7 @@ function BookingPageContent() {
   }, [allItems, searchQuery, dateFilterFrom, dateFilterTo, allDoctorFilter, allStatusFilter]);
 
   const items = filteredAllItems;
-  const calendarItems = calendarData?.items ?? [];
+  const calendarItems = useMemo(() => calendarData?.items ?? [], [calendarData]);
   const selectedDayItems = selectedDate
     ? calendarItems.filter((b) => b.scheduledAt.startsWith(selectedDate))
     : [];
@@ -1181,7 +1158,7 @@ function BookingPageContent() {
     apiFetcher,
     { refreshInterval: 10000 }
   );
-  const queueItemsForToast = queueDataForToast?.items ?? [];
+  const queueItemsForToast = useMemo(() => queueDataForToast?.items ?? [], [queueDataForToast]);
   useEffect(() => {
     const aiPending = queueItemsForToast.filter((b) => b.source === "ai" && (b.status === "pending_admin_confirm" || b.status === "pending"));
     for (const b of aiPending) {
@@ -1217,16 +1194,54 @@ function BookingPageContent() {
     void mutateCalendar();
   }, [rejectTarget, mutateList, mutateCalendar]);
 
-  const [tabUnderlineExpanded, setTabUnderlineExpanded] = useState(true);
-  useEffect(() => {
-    const id = requestAnimationFrame(() => {
-      requestAnimationFrame(() => setTabUnderlineExpanded(true));
-    });
-    return () => cancelAnimationFrame(id);
-  }, [activeTab]);
   const setActiveTabWithUnderline = useCallback((tab: WorkspaceTab) => {
     setActiveTab(tab);
-    setTabUnderlineExpanded(false);
+  }, []);
+
+  const applyAllTabPreset = useCallback((preset: "today" | "pending" | "ai-booking" | "today-pending") => {
+    if (preset === "today-pending") {
+      setSearchQuery("");
+      setDateFilterFrom(todayStr);
+      setDateFilterTo(todayStr);
+      setAllDoctorFilter("all");
+      setAllStatusFilter("pending_admin_confirm");
+      setChannelFilter("all");
+      return;
+    }
+    if (preset === "today") {
+      setSearchQuery("");
+      setDateFilterFrom(todayStr);
+      setDateFilterTo(todayStr);
+      setAllDoctorFilter("all");
+      setAllStatusFilter("");
+      setChannelFilter("all");
+      return;
+    }
+    if (preset === "pending") {
+      setSearchQuery("");
+      setDateFilterFrom("");
+      setDateFilterTo("");
+      setAllDoctorFilter("all");
+      setAllStatusFilter("pending_admin_confirm");
+      setChannelFilter("all");
+      return;
+    }
+    setSearchQuery("");
+    setDateFilterFrom("");
+    setDateFilterTo("");
+    setAllDoctorFilter("all");
+    setAllStatusFilter("");
+    setChannelFilter("line");
+  }, [todayStr]);
+
+  const resetAllTabFilters = useCallback(() => {
+    setSearchQuery("");
+    setDateFilterFrom("");
+    setDateFilterTo("");
+    setBranchFilter("all");
+    setAllDoctorFilter("all");
+    setAllStatusFilter("");
+    setChannelFilter("all");
   }, []);
 
   return (
@@ -1246,6 +1261,14 @@ function BookingPageContent() {
               </Button>
           }
         />
+        {calendarError && (
+          <div className="mb-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 flex items-center justify-between gap-3">
+            <p className="font-body text-sm text-amber-800">โหลดปฏิทินการจองไม่สำเร็จ กรุณาลองอีกครั้ง</p>
+            <Button variant="secondary" size="sm" onClick={() => mutateCalendar()}>
+              ลองอีกครั้ง
+            </Button>
+          </div>
+        )}
 
       {activeTab === "today" && (
         <div className="pt-4 pb-2">
@@ -1254,7 +1277,7 @@ function BookingPageContent() {
         </div>
       )}
 
-      <div className="flex items-center gap-1 p-1 bg-cream-200 rounded-2xl w-fit mb-6" role="tablist" aria-label="Workspace tabs">
+      <div className="flex flex-nowrap sm:flex-wrap items-center gap-1 p-1 bg-cream-200 rounded-2xl mb-6 w-full overflow-x-auto sm:overflow-visible" role="tablist" aria-label="Workspace tabs">
         {(
           [
             ["today", "วันนี้"],
@@ -1271,7 +1294,7 @@ function BookingPageContent() {
             tabIndex={activeTab === tab ? 0 : -1}
             onClick={() => setActiveTabWithUnderline(tab)}
             className={cn(
-              "relative min-h-[40px] px-4 py-2 rounded-xl text-sm font-body font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-rg-300 focus:ring-offset-2",
+              "relative min-h-[40px] px-3 sm:px-4 py-2 rounded-xl text-sm font-body font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-rg-300 focus:ring-offset-2",
               activeTab === tab ? "bg-white text-mauve-700 shadow-luxury" : "text-mauve-400 hover:text-mauve-600"
             )}
           >
@@ -1677,6 +1700,23 @@ function BookingPageContent() {
               <option key={ch} value={ch}>{CHANNEL_LABEL[ch] ?? ch}</option>
             ))}
           </select>
+          <div className="flex items-center gap-1.5">
+            <Button type="button" size="sm" variant="secondary" onClick={() => applyAllTabPreset("today-pending")}>
+              วันนี้ + รอยืนยัน
+            </Button>
+            <Button type="button" size="sm" variant="secondary" onClick={() => applyAllTabPreset("today")}>
+              วันนี้
+            </Button>
+            <Button type="button" size="sm" variant="secondary" onClick={() => applyAllTabPreset("pending")}>
+              รอยืนยัน
+            </Button>
+            <Button type="button" size="sm" variant="secondary" onClick={() => applyAllTabPreset("ai-booking")}>
+              AI booking
+            </Button>
+            <Button type="button" size="sm" variant="ghost" onClick={resetAllTabFilters}>
+              รีเซ็ตทั้งหมด
+            </Button>
+          </div>
           <Button type="button" size="sm" variant="outline" onClick={() => {
             const headers = ["วันที่", "เวลา", "ลูกค้า", "บริการ", "หมอ", "ช่องทาง", "จองโดย", "สถานะ"];
             const rows = items.map((b) => [
@@ -1705,7 +1745,16 @@ function BookingPageContent() {
         </div>
         <div className="luxury-card overflow-hidden">
           <div className="overflow-x-auto">
-            {items.length === 0 ? (
+            {listLoading && allItems.length === 0 ? (
+              <div className="p-6 space-y-3" aria-busy="true">
+                <div className="h-4 w-40 rounded-2xl bg-cream-200 animate-pulse" />
+                <div className="space-y-2">
+                  {Array.from({ length: 8 }).map((_, i) => (
+                    <div key={i} className="h-10 rounded-xl bg-cream-100 animate-pulse" />
+                  ))}
+                </div>
+              </div>
+            ) : items.length === 0 ? (
               <div className="p-12">
                 <EmptyState
                   icon={<TableCellsIcon className="w-12 h-12 text-mauve-300" />}
@@ -1783,10 +1832,23 @@ function BookingPageContent() {
           <h2 className="font-display text-lg font-semibold text-mauve-800">รายงานการจอง</h2>
           <p className="font-body text-sm text-mauve-400 mt-0.5">สรุปตามช่องทาง หัตถการ จำนวนเงิน</p>
         </div>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <StatCard label="จำนวนจอง" value={reports.totalCount} />
-          <StatCard label="รายได้รวม (฿)" value={reports.totalAmount.toLocaleString()} />
-          <StatCard label="อัตรายกเลิก" value={`${reports.cancellationRate.toFixed(1)}%`} subtext={`${reports.cancelledCount} รายการ`} />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          {reportLoading && !reportData ? (
+            <>
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="luxury-card p-4">
+                  <div className="h-4 w-24 rounded-2xl bg-cream-200 animate-pulse mb-2" />
+                  <div className="h-8 w-20 rounded-2xl bg-cream-100 animate-pulse" />
+                </div>
+              ))}
+            </>
+          ) : (
+            <>
+              <StatCard label="จำนวนจอง" value={reports.totalCount} />
+              <StatCard label="รายได้รวม (฿)" value={reports.totalAmount.toLocaleString()} />
+              <StatCard label="อัตรายกเลิก" value={`${reports.cancellationRate.toFixed(1)}%`} subtext={`${reports.cancelledCount} รายการ`} />
+            </>
+          )}
         </div>
         <div className="flex flex-wrap gap-3 items-center mb-8">
           <label className="flex items-center gap-2 font-body text-sm font-medium text-mauve-600">
@@ -1834,6 +1896,27 @@ function BookingPageContent() {
             Export CSV
           </Button>
         </div>
+          {reportLoading && !reportData ? (
+            <div className="space-y-4" aria-busy="true">
+              <div className="grid lg:grid-cols-2 gap-6">
+                {Array.from({ length: 2 }).map((_, i) => (
+                  <div key={i} className="luxury-card p-6">
+                    <div className="h-5 w-48 rounded-2xl bg-cream-200 animate-pulse mb-4" />
+                    <div className="h-64 rounded-2xl bg-cream-100 animate-pulse" />
+                  </div>
+                ))}
+              </div>
+              <div className="grid lg:grid-cols-2 gap-6">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="luxury-card p-6">
+                    <div className="h-5 w-40 rounded-2xl bg-cream-200 animate-pulse mb-4" />
+                    <div className="h-40 rounded-2xl bg-cream-100 animate-pulse" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+          <>
           <div className="grid lg:grid-cols-2 gap-6 mb-8">
           <div className="luxury-card p-6">
             <h3 className="font-display text-lg font-semibold text-mauve-800 mb-4">จำนวนการจองต่อวัน</h3>
@@ -1961,6 +2044,8 @@ function BookingPageContent() {
             </p>
           </div>
         </div>
+        </>
+          )}
       </section>
       )}
 
@@ -2012,7 +2097,6 @@ function EditBookingModal({
   item,
   branches,
   services,
-  doctors: _doctors,
   onClose,
   onSuccess,
 }: {
@@ -2283,7 +2367,14 @@ function CustomerAutocomplete({
                   }}
                 >
                   {c.pictureUrl ? (
-                    <img src={c.pictureUrl} alt="" className="w-9 h-9 rounded-full object-cover flex-shrink-0" />
+                    <Image
+                      src={c.pictureUrl}
+                      alt=""
+                      width={36}
+                      height={36}
+                      unoptimized
+                      className="w-9 h-9 rounded-full object-cover flex-shrink-0"
+                    />
                   ) : (
                     <div className="w-9 h-9 rounded-full bg-cream-200 flex items-center justify-center text-mauve-500 text-sm font-medium flex-shrink-0">
                       {(c.name || "?").charAt(0)}

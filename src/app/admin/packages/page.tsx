@@ -23,7 +23,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { Input, Textarea } from "@/components/ui/Input";
 import { Badge } from "@/components/ui/Badge";
-import type { PricingPackage, PricingPackageCreate } from "@/types/pricing";
+import type { PricingPackage } from "@/types/pricing";
 
 const FEATURE_KEYS = [
   "ai_chat",

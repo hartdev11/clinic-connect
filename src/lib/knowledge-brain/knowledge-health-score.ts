@@ -3,13 +3,6 @@
  */
 import { db } from "@/lib/firebase-admin";
 
-function toISO(t: unknown): string {
-  if (typeof t === "string") return t;
-  if (t instanceof Date) return t.toISOString();
-  const d = (t as { toDate?: () => Date })?.toDate?.();
-  return d ? d.toISOString() : "";
-}
-
 export interface ClinicKnowledgeHealthMetric {
   org_id: string;
   knowledge_health_score: number;

@@ -8,7 +8,6 @@ import { getOrgIdFromClinicId } from "@/lib/clinic-data";
 import { requireRole } from "@/lib/rbac";
 import { getEffectiveUser } from "@/lib/rbac";
 import {
-  getClinicKnowledgeById,
   getKnowledgeVersionByNumber,
   logKnowledgeAudit,
 } from "@/lib/knowledge-brain";

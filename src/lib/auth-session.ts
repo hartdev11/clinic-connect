@@ -12,9 +12,11 @@ import { verifyToken, COOKIE_NAME } from "@/lib/session";
 export interface SessionPayload {
   clinicId: string;
   email: string;
+  tenant_id?: string | null;
   org_id: string | null;
   branch_id: string | null;
   user_id: string | null;
+  role?: string | null;
 }
 
 function toSessionPayload(payload: Awaited<ReturnType<typeof verifyToken>>): SessionPayload | null {
@@ -22,9 +24,11 @@ function toSessionPayload(payload: Awaited<ReturnType<typeof verifyToken>>): Ses
   return {
     clinicId: payload.sub,
     email: payload.email,
+    tenant_id: payload.tenant_id ?? payload.org_id ?? null,
     org_id: payload.org_id ?? null,
     branch_id: payload.branch_id ?? null,
     user_id: payload.user_id ?? null,
+    role: payload.role ?? null,
   };
 }
 

@@ -76,8 +76,22 @@ export interface ChatOrchestratorOutput {
   model_used?: "template" | "gemini-flash";
   ai_confidence?: number;
   cache_hit?: boolean;
-  /** Phase 12: When confidence < 0.65 — trigger handoff, do not send uncertain reply. Phase 15: medical_question */
-  handoffTriggered?: { triggerType: "low_ai_confidence" | "medical"; confidence?: number };
+  /** Phase 12: When confidence < 0.65 — trigger handoff, do not send uncertain reply. */
+  handoffTriggered?: {
+    triggerType: "low_ai_confidence" | "medical" | "booking_intent" | "complaint";
+    confidence?: number;
+    reason?: string;
+  };
+}
+
+function detectHardHandoffReason(message: string): "booking_intent" | "complaint" | null {
+  const bookingRegex =
+    /จอง|booking|นัด|เลื่อนนัด|ยกเลิกนัด|ขอคิว|confirm\s*booking|appointment|book\s*now|มัดจำ|โอนเงิน|ชำระ|ยืนยันโปร|ยืนยันสิทธิ์/i;
+  const complaintRegex =
+    /ร้องเรียน|ไม่พอใจ|โกรธ|แย่มาก|บริการแย่|จะฟ้อง|refund|คืนเงิน|คอมเพลน|ผิดพลาดร้ายแรง/i;
+  if (complaintRegex.test(message)) return "complaint";
+  if (bookingRegex.test(message)) return "booking_intent";
+  return null;
 }
 
 /**
@@ -91,6 +105,18 @@ export async function chatOrchestrate(
 
   const correlationId = input.correlationId ?? `chat_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
   const trimmed = input.message?.trim();
+  const forwardChatToPhaseG = process.env.FORWARD_CHAT_TO_PHASE_G?.trim().toLowerCase() === "true";
+  if (forwardChatToPhaseG) {
+    // In the new architecture, chat generation is owned by Phase backends.
+    // Fail closed so Next.js never runs direct LLM logic.
+    return {
+      reply: "ขออภัยค่ะ ระบบกำลังประมวลผลผ่านบริการภายนอก กรุณาลองใหม่อีกครั้ง",
+      success: false,
+      totalMs: Date.now() - start,
+      error: "FORWARDED_CHAT_TO_PHASE_G",
+      correlationId,
+    };
+  }
   if (!trimmed || trimmed.length < 2) {
     return {
       reply: "พิมพ์เพิ่มนิดนึงได้ไหมคะ เดี๋ยวช่วยดูให้",
@@ -129,12 +155,37 @@ export async function chatOrchestrate(
   // Phase 15: Requires doctor — sensitive topic + question → escalate, don't answer
   const { requiresDoctor, REQUIRES_DOCTOR_MESSAGE } = await import("./safety-compliance");
   if (requiresDoctor(trimmed)) {
+    void recordPipelineMetrics(input.org_id, { handoffType: "medical" });
     return {
       reply: REQUIRES_DOCTOR_MESSAGE,
       success: true,
       totalMs: Date.now() - start,
       correlationId,
       handoffTriggered: { triggerType: "medical" },
+    };
+  }
+
+  // Enterprise hard rules: do not let model decide these cases.
+  const hardHandoffReason = detectHardHandoffReason(trimmed);
+  if (hardHandoffReason) {
+    const handoffMessage =
+      hardHandoffReason === "complaint"
+        ? "ขออภัยในความไม่สะดวกค่ะ กำลังส่งต่อให้เจ้าหน้าที่ดูแลเคสนี้โดยด่วนค่ะ"
+        : "รับคำขอแล้วค่ะ กำลังส่งต่อเจ้าหน้าที่เพื่อยืนยันและจัดการนัดหมายให้นะคะ";
+    void logAIActivity({
+      org_id: input.org_id,
+      correlation_id: correlationId,
+      model_version: "handoff-hard-rule",
+      total_latency_ms: Date.now() - start,
+      extra: { hard_handoff_rule: hardHandoffReason },
+    });
+    void recordPipelineMetrics(input.org_id, { handoffType: hardHandoffReason });
+    return {
+      reply: handoffMessage,
+      success: true,
+      totalMs: Date.now() - start,
+      correlationId,
+      handoffTriggered: { triggerType: hardHandoffReason, reason: "hard_rule" },
     };
   }
 
@@ -488,9 +539,15 @@ export async function chatOrchestrate(
 
     // Phase 12: Low confidence → handoff, do not send uncertain response
     let handoffTriggered: ChatOrchestratorOutput["handoffTriggered"] = undefined;
+    let handoffMetricType: "low_ai_confidence" | undefined;
     if (shouldHandoff && !blockDueToFinanceClassification && !policyViolation && !hallucination) {
       replyToCustomer = "กำลังส่งต่อให้เจ้าหน้าที่ค่ะ รอสักครู่จะมีคนติดต่อกลับนะคะ 😊";
-      handoffTriggered = { triggerType: "low_ai_confidence", confidence: aiConfidenceScore };
+      handoffTriggered = {
+        triggerType: "low_ai_confidence",
+        confidence: aiConfidenceScore,
+        reason: "confidence_below_threshold",
+      };
+      handoffMetricType = "low_ai_confidence";
       void logAIActivity({
         org_id: input.org_id,
         correlation_id: correlationId,
@@ -570,6 +627,7 @@ export async function chatOrchestrate(
       aiConfidence: aiConfidenceScore,
       tokensSavedByCache,
       costSavedThb,
+      handoffType: handoffMetricType,
     });
 
     return {

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionFromCookies } from "@/lib/auth-session";
 import { getOrgIdFromClinicId, getDoctorScheduleByDocId } from "@/lib/clinic-data";
-import { getEffectiveUser, requireRole } from "@/lib/rbac";
 
 export const dynamic = "force-dynamic";
 

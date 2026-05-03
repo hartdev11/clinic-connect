@@ -4,6 +4,7 @@ import { hashPassword } from "@/lib/auth";
 import { FieldValue } from "firebase-admin/firestore";
 import { getPurchaseRecordByLicenseKey } from "@/lib/purchase-record";
 import { PURCHASE_COLLECTION } from "@/types/purchase";
+import { checkDistributedRateLimit, getClientIp } from "@/lib/distributed-rate-limit";
 
 const COLLECTIONS = {
   organizations: "organizations",
@@ -18,19 +19,31 @@ function validateLicenseKey(key: string): boolean {
 
 export async function POST(request: NextRequest) {
   try {
+    const ip = getClientIp(request);
+    const byIp = await checkDistributedRateLimit(`auth:register:ip:${ip}`, 8, 60 * 15);
+    if (!byIp.allowed) {
+      return NextResponse.json(
+        { error: "สมัครสมาชิกบ่อยเกินไป กรุณารอสักครู่", retryAfterMs: byIp.retryAfterMs },
+        { status: 429 }
+      );
+    }
     const body = await request.json();
     const {
       licenseKey,
       clinicName,
-      branches,
       phone,
+      address,
+      businessType,
+      fullName,
       email,
       password,
     } = body as {
       licenseKey?: string;
       clinicName?: string;
-      branches?: string | number;
       phone?: string;
+      address?: string;
+      businessType?: "single" | "franchise" | string;
+      fullName?: string;
       email?: string;
       password?: string;
     };
@@ -67,6 +80,13 @@ export async function POST(request: NextRequest) {
     }
 
     const normalizedEmail = email.trim().toLowerCase();
+    const byEmail = await checkDistributedRateLimit(`auth:register:email:${normalizedEmail}`, 4, 60 * 60);
+    if (!byEmail.allowed) {
+      return NextResponse.json(
+        { error: "สมัครสมาชิกบ่อยเกินไป กรุณารอสักครู่", retryAfterMs: byEmail.retryAfterMs },
+        { status: 429 }
+      );
+    }
     const keyTrimmed = licenseKey.trim();
 
     const purchaseRecord = await getPurchaseRecordByLicenseKey(keyTrimmed);
@@ -146,6 +166,8 @@ export async function POST(request: NextRequest) {
         name: clinicName.trim(),
         plan: "starter",
         phone: phone?.trim() ?? "",
+        address: address?.trim() ?? "",
+        businessType: businessType === "franchise" ? "franchise" : "single",
         email: normalizedEmail,
         licenseKey: keyTrimmed,
         createdAt: now,
@@ -166,8 +188,10 @@ export async function POST(request: NextRequest) {
         org_id: orgRef.id,
         email: normalizedEmail,
         passwordHash,
+        name: fullName?.trim() || null,
         role: "owner",
         default_branch_id: branchRef.id,
+        is_active: true,
         createdAt: now,
         updatedAt: now,
       });

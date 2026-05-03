@@ -11,6 +11,7 @@ export const dynamic = "force-dynamic";
 
 export interface AnomalyItem {
   id: string;
+  policyId: string;
   orgId: string;
   orgName: string;
   metric: string;
@@ -65,6 +66,7 @@ export async function GET() {
       if (costYesterday > 0 && costToday > costYesterday * 3) {
         anomalies.push({
           id: `cost-spike-${orgId}`,
+          policyId: "ai_cost_spike_high",
           orgId,
           orgName,
           metric: "AI cost spike",
@@ -79,6 +81,7 @@ export async function GET() {
       if (avg7d > 0 && convsToday > avg7d * 3) {
         anomalies.push({
           id: `usage-spike-${orgId}`,
+          policyId: "usage_spike_medium",
           orgId,
           orgName,
           metric: "Usage spike",
@@ -93,6 +96,7 @@ export async function GET() {
       if (avg7d > 0 && convsToday < avg7d * 0.3) {
         anomalies.push({
           id: `conversation-drop-${orgId}`,
+          policyId: "conversation_drop_high",
           orgId,
           orgName,
           metric: "Conversation drop",

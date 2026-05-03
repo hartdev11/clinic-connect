@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useState, useCallback, useEffect } from "react";
 import useSWR from "swr";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
   LineChart,
@@ -24,6 +25,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { RequireRole } from "@/components/rbac/RequireRole";
 import { useClinicContext } from "@/contexts/ClinicContext";
 import { apiFetcher } from "@/lib/api-fetcher";
+import { useToast } from "@/components/ui/Toast";
 import type { DatePeriod } from "@/lib/financial-data/executive";
 
 type ExecutiveFinanceData = {
@@ -69,6 +71,41 @@ type InvoiceListItem = {
   created_at?: string | null;
 };
 
+type InvoiceListApiResponse = {
+  items?: unknown;
+  invoices?: unknown;
+};
+
+function normalizeInvoices(raw: unknown): InvoiceListItem[] {
+  const asRecord = raw && typeof raw === "object" ? (raw as InvoiceListApiResponse) : null;
+  const source = Array.isArray(asRecord?.items)
+    ? asRecord.items
+    : Array.isArray(asRecord?.invoices)
+      ? asRecord.invoices
+      : Array.isArray(raw)
+        ? raw
+        : [];
+  return source
+    .map((x) => (x && typeof x === "object" ? (x as Record<string, unknown>) : null))
+    .filter((x): x is Record<string, unknown> => !!x)
+    .map((x) => ({
+      id: typeof x.id === "string" ? x.id : "",
+      invoiceNumber: typeof x.invoiceNumber === "string" ? x.invoiceNumber : typeof x.invoice_number === "string" ? x.invoice_number : null,
+      status: typeof x.status === "string" ? x.status : "unknown",
+      grand_total_satang:
+        typeof x.grand_total_satang === "number"
+          ? x.grand_total_satang
+          : typeof x.grandTotalSatang === "number"
+            ? x.grandTotalSatang
+            : undefined,
+      customer_id:
+        typeof x.customer_id === "string" ? x.customer_id : typeof x.customerId === "string" ? x.customerId : null,
+      created_at:
+        typeof x.created_at === "string" ? x.created_at : typeof x.createdAt === "string" ? x.createdAt : null,
+    }))
+    .filter((x) => !!x.id);
+}
+
 function buildPeriodOptions(period: DatePeriod): { value: string; label: string }[] {
   const now = new Date();
   const options: { value: string; label: string }[] = [];
@@ -93,6 +130,8 @@ function buildPeriodOptions(period: DatePeriod): { value: string; label: string 
 }
 
 export default function FinancePage() {
+  const router = useRouter();
+  const { addToast } = useToast();
   const { branch_id } = useClinicContext();
   const [period, setPeriod] = useState<DatePeriod>("month");
   const now = new Date();
@@ -120,6 +159,12 @@ export default function FinancePage() {
     if (branch_id) params.set("branchId", branch_id);
     return `/api/clinic/finance/executive-brief?${params.toString()}`;
   }, [period, periodValue, branch_id]);
+  const invoicesUrl = useMemo(() => {
+    const params = new URLSearchParams();
+    params.set("limit", "100");
+    if (branch_id) params.set("branchId", branch_id);
+    return `/api/billing/invoice?${params.toString()}`;
+  }, [branch_id]);
 
   const { data, error, isLoading } = useSWR<ExecutiveFinanceData>(financeUrl, apiFetcher, {
     revalidateOnFocus: false,
@@ -129,16 +174,34 @@ export default function FinancePage() {
     revalidateOnFocus: false,
     dedupingInterval: 120_000,
   });
+  const {
+    data: invoicesData,
+    error: invoicesError,
+    isLoading: invoicesLoading,
+    mutate: mutateInvoices,
+  } = useSWR<unknown>(invoicesUrl, apiFetcher, {
+    revalidateOnFocus: true,
+    dedupingInterval: 45_000,
+    keepPreviousData: true,
+  });
+
+  useEffect(() => {
+    setInvoices(normalizeInvoices(invoicesData));
+  }, [invoicesData]);
 
   const handleExportPdf = useCallback(() => {
-    // Placeholder: wire to PDF export when implemented
-  }, []);
+    if (typeof window === "undefined") return;
+    addToast({ title: "กำลังเปิดโหมดพิมพ์ / Export PDF", variant: "success" });
+    window.print();
+  }, [addToast]);
   const handleCreateInvoice = useCallback(() => {
-    // Placeholder: navigate or open modal when create-invoice flow exists
-  }, []);
+    addToast({ title: "ไปหน้าลูกค้าเพื่อสร้างใบแจ้งหนี้", variant: "default" });
+    router.push("/clinic/customers");
+  }, [addToast, router]);
   const handleInvoiceRowClick = useCallback((invoice: InvoiceListItem) => {
-    // Keep: navigate to detail when implemented — e.g. router.push(`/clinic/finance/invoices/${invoice.id}`)
-  }, []);
+    if (!invoice?.id) return;
+    router.push(`/clinic/customers?invoiceId=${encodeURIComponent(invoice.id)}`);
+  }, [router]);
 
   const executiveBrief = briefData?.brief ?? null;
   const formatBaht = (v: number) => `฿${v.toLocaleString("th-TH", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
@@ -296,6 +359,25 @@ export default function FinancePage() {
                   ))}
                 </div>
               </div>
+              {invoicesError && (
+                <div className="px-6 py-4 border-b border-cream-200 bg-red-50/50">
+                  <p className="font-body text-sm text-red-700">โหลดรายการใบแจ้งหนี้ไม่สำเร็จ</p>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    className="mt-2"
+                    onClick={() => void mutateInvoices()}
+                  >
+                    ลองใหม่
+                  </Button>
+                </div>
+              )}
+              {invoicesLoading && (
+                <div className="px-6 py-4 border-b border-cream-200">
+                  <div className="h-16 animate-pulse rounded-xl bg-cream-100" />
+                </div>
+              )}
               <div className="divide-y divide-cream-200">
                 {invoices
                   .filter((inv) => {

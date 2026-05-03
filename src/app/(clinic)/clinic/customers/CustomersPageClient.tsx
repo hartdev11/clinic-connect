@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useMemo } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
 import useSWRInfinite from "swr/infinite";
@@ -195,9 +196,12 @@ function CustomerProfilePicture({ customer, size = "md" }: { customer: CustomerI
   }
   if (showImage) {
     return (
-      <img
+      <Image
         src={customer.pictureUrl!}
         alt=""
+        width={size === "sm" ? 32 : size === "lg" ? 44 : 40}
+        height={size === "sm" ? 32 : size === "lg" ? 44 : 40}
+        unoptimized
         className={`${className} ${size === "lg" ? "rounded-2xl" : "rounded-full"} object-cover flex-shrink-0 ring-1 ring-cream-300`}
         referrerPolicy="no-referrer"
         onError={() => setImgError(true)}
@@ -234,7 +238,7 @@ type FeedbackItem = {
   createdAt: string;
 };
 
-function FeedbackTabContent({ unlabeledCount, onMutate }: { unlabeledCount: number; onMutate: () => void }) {
+function FeedbackTabContent({ onMutate }: { onMutate: () => void }) {
   const [filterUnlabeled, setFilterUnlabeled] = useState(false);
   const [labelingId, setLabelingId] = useState<string | null>(null);
   const [labelError, setLabelError] = useState<string | null>(null);
@@ -296,7 +300,7 @@ function FeedbackTabContent({ unlabeledCount, onMutate }: { unlabeledCount: numb
                 onClick={() => handleLabel(item.id, "success")}
                 aria-label="ป้ายว่าดี"
                 className={cn(
-                  "flex items-center gap-1.5 px-4 py-1.5 rounded-full border text-sm font-medium transition-colors min-w-[4.5rem] justify-center disabled:opacity-60",
+                  "flex items-center gap-1.5 px-4 py-1.5 rounded-full border text-sm font-medium transition-colors justify-center disabled:opacity-60",
                   item.adminLabel === "success"
                     ? "bg-emerald-500 text-white border-emerald-500"
                     : "border-emerald-300 text-emerald-600 hover:bg-emerald-50",
@@ -312,7 +316,7 @@ function FeedbackTabContent({ unlabeledCount, onMutate }: { unlabeledCount: numb
                 onClick={() => handleLabel(item.id, "fail")}
                 aria-label="ป้ายว่าแย่"
                 className={cn(
-                  "flex items-center gap-1.5 px-4 py-1.5 rounded-full border text-sm font-medium transition-colors min-w-[4.5rem] justify-center disabled:opacity-60",
+                  "flex items-center gap-1.5 px-4 py-1.5 rounded-full border text-sm font-medium transition-colors justify-center disabled:opacity-60",
                   item.adminLabel === "fail"
                     ? "bg-red-500 text-white border-red-500"
                     : "border-red-300 text-red-500 hover:bg-red-50",
@@ -345,10 +349,9 @@ export function CustomersPageClient({
 }) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"customers" | "feedback">(tabParam === "feedback" ? "feedback" : "customers");
-  const { branch_id, currentOrg, currentUser } = useClinicContext();
+  const { currentOrg, currentUser } = useClinicContext();
   const [filterBranchId, setFilterBranchId] = useState<string>("all");
   const [selectedCustomer, setSelectedCustomer] = useState<CustomerItem | null>(null);
-  const [isTabVisible, setIsTabVisible] = useState(true);
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [filterChannel, setFilterChannel] = useState<"all" | CustomerSource>("all");
@@ -358,6 +361,8 @@ export function CustomersPageClient({
   const [manualReply, setManualReply] = useState("");
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState<string | null>(null);
+  const [aiSuggestion, setAiSuggestion] = useState<string | null>(null);
+  const [aiSuggestionLoading, setAiSuggestionLoading] = useState(false);
   const [isOnline, setIsOnline] = useState(typeof navigator !== "undefined" ? navigator.onLine : true);
   const [optimisticChat, setOptimisticChat] = useState<ChatItem | null>(null);
 
@@ -377,12 +382,6 @@ export function CustomersPageClient({
   }, [tabParam]);
 
   useEffect(() => {
-    const onVisibilityChange = () => setIsTabVisible(document.visibilityState === "visible");
-    document.addEventListener("visibilitychange", onVisibilityChange);
-    return () => document.removeEventListener("visibilitychange", onVisibilityChange);
-  }, []);
-
-  useEffect(() => {
     const onOnline = () => setIsOnline(true);
     const onOffline = () => setIsOnline(false);
     window.addEventListener("online", onOnline);
@@ -399,14 +398,23 @@ export function CustomersPageClient({
   }, []);
 
   useEffect(() => {
-    if (!selectedCustomer) return;
-    if (useRealtime) {
-      const updated = realtimeCustomers.find((c) => c.id === selectedCustomer.id);
-      if (updated && (updated.name !== selectedCustomer.name || updated.pictureUrl !== selectedCustomer.pictureUrl)) {
-        setSelectedCustomer(updated);
-      }
+    if (!selectedCustomer || !useRealtime) return;
+    const updated = realtimeCustomers.find((c) => c.id === selectedCustomer.id);
+    if (!updated) return;
+    if (
+      updated.name !== selectedCustomer.name ||
+      updated.pictureUrl !== selectedCustomer.pictureUrl ||
+      updated.status !== selectedCustomer.status ||
+      updated.lastChatAt !== selectedCustomer.lastChatAt ||
+      updated.leadScore !== selectedCustomer.leadScore
+    ) {
+      setSelectedCustomer(updated);
     }
-  }, [useRealtime, realtimeCustomers, selectedCustomer?.id]);
+  }, [useRealtime, realtimeCustomers, selectedCustomer]);
+
+  useEffect(() => {
+    setAiSuggestion(null);
+  }, [selectedCustomer?.id]);
 
   useEffect(() => {
     if (!useRealtime || !firebase.orgId) return;
@@ -456,12 +464,28 @@ export function CustomersPageClient({
   useEffect(() => {
     if (!selectedCustomer || selectedCustomer.source !== "line" || !selectedCustomer.externalId) return;
     if (selectedCustomer.name !== "ลูกค้า LINE" && selectedCustomer.pictureUrl) return;
-    if (useRealtime) { fetch(`/api/clinic/customers/${encodeURIComponent(selectedCustomer.id)}/refresh-profile`, { method: "POST", credentials: "include" }).catch(() => {}); return; }
-    fetch(`/api/clinic/customers/${encodeURIComponent(selectedCustomer.id)}/refresh-profile`, { method: "POST", credentials: "include" })
-      .then((r) => r.ok && r.json())
-      .then((data) => { if (data?.ok) { mutateCustomers(); setSelectedCustomer((prev) => prev ? { ...prev, name: data.name ?? prev.name, pictureUrl: data.pictureUrl ?? prev.pictureUrl } : null); } })
+    if (useRealtime) {
+      fetch(`/api/clinic/customers/${encodeURIComponent(selectedCustomer.id)}/refresh-profile`, {
+        method: "POST",
+        credentials: "include",
+      }).catch(() => {});
+      return;
+    }
+    fetch(`/api/clinic/customers/${encodeURIComponent(selectedCustomer.id)}/refresh-profile`, {
+      method: "POST",
+      credentials: "include",
+    })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data?.ok) {
+          mutateCustomers();
+          setSelectedCustomer((prev) =>
+            prev ? { ...prev, name: data.name ?? prev.name, pictureUrl: data.pictureUrl ?? prev.pictureUrl } : null
+          );
+        }
+      })
       .catch(() => {});
-  }, [useRealtime, selectedCustomer?.id, selectedCustomer?.name, selectedCustomer?.pictureUrl, mutateCustomers]);
+  }, [useRealtime, selectedCustomer, mutateCustomers]);
 
   const apiItems = swrPages?.flatMap((p) => p.items) ?? [];
   const lastPage = swrPages?.[swrPages.length - 1];
@@ -476,6 +500,15 @@ export function CustomersPageClient({
       if (found) setSelectedCustomer(found);
     }
   }, [selectCustomerId, rawItems]);
+
+  useEffect(() => {
+    if (!selectedCustomer) return;
+    const stillExists = rawItems.some((c) => c.id === selectedCustomer.id);
+    if (!stillExists) {
+      setSelectedCustomer(null);
+      setRealtimeChats([]);
+    }
+  }, [rawItems, selectedCustomer]);
 
   let filteredItems = rawItems.filter((c) => {
     if (c.deleted_at) return false;
@@ -568,30 +601,50 @@ export function CustomersPageClient({
     const text = manualReply.trim();
     setSendError(null);
     setSending(true);
+    setAiSuggestion(null);
+    setAiSuggestionLoading(!!currentOrg?.id);
     const tempId = `opt_${Date.now()}`;
     setOptimisticChat({ id: tempId, userMessage: "", botReply: text, source: "admin", createdAt: new Date().toISOString() });
     setManualReply("");
     try {
-      const res = await fetch(`/api/clinic/customers/${selectedCustomer.id}/send-message`, { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify({ text }) });
-      const json = await res.json().catch(() => ({}));
-      if (!res.ok) { setOptimisticChat(null); setManualReply(text); setSendError(json.error ?? "ส่งไม่สำเร็จ"); return; }
+      const sendMessagePromise = fetch(`/api/clinic/customers/${selectedCustomer.id}/send-message`, { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify({ text }) });
+      const aiSuggestPromise = currentOrg?.id
+        ? fetch("/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ message: text, org_id: currentOrg.id }),
+          })
+        : Promise.resolve<Response | null>(null);
+
+      const [sendRes, aiRes] = await Promise.all([sendMessagePromise, aiSuggestPromise]);
+      const json = await sendRes.json().catch(() => ({}));
+      if (!sendRes.ok) { setOptimisticChat(null); setManualReply(text); setSendError(json.error ?? "ส่งไม่สำเร็จ"); return; }
       setOptimisticChat(null);
       mutateChats?.();
       chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      if (aiRes) {
+        const aiJson = await aiRes.json().catch(() => ({}));
+        if (aiRes.ok && typeof aiJson?.reply === "string" && aiJson.reply.trim()) {
+          setAiSuggestion(aiJson.reply.trim());
+        } else {
+          setAiSuggestion(null);
+        }
+      }
     } catch { setOptimisticChat(null); setManualReply(text); setSendError("เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง"); setSending(false); return; }
-    finally { setSending(false); }
+    finally { setAiSuggestionLoading(false); setSending(false); }
   };
 
   return (
     <div className="space-y-8">
       {!isOnline && <div role="alert" className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800">คุณกำลังออฟไลน์ — ข้อมูลจะอัปเดตเมื่อกลับมาออนไลน์</div>}
       <PageHeader title="ลูกค้า & แชท" subtitle="จัดการข้อมูลลูกค้าและประวัติการสนทนาทั้งหมด" />
-      <div role="tablist" aria-label="แท็บ Customers และ Feedback" className="flex items-center gap-1 p-1 bg-cream-200 rounded-2xl w-fit">
-        <button type="button" role="tab" aria-selected={activeTab === "customers"} tabIndex={activeTab === "customers" ? 0 : -1} onClick={() => { setActiveTab("customers"); router.replace("/clinic/customers", { scroll: false }); }} className={cn("px-4 py-2 rounded-xl text-sm font-body font-medium transition-all duration-200", activeTab === "customers" ? "bg-white text-mauve-700 shadow-luxury" : "text-mauve-400 hover:text-mauve-600")}>รายชื่อลูกค้า & แชท</button>
-        <button type="button" role="tab" aria-selected={activeTab === "feedback"} tabIndex={activeTab === "feedback" ? 0 : -1} onClick={() => { setActiveTab("feedback"); router.replace("/clinic/customers?tab=feedback", { scroll: false }); }} className={cn("px-4 py-2 rounded-xl text-sm font-body font-medium transition-all duration-200 flex items-center gap-2", activeTab === "feedback" ? "bg-white text-mauve-700 shadow-luxury" : "text-mauve-400 hover:text-mauve-600")}>Golden Dataset {unlabeledCount > 0 && <Badge variant="warning" className="text-[10px] px-1.5">รอป้าย {unlabeledCount}</Badge>}</button>
+      <div role="tablist" aria-label="แท็บ Customers และ Feedback" className="flex flex-wrap items-center gap-1 p-1 bg-cream-200 rounded-2xl w-full">
+        <button type="button" role="tab" aria-selected={activeTab === "customers"} tabIndex={activeTab === "customers" ? 0 : -1} onClick={() => { setActiveTab("customers"); router.replace("/clinic/customers", { scroll: false }); }} className={cn("flex-1 sm:flex-none px-4 py-2 rounded-xl text-sm font-body font-medium transition-all duration-200", activeTab === "customers" ? "bg-white text-mauve-700 shadow-luxury" : "text-mauve-400 hover:text-mauve-600")}>รายชื่อลูกค้า & แชท</button>
+        <button type="button" role="tab" aria-selected={activeTab === "feedback"} tabIndex={activeTab === "feedback" ? 0 : -1} onClick={() => { setActiveTab("feedback"); router.replace("/clinic/customers?tab=feedback", { scroll: false }); }} className={cn("flex-1 sm:flex-none px-4 py-2 rounded-xl text-sm font-body font-medium transition-all duration-200 flex items-center justify-center gap-2", activeTab === "feedback" ? "bg-white text-mauve-700 shadow-luxury" : "text-mauve-400 hover:text-mauve-600")}>Golden Dataset {unlabeledCount > 0 && <Badge variant="warning" className="text-[10px] px-1.5">รอป้าย {unlabeledCount}</Badge>}</button>
       </div>
       {activeTab === "feedback" ? (
-        <section><SectionHeader title="Conversation Feedback" description="ประเมินคำตอบบอท ✓ ดี / ✗ แย่ — เก็บเป็น golden dataset" /><Card padding="lg"><FeedbackTabContent unlabeledCount={unlabeledCount} onMutate={() => mutateFeedbackStats()} /></Card></section>
+        <section><SectionHeader title="Conversation Feedback" description="ประเมินคำตอบบอท ✓ ดี / ✗ แย่ — เก็บเป็น golden dataset" /><Card padding="lg"><FeedbackTabContent onMutate={() => mutateFeedbackStats()} /></Card></section>
       ) : (
         <section>
           <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
@@ -607,9 +660,9 @@ export function CustomersPageClient({
               Backfill สำเร็จ: อัปเดต {backfillResult.success} รายการ{backfillResult.failed > 0 ? ` (ล้มเหลว ${backfillResult.failed})` : ""}
             </div>
           )}
-          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.4 }} className="flex flex-col sm:flex-row gap-3 mb-6">
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1, duration: 0.4 }} className="flex flex-col gap-3 mb-6">
             <div className="flex-1"><Input placeholder="ค้นหาชื่อ, เบอร์โทร, LINE..." icon={<span className="text-sm">⌕</span>} value={search} onChange={(e) => setSearch(e.target.value)} className="bg-white" aria-label="ค้นหาชื่อลูกค้า" /></div>
-            <div className="flex items-center gap-1 p-1 bg-cream-200 rounded-2xl flex-shrink-0">
+            <div className="flex flex-wrap items-center gap-1 p-1 bg-cream-200 rounded-2xl">
               {(["all", "hot", "warm", "cold"] as const).map((t) => (
                 <button
                   key={t}
@@ -626,7 +679,7 @@ export function CustomersPageClient({
                 </button>
               ))}
             </div>
-            <div className="flex items-center gap-1 p-1 bg-cream-200 rounded-2xl flex-shrink-0">
+            <div className="flex items-center gap-1 p-1 bg-cream-200 rounded-2xl w-full sm:w-auto">
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as "lastChatAt" | "leadScore")}
@@ -637,17 +690,21 @@ export function CustomersPageClient({
                 <option value="leadScore">Lead Score</option>
               </select>
             </div>
-            <div className="flex items-center gap-1 p-1 bg-cream-200 rounded-2xl flex-shrink-0 flex-wrap"><ChannelChips value={filterChannel} onChange={(v) => setFilterChannel(v)} counts={channelCounts} /></div>
+            <div className="flex items-center gap-1 p-1 bg-cream-200 rounded-2xl flex-wrap w-full sm:w-auto"><ChannelChips value={filterChannel} onChange={(v) => setFilterChannel(v)} counts={channelCounts} /></div>
             {currentOrg && (currentOrg.branches?.length ?? 0) > 1 && (
-              <div className="relative min-w-0 max-w-[180px] overflow-hidden">
+              <div className="relative min-w-0 w-full sm:w-auto sm:max-w-[180px] overflow-hidden">
                 <select value={filterBranchId} onChange={(e) => setFilterBranchId(e.target.value)} className="h-11 w-full min-w-0 pr-10 pl-4 rounded-2xl font-body text-sm text-mauve-600 bg-white border border-cream-300 focus:outline-none focus:ring-2 focus:ring-rg-300/50 focus:border-rg-400 transition-all appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2024%2024%22%20stroke%3D%22%236B7280%22%3E%3Cpath%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%222%22%20d%3D%22M19%209l-7%207-7-7%22%2F%3E%3C%2Fsvg%3E')] bg-[length:1.25rem] bg-[right_0.5rem_center] bg-no-repeat truncate" aria-label="กรองตามสาขา"><option value="all">ทุกสาขา</option>{currentOrg.branches?.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}</select>
               </div>
             )}
-            <div className="relative min-w-0 w-fit max-w-[140px] overflow-hidden">
+            <div className="relative min-w-0 w-full sm:w-auto sm:max-w-[140px] overflow-hidden">
               <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="h-11 w-full min-w-0 pr-10 pl-4 rounded-2xl font-body text-sm text-mauve-600 bg-white border border-cream-300 focus:outline-none focus:ring-2 focus:ring-rg-300/50 focus:border-rg-400 transition-all appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2024%2024%22%20stroke%3D%22%236B7280%22%3E%3Cpath%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%222%22%20d%3D%22M19%209l-7%207-7-7%22%2F%3E%3C%2Fsvg%3E')] bg-[length:1.25rem] bg-[right_0.5rem_center] bg-no-repeat truncate" aria-label="กรองตาม Status"><option value="all">ทุก Status</option><option value="active">active</option><option value="pending">pending</option><option value="inactive">inactive</option></select>
             </div>
           </motion.div>
-          {showError && <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 mb-6">{showError}</div>}
+          {showError && (
+            <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 mb-6">
+              {showError}
+            </div>
+          )}
           <div className="grid lg:grid-cols-3 gap-6">
             <div className="lg:col-span-1 space-y-4">
               {showLoading && <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-4">{[...Array(6)].map((_, i) => <div key={i} className="h-44 rounded-2xl bg-cream-200 animate-pulse" style={{ animationDelay: `${i * 80}ms` }} />)}</div>}
@@ -680,7 +737,7 @@ export function CustomersPageClient({
                                   <Badge variant={c.externalId ? "success" : "default"} dot size="sm">{c.source === "line" && c.externalId ? "LINE" : c.source === "line" ? "ไม่มี LINE" : getChannelLabel(c.source)}</Badge>
                                 </div>
                               </div>
-                              <div className="grid grid-cols-3 gap-2 pt-3 border-t border-cream-200">
+                              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-3 border-t border-cream-200">
                                 <div className="text-center"><p className="font-body text-sm font-semibold text-mauve-700">-</p><p className="font-body text-[10px] text-mauve-400 uppercase tracking-wide">จอง</p></div>
                                 <div className="text-center"><p className="font-body text-sm font-semibold text-mauve-700">{c.lastChatAt ? "1" : "0"}</p><p className="font-body text-[10px] text-mauve-400 uppercase tracking-wide">แชท</p></div>
                                 <div className="text-center"><p className="font-body text-sm font-semibold text-mauve-700">-</p><p className="font-body text-[10px] text-mauve-400 uppercase tracking-wide">ใช้จ่าย</p></div>
@@ -794,7 +851,7 @@ export function CustomersPageClient({
                     <Input
                       placeholder="พิมพ์ข้อความที่ต้องการส่งถึงลูกค้า..."
                       value={manualReply}
-                      onChange={(e) => { setManualReply(e.target.value); setSendError(null); }}
+                      onChange={(e) => { setManualReply(e.target.value); setSendError(null); if (aiSuggestion) setAiSuggestion(null); }}
                       onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSendManualReply(); } }}
                       disabled={sending}
                       className="flex-1"
@@ -802,6 +859,12 @@ export function CustomersPageClient({
                     />
                     <Button variant="primary" size="md" loading={sending} disabled={!manualReply.trim()} onClick={handleSendManualReply} aria-label="ส่งข้อความ">ส่ง</Button>
                   </div>
+                  {aiSuggestionLoading && (
+                    <p className="text-xs font-body text-mauve-400 mt-2">AI suggestion: กำลังประมวลผล...</p>
+                  )}
+                  {!aiSuggestionLoading && aiSuggestion && (
+                    <p className="text-xs font-body text-mauve-500 mt-2">AI suggestion: {aiSuggestion}</p>
+                  )}
                   <p className="text-xs font-body text-mauve-400 mt-2">ข้อความจะถูกส่งไปยัง LINE ของลูกค้าทันที</p>
                 </div>
               )}

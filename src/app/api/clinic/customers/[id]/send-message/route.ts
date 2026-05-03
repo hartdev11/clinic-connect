@@ -90,8 +90,6 @@ export async function POST(
     const channel = await getLineChannelByOrgId(orgId);
     if (channel?.channel_access_token) {
       accessToken = channel.channel_access_token;
-    } else if (process.env.LINE_ORG_ID === orgId && process.env.LINE_CHANNEL_ACCESS_TOKEN?.trim()) {
-      accessToken = process.env.LINE_CHANNEL_ACCESS_TOKEN.trim();
     }
     if (!accessToken) {
       return NextResponse.json(

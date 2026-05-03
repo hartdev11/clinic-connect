@@ -5,7 +5,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdminSession } from "@/lib/admin-guard";
 import { db } from "@/lib/firebase-admin";
-import { getRedisClient } from "@/lib/redis-client";
+import { getRedisClient, isRedisConfigured, REDIS_URL } from "@/lib/redis-client";
 
 export const dynamic = "force-dynamic";
 
@@ -33,10 +33,16 @@ async function checkFirestore(): Promise<ServiceStatus> {
 
 async function checkRedis(): Promise<ServiceStatus> {
   const now = new Date().toISOString();
+  if (!isRedisConfigured()) {
+    const hint = REDIS_URL
+      ? "REDIS_URL must be redis:// or rediss:// (not https REST). Unset to disable Redis."
+      : "REDIS_URL not set (optional)";
+    return { name: "Redis", ok: false, message: hint, lastChecked: now };
+  }
   try {
     const client = await getRedisClient();
     if (!client) {
-      return { name: "Redis", ok: false, message: "REDIS_URL not configured", lastChecked: now };
+      return { name: "Redis", ok: false, message: "Redis client unavailable", lastChecked: now };
     }
     await client.ping();
     return { name: "Redis", ok: true, lastChecked: now };

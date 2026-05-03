@@ -1,0 +1,594 @@
+{
+  "affiliate": {
+    "enabled": false,
+    "top_links": [
+      {
+        "bookings": 0,
+        "campaign_id": "",
+        "clicks": 0,
+        "commission": 0,
+        "link_id": "",
+        "revenue": 0
+      }
+    ],
+    "total_bookings": 0,
+    "total_clicks": 0,
+    "total_commission": 0,
+    "total_leads": 0,
+    "total_revenue": 0
+  },
+  "agent": {
+    "close_rate": 0,
+    "enabled": false,
+    "top_agents": [
+      {
+        "agent_id": "",
+        "agent_name": "",
+        "bookings": 0,
+        "close_rate": 0,
+        "commission": 0,
+        "leads": 0,
+        "revenue": 0
+      }
+    ],
+    "total_bookings": 0,
+    "total_commission": 0,
+    "total_leads": 0,
+    "total_revenue": 0
+  },
+  "alerts": [
+    {
+      "code": "LOW_CONVERSION",
+      "message": "Conversion rate ต่ำ (0.0501) ควรปรับ CTA",
+      "severity": "high"
+    },
+    {
+      "code": "LOW_AGENT_CLOSE_RATE",
+      "message": "Close rate ต่ำ (0.0574)",
+      "severity": "medium"
+    },
+    {
+      "code": "LOW_BRANCH_CONVERSION",
+      "message": "มี 4 สาขา conversion ต่ำ",
+      "severity": "medium"
+    }
+  ],
+  "bookings": {
+    "recent": [
+      {
+        "booking_id": "bk_8befe948",
+        "branch_id": "cnx_nimman",
+        "customer_id": "cust_70113df1",
+        "procedure_id": "proc_007",
+        "procedure_name": "Brightening Program",
+        "revenue": 15469.0,
+        "status": "completed",
+        "timestamp": "2026-03-07T13:33:41.604814Z"
+      },
+      {
+        "booking_id": "bk_e9eb1ae6",
+        "branch_id": "cnx_nimman",
+        "customer_id": "cust_cc1da4b5",
+        "procedure_id": "proc_004",
+        "procedure_name": "Ulthera",
+        "revenue": 9868.0,
+        "status": "pending",
+        "timestamp": "2026-03-08T15:31:41.604814Z"
+      },
+      {
+        "booking_id": "bk_b445f2a2",
+        "branch_id": "bkk_siam",
+        "customer_id": "cust_b32edcc2",
+        "procedure_id": "proc_002",
+        "procedure_name": "Filler ปาก",
+        "revenue": 9266.0,
+        "status": "completed",
+        "timestamp": "2026-03-14T11:09:41.604814Z"
+      },
+      {
+        "booking_id": "bk_ae1d18c9",
+        "branch_id": "bkk_siam",
+        "customer_id": "cust_8e5ce420",
+        "procedure_id": "proc_007",
+        "procedure_name": "Brightening Program",
+        "revenue": 11717.0,
+        "status": "completed",
+        "timestamp": "2026-03-19T11:09:41.604814Z"
+      },
+      {
+        "booking_id": "bk_f912d2fa",
+        "branch_id": "cnx_nimman",
+        "customer_id": "cust_bd64345e",
+        "procedure_id": "proc_001",
+        "procedure_name": "Botox ลดกราม",
+        "revenue": 17219.0,
+        "status": "completed",
+        "timestamp": "2026-03-11T13:45:41.604814Z"
+      },
+      {
+        "booking_id": "bk_10a8ea7b",
+        "branch_id": "cnx_nimman",
+        "customer_id": "cust_067142a3",
+        "procedure_id": "proc_001",
+        "procedure_name": "Botox ลดกราม",
+        "revenue": 5870.0,
+        "status": "completed",
+        "timestamp": "2026-03-12T13:10:41.604814Z"
+      },
+      {
+        "booking_id": "bk_dfac02af",
+        "branch_id": "bkk_ladprao",
+        "customer_id": "cust_a4d4b1fb",
+        "procedure_id": "proc_005",
+        "procedure_name": "Thermage",
+        "revenue": 4176.0,
+        "status": "completed",
+        "timestamp": "2026-03-09T13:05:41.604814Z"
+      },
+      {
+        "booking_id": "bk_65fb1fba",
+        "branch_id": "cnx_nimman",
+        "customer_id": "cust_1c96ace9",
+        "procedure_id": "proc_001",
+        "procedure_name": "Botox ลดกราม",
+        "revenue": 7421.0,
+        "status": "completed",
+        "timestamp": "2026-03-08T06:26:41.604814Z"
+      },
+      {
+        "booking_id": "bk_9dbbc539",
+        "branch_id": "cnx_nimman",
+        "customer_id": "cust_01b30bca",
+        "procedure_id": "proc_007",
+        "procedure_name": "Brightening Program",
+        "revenue": 13194.0,
+        "status": "completed",
+        "timestamp": "2026-03-12T12:52:41.604814Z"
+      },
+      {
+        "booking_id": "bk_65e9ab80",
+        "branch_id": "hkt_oldtown",
+        "customer_id": "cust_f010bba2",
+        "procedure_id": "proc_001",
+        "procedure_name": "Botox ลดกราม",
+        "revenue": 6844.0,
+        "status": "confirmed",
+        "timestamp": "2026-03-10T14:27:41.604814Z"
+      },
+      {
+        "booking_id": "bk_60c5d50a",
+        "branch_id": "cnx_nimman",
+        "customer_id": "cust_f010bba2",
+        "procedure_id": "proc_005",
+        "procedure_name": "Thermage",
+        "revenue": 10770.0,
+        "status": "confirmed",
+        "timestamp": "2026-03-07T14:19:41.604814Z"
+      },
+      {
+        "booking_id": "bk_9f6cd8d2",
+        "branch_id": "bkk_siam",
+        "customer_id": "cust_f010bba2",
+        "procedure_id": "proc_002",
+        "procedure_name": "Filler ปาก",
+        "revenue": 11593.0,
+        "status": "confirmed",
+        "timestamp": "2026-03-14T14:20:41.604814Z"
+      },
+      {
+        "booking_id": "bk_2d14c4ea",
+        "branch_id": "bkk_ladprao",
+        "customer_id": "cust_fa0900e5",
+        "procedure_id": "proc_005",
+        "procedure_name": "Thermage",
+        "revenue": 11265.0,
+        "status": "completed",
+        "timestamp": "2026-03-14T12:33:41.604814Z"
+      },
+      {
+        "booking_id": "bk_51c14f72",
+        "branch_id": "cnx_nimman",
+        "customer_id": "cust_546c9495",
+        "procedure_id": "proc_001",
+        "procedure_name": "Botox ลดกราม",
+        "revenue": 13430.0,
+        "status": "completed",
+        "timestamp": "2026-03-16T16:41:41.604814Z"
+      },
+      {
+        "booking_id": "bk_98407d69",
+        "branch_id": "cnx_nimman",
+        "customer_id": "cust_7999eeb6",
+        "procedure_id": "proc_004",
+        "procedure_name": "Ulthera",
+        "revenue": 14008.0,
+        "status": "completed",
+        "timestamp": "2026-03-07T04:27:41.604814Z"
+      },
+      {
+        "booking_id": "bk_69388ebe",
+        "branch_id": "bkk_ladprao",
+        "customer_id": "cust_ddbeb5e8",
+        "procedure_id": "proc_007",
+        "procedure_name": "Brightening Program",
+        "revenue": 15575.0,
+        "status": "confirmed",
+        "timestamp": "2026-03-17T11:27:41.604814Z"
+      },
+      {
+        "booking_id": "bk_c4b058b5",
+        "branch_id": "bkk_ladprao",
+        "customer_id": "cust_31e0efb4",
+        "procedure_id": "proc_001",
+        "procedure_name": "Botox ลดกราม",
+        "revenue": 4492.0,
+        "status": "confirmed",
+        "timestamp": "2026-03-20T10:26:41.604814Z"
+      },
+      {
+        "booking_id": "bk_6e335a9b",
+        "branch_id": "cnx_nimman",
+        "customer_id": "cust_a5680de2",
+        "procedure_id": "proc_004",
+        "procedure_name": "Ulthera",
+        "revenue": 16578.0,
+        "status": "cancelled",
+        "timestamp": "2026-03-15T14:18:41.604814Z"
+      },
+      {
+        "booking_id": "bk_6bcadafb",
+        "branch_id": "cnx_nimman",
+        "customer_id": "cust_7d5edb80",
+        "procedure_id": "proc_006",
+        "procedure_name": "Acne Program",
+        "revenue": 17501.0,
+        "status": "pending",
+        "timestamp": "2026-03-17T04:01:41.604814Z"
+      },
+      {
+        "booking_id": "bk_5fd8e471",
+        "branch_id": "bkk_siam",
+        "customer_id": "cust_50abeb94",
+        "procedure_id": "proc_005",
+        "procedure_name": "Thermage",
+        "revenue": 6704.0,
+        "status": "completed",
+        "timestamp": "2026-03-14T06:29:41.604814Z"
+      }
+    ],
+    "summary": {
+      "cancelled": 3,
+      "completed": 17,
+      "confirmed": 12,
+      "pending": 3
+    }
+  },
+  "branch_performance": {
+    "branches": [
+      {
+        "bookings": 6,
+        "branch_id": "bkk_siam",
+        "branch_name": "bkk_siam",
+        "conversion_rate": 0.0117,
+        "revenue": 71417.0,
+        "sessions": 515
+      },
+      {
+        "bookings": 10,
+        "branch_id": "bkk_ladprao",
+        "branch_name": "bkk_ladprao",
+        "conversion_rate": 0.027,
+        "revenue": 116678.0,
+        "sessions": 370
+      },
+      {
+        "bookings": 14,
+        "branch_id": "cnx_nimman",
+        "branch_name": "cnx_nimman",
+        "conversion_rate": 0.0444,
+        "revenue": 165383.0,
+        "sessions": 315
+      },
+      {
+        "bookings": 5,
+        "branch_id": "hkt_oldtown",
+        "branch_name": "hkt_oldtown",
+        "conversion_rate": 0.0167,
+        "revenue": 46740.0,
+        "sessions": 299
+      }
+    ],
+    "enabled": true
+  },
+  "customers": {
+    "cold_leads": 0,
+    "hot_leads": 0,
+    "new_customers": 0,
+    "returning_customers": 350,
+    "warm_leads": 0
+  },
+  "funnel": {
+    "booking": 35,
+    "click": 66,
+    "view": 699
+  },
+  "insights": [
+    {
+      "message": "ควรตรวจจุด drop ใน funnel",
+      "priority": "high",
+      "title": "Conversion ต่ำกว่ามาตรฐาน",
+      "type": "conversion"
+    },
+    {
+      "message": "CTR = 0.0944",
+      "priority": "low",
+      "title": "CTR อยู่ในเกณฑ์",
+      "type": "ctr"
+    },
+    {
+      "message": "ควร push Botox ลดกราม รายได้ 117100.0",
+      "priority": "high",
+      "title": "Procedure ที่ทำเงินดีที่สุด",
+      "type": "procedure"
+    },
+    {
+      "message": "facebook ทำรายได้ 94052.0",
+      "priority": "medium",
+      "title": "ช่องทางที่ทำรายได้ดีที่สุด",
+      "type": "channel"
+    },
+    {
+      "message": "สาขา hkt_oldtown รายได้ 46740.0",
+      "priority": "medium",
+      "title": "สาขา performance ต่ำสุด",
+      "type": "branch"
+    },
+    {
+      "message": "Revenue per session = 572.56",
+      "priority": "low",
+      "title": "มูลค่าเฉลี่ยต่อ session",
+      "type": "business"
+    },
+    {
+      "message": "Revenue per user = 1143.48",
+      "priority": "low",
+      "title": "มูลค่าเฉลี่ยต่อ user",
+      "type": "business"
+    },
+    {
+      "message": "clicks 41 bookings 24",
+      "priority": "medium",
+      "title": "Affiliate channel กำลังทำงาน",
+      "type": "affiliate"
+    },
+    {
+      "message": "Close rate = 0.0574",
+      "priority": "medium",
+      "title": "ภาพรวม sales agent",
+      "type": "agent"
+    },
+    {
+      "message": "รายได้รวม 400218.0 สาขา 4",
+      "priority": "low",
+      "title": "ภาพรวม owner",
+      "type": "owner"
+    }
+  ],
+  "meta": {
+    "affiliate_id": "",
+    "agent_id": "",
+    "branch_id": "",
+    "clinic_id": "",
+    "dashboard_version": "k_final_v1",
+    "generated_at": "2026-03-20T19:04:41.880367Z",
+    "role": "branch",
+    "tenant_id": ""
+  },
+  "overview": {
+    "conversion_rate": 0.0501,
+    "ctr": 0.0944,
+    "total_bookings": 35,
+    "total_leads": 699,
+    "total_revenue": 400218.0,
+    "total_sessions": 699,
+    "total_users": 350
+  },
+  "top_channels": [
+    {
+      "bookings": 8,
+      "channel": "line",
+      "conversion_rate": 0.0185,
+      "revenue": 91914.0,
+      "sessions": 432
+    },
+    {
+      "bookings": 7,
+      "channel": "instagram",
+      "conversion_rate": 0.0205,
+      "revenue": 83675.0,
+      "sessions": 341
+    },
+    {
+      "bookings": 7,
+      "channel": "web",
+      "conversion_rate": 0.0251,
+      "revenue": 69103.0,
+      "sessions": 279
+    },
+    {
+      "bookings": 7,
+      "channel": "facebook",
+      "conversion_rate": 0.0271,
+      "revenue": 94052.0,
+      "sessions": 258
+    },
+    {
+      "bookings": 6,
+      "channel": "tiktok",
+      "conversion_rate": 0.0317,
+      "revenue": 61474.0,
+      "sessions": 189
+    }
+  ],
+  "top_procedures": [
+    {
+      "bookings": 12,
+      "conversion_rate": 0.0612,
+      "procedure_id": "proc_001",
+      "procedure_name": "Botox ลดกราม",
+      "revenue": 117100.0,
+      "views": 196
+    },
+    {
+      "bookings": 5,
+      "conversion_rate": 0.0407,
+      "procedure_id": "proc_004",
+      "procedure_name": "Ulthera",
+      "revenue": 66742.0,
+      "views": 123
+    },
+    {
+      "bookings": 5,
+      "conversion_rate": 0.0581,
+      "procedure_id": "proc_007",
+      "procedure_name": "Brightening Program",
+      "revenue": 71529.0,
+      "views": 86
+    },
+    {
+      "bookings": 6,
+      "conversion_rate": 0.0723,
+      "procedure_id": "proc_005",
+      "procedure_name": "Thermage",
+      "revenue": 49523.0,
+      "views": 83
+    },
+    {
+      "bookings": 4,
+      "conversion_rate": 0.0526,
+      "procedure_id": "proc_002",
+      "procedure_name": "Filler ปาก",
+      "revenue": 50019.0,
+      "views": 76
+    },
+    {
+      "bookings": 0,
+      "conversion_rate": 0.0,
+      "procedure_id": "proc_003",
+      "procedure_name": "Filler คาง",
+      "revenue": 0.0,
+      "views": 72
+    },
+    {
+      "bookings": 3,
+      "conversion_rate": 0.0476,
+      "procedure_id": "proc_006",
+      "procedure_name": "Acne Program",
+      "revenue": 45305.0,
+      "views": 63
+    }
+  ],
+  "trend": {
+    "comparison": {
+      "conversion_growth_rate": 1.0718,
+      "previous_period_conversion": 0.0242,
+      "previous_period_revenue": 395726.0,
+      "revenue_growth_rate": 0.0114
+    },
+    "daily": [
+      {
+        "bookings": 5,
+        "date": "2026-03-07",
+        "revenue": 52064.0,
+        "sessions": 105
+      },
+      {
+        "bookings": 3,
+        "date": "2026-03-08",
+        "revenue": 33386.0,
+        "sessions": 123
+      },
+      {
+        "bookings": 1,
+        "date": "2026-03-09",
+        "revenue": 4176.0,
+        "sessions": 98
+      },
+      {
+        "bookings": 2,
+        "date": "2026-03-10",
+        "revenue": 19964.0,
+        "sessions": 100
+      },
+      {
+        "bookings": 3,
+        "date": "2026-03-11",
+        "revenue": 39792.0,
+        "sessions": 119
+      },
+      {
+        "bookings": 5,
+        "date": "2026-03-12",
+        "revenue": 54590.0,
+        "sessions": 112
+      },
+      {
+        "bookings": 0,
+        "date": "2026-03-13",
+        "revenue": 0,
+        "sessions": 83
+      },
+      {
+        "bookings": 4,
+        "date": "2026-03-14",
+        "revenue": 38828.0,
+        "sessions": 120
+      },
+      {
+        "bookings": 2,
+        "date": "2026-03-15",
+        "revenue": 26769.0,
+        "sessions": 123
+      },
+      {
+        "bookings": 4,
+        "date": "2026-03-16",
+        "revenue": 59752.0,
+        "sessions": 122
+      },
+      {
+        "bookings": 3,
+        "date": "2026-03-17",
+        "revenue": 49116.0,
+        "sessions": 96
+      },
+      {
+        "bookings": 0,
+        "date": "2026-03-18",
+        "revenue": 0,
+        "sessions": 95
+      },
+      {
+        "bookings": 2,
+        "date": "2026-03-19",
+        "revenue": 17289.0,
+        "sessions": 110
+      },
+      {
+        "bookings": 1,
+        "date": "2026-03-20",
+        "revenue": 4492.0,
+        "sessions": 93
+      }
+    ]
+  },
+  "white_label": {
+    "brand_name": "",
+    "custom_domain": "",
+    "enabled": false,
+    "logo_url": "",
+    "partner_id": "",
+    "primary_color": "",
+    "secondary_color": ""
+  }
+}

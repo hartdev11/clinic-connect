@@ -39,3 +39,15 @@ next-env.d.ts
 
 # IDE / editor
 .cursor
+
+# Python
+__pycache__/
+*.py[cod]
+
+# local secrets / test artifacts (never commit)
+auth_cookie*.txt
+.cookie-jar.txt
+.login-test-body.json
+
+# Generated gold dataset exports (often > GitHub 100MB limit)
+gold_output_v*.json

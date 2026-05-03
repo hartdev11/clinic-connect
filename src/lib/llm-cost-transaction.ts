@@ -68,8 +68,9 @@ export async function reconcileLLMUsage(
   orgId: string,
   reservedSatang: number,
   actualUsage: LLMUsage,
-  _correlationId?: string
+  correlationId?: string
 ): Promise<void> {
+  void correlationId;
   const { FieldValue } = await import("firebase-admin/firestore");
   const key = `${orgId}_${getTodayKeyBangkok()}`;
   const docRef = db.collection(COLLECTION).doc(key);

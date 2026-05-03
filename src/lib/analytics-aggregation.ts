@@ -8,13 +8,6 @@ import { getDateKeyBangkokDaysAgo } from "@/lib/timezone";
 import { getRevenueFromPaidInvoices } from "@/lib/financial-data";
 import { getAIUsageDaily } from "@/lib/ai-usage-daily";
 
-function toISO(t: unknown): string {
-  if (typeof t === "string") return t;
-  if (t instanceof Date) return t.toISOString();
-  const d = (t as { toDate?: () => Date })?.toDate?.();
-  return d ? d.toISOString() : "";
-}
-
 /** Aggregate metrics for one org for yesterday */
 export async function aggregateOrgMetricsForDate(
   orgId: string,

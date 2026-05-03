@@ -1,5 +1,11 @@
 import type { ConversationState } from "../agents/conversation-state";
 import type { IntentType } from "../agents/types";
+import {
+  isAskingForOtherPromotionsCount,
+  isExplicitPromotionListingAsk,
+  isPromotionDetailScopeAsk,
+  isPromotionOpinionOrSuitabilityAsk,
+} from "../agents/promotion-listing-intent";
 
 /**
  * Intent Deduplication Guard
@@ -22,8 +28,18 @@ import type { IntentType } from "../agents/types";
 export function intentDedupGuard(
   prevState: ConversationState,
   intent: IntentType,
-  nextState: ConversationState
+  nextState: ConversationState,
+  opts?: { userMessage?: string }
 ): boolean {
+  if (
+    opts?.userMessage &&
+    (isExplicitPromotionListingAsk(opts.userMessage) ||
+      isAskingForOtherPromotionsCount(opts.userMessage) ||
+      isPromotionDetailScopeAsk(opts.userMessage) ||
+      isPromotionOpinionOrSuitabilityAsk(opts.userMessage))
+  ) {
+    return false;
+  }
   // ถ้าไม่มี state ก่อนหน้า → ไม่ซ้ำ (ถามได้)
   if (!prevState.service && !prevState.area) {
     return false;

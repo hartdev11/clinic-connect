@@ -5,17 +5,24 @@ import { motion } from "framer-motion";
 import {
   LineChart,
   Line,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
   ReferenceLine,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  Legend,
 } from "recharts";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Dialog } from "@/components/ui/Dialog";
+import { KnowledgeErrorState } from "@/components/clinic/KnowledgeErrorState";
 
 const CHART = {
   primary: "var(--color-rg-400)",
@@ -61,7 +68,7 @@ interface KnowledgeHealthData {
   > | null;
 }
 
-type TabId = "health" | "learning";
+type TabId = "health" | "learning" | "analytics";
 type LearningSubTab = "approved" | "pending" | "rejected";
 
 interface LearningStats {
@@ -88,6 +95,20 @@ interface LearningMetrics {
   rejectedCount: number;
 }
 
+interface KnowledgeAnalyticsPayload {
+  byCategory: { service: number; price: number; faq: number };
+  indexingSuccessRate7dPct: number;
+  avgIndexingTimeMs: number;
+  top5RecentTopics: Array<{
+    id: string;
+    topic: string;
+    category: string;
+    lastUpdated: string;
+  }>;
+  failedCount7d: number;
+  failedTrend: Array<{ date: string; count: number }>;
+}
+
 interface LearningQueueItem {
   id: string;
   question: string;
@@ -103,6 +124,7 @@ interface LearningQueueItem {
 export default function KnowledgeHealthPage() {
   const [data, setData] = useState<KnowledgeHealthData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [pageError, setPageError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<TabId>("health");
   const [learningData, setLearningData] = useState<LearningStats | null>(null);
   const [learningMetrics, setLearningMetrics] = useState<LearningMetrics | null>(null);
@@ -124,6 +146,10 @@ export default function KnowledgeHealthPage() {
     targetRate: number;
     improvement: number | null;
   } | null>(null);
+
+  const [analytics, setAnalytics] = useState<KnowledgeAnalyticsPayload | null>(null);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
+  const [analyticsError, setAnalyticsError] = useState<string | null>(null);
 
   const fetchLearning = useCallback(async () => {
     setLearningLoading(true);
@@ -182,9 +208,28 @@ export default function KnowledgeHealthPage() {
     }
   }, []);
 
+  const fetchAnalytics = useCallback(async () => {
+    setAnalyticsLoading(true);
+    setAnalyticsError(null);
+    try {
+      const res = await fetch("/api/clinic/knowledge-health/analytics", { credentials: "include" });
+      const body = await res.json().catch(() => ({}));
+      if (res.ok) setAnalytics(body as KnowledgeAnalyticsPayload);
+      else setAnalyticsError(typeof body.error === "string" ? body.error : "โหลด Analytics ไม่สำเร็จ");
+    } catch {
+      setAnalyticsError("โหลด Analytics ไม่สำเร็จ");
+    } finally {
+      setAnalyticsLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     if (activeTab === "learning") fetchLearning();
   }, [activeTab, fetchLearning]);
+
+  useEffect(() => {
+    if (activeTab === "analytics") void fetchAnalytics();
+  }, [activeTab, fetchAnalytics]);
 
   useEffect(() => {
     if (activeTab === "learning") fetchHandoffRate();
@@ -277,10 +322,15 @@ export default function KnowledgeHealthPage() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch("/api/admin/knowledge-health");
+        setPageError(null);
+        const res = await fetch("/api/clinic/knowledge-health", { credentials: "include" });
         if (res.ok) setData(await res.json());
+        else {
+          const data = await res.json().catch(() => ({}));
+          setPageError(data.error ?? "โหลดข้อมูล Knowledge Health ไม่สำเร็จ");
+        }
       } catch {
-        // ignore
+        setPageError("โหลดข้อมูล Knowledge Health ไม่สำเร็จ");
       } finally {
         setLoading(false);
       }
@@ -311,6 +361,30 @@ export default function KnowledgeHealthPage() {
         shimmer
       />
 
+      {pageError && (
+        <KnowledgeErrorState
+          message={pageError}
+          onRetry={() => {
+            setLoading(true);
+            setPageError(null);
+            void (async () => {
+              try {
+                const res = await fetch("/api/clinic/knowledge-health", { credentials: "include" });
+                if (res.ok) setData(await res.json());
+                else {
+                  const data = await res.json().catch(() => ({}));
+                  setPageError(data.error ?? "โหลดข้อมูล Knowledge Health ไม่สำเร็จ");
+                }
+              } catch {
+                setPageError("โหลดข้อมูล Knowledge Health ไม่สำเร็จ");
+              } finally {
+                setLoading(false);
+              }
+            })();
+          }}
+        />
+      )}
+
       <div className="flex gap-2 border-b border-cream-300 pb-2">
         <button
           type="button"
@@ -330,7 +404,154 @@ export default function KnowledgeHealthPage() {
         >
           การเรียนรู้ AI
         </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab("analytics")}
+          className={`px-4 py-2 rounded-xl text-sm font-body ${
+            activeTab === "analytics" ? "bg-rg-100 text-rg-700" : "text-mauve-600 hover:bg-cream-200"
+          }`}
+        >
+          Analytics
+        </button>
       </div>
+
+      {activeTab === "analytics" && (
+        <section className="space-y-6">
+          <h2 className="font-display text-lg font-semibold text-mauve-800">Knowledge quality analytics</h2>
+          {analyticsLoading && (
+            <div className="grid gap-4 md:grid-cols-2">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="h-40 rounded-2xl bg-cream-200 animate-pulse" />
+              ))}
+            </div>
+          )}
+          {analyticsError && !analyticsLoading && (
+            <KnowledgeErrorState message={analyticsError} onRetry={() => void fetchAnalytics()} />
+          )}
+          {!analyticsLoading && !analyticsError && analytics && (
+            <>
+              <div className="grid gap-4 md:grid-cols-3">
+                <div className="luxury-card p-4">
+                  <p className="font-body text-xs text-mauve-500">Indexing success rate (7 วัน)</p>
+                  <p className="font-display text-2xl font-semibold text-mauve-800">
+                    {analytics.indexingSuccessRate7dPct}%
+                  </p>
+                </div>
+                <div className="luxury-card p-4">
+                  <p className="font-body text-xs text-mauve-500">เวลาเฉลี่ยในการจัดทำดัชนี</p>
+                  <p className="font-display text-2xl font-semibold text-mauve-800">
+                    {analytics.avgIndexingTimeMs > 0
+                      ? `${(analytics.avgIndexingTimeMs / 1000).toFixed(1)} วินาที`
+                      : "—"}
+                  </p>
+                </div>
+                <div className="luxury-card p-4">
+                  <p className="font-body text-xs text-mauve-500">หัวข้อที่ล้มเหลว (7 วัน)</p>
+                  <p className="font-display text-2xl font-semibold text-red-600">{analytics.failedCount7d}</p>
+                </div>
+              </div>
+
+              <div className="grid gap-6 lg:grid-cols-2">
+                <div className="luxury-card p-6">
+                  <h3 className="font-body text-sm font-semibold text-mauve-700 mb-4">จำนวนตามหมวดหมู่</h3>
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={[
+                          { name: "บริการ", n: analytics.byCategory.service },
+                          { name: "ราคา", n: analytics.byCategory.price },
+                          { name: "FAQ", n: analytics.byCategory.faq },
+                        ]}
+                        margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" stroke={CHART.grid} />
+                        <XAxis dataKey="name" tick={{ fill: CHART.axis, fontSize: 11 }} />
+                        <YAxis tick={{ fill: CHART.axis, fontSize: 11 }} allowDecimals={false} />
+                        <Tooltip />
+                        <Bar dataKey="n" fill={CHART.primary} radius={[6, 6, 0, 0]} name="รายการ" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+                <div className="luxury-card p-6">
+                  <h3 className="font-body text-sm font-semibold text-mauve-700 mb-4">สัดส่วนตามหมวด (pie)</h3>
+                  <div className="h-64">
+                    {(() => {
+                      const pieData = [
+                        { name: "บริการ", value: analytics.byCategory.service },
+                        { name: "ราคา", value: analytics.byCategory.price },
+                        { name: "FAQ", value: analytics.byCategory.faq },
+                      ].filter((x) => x.value > 0);
+                      const colors = ["var(--color-rg-400)", "var(--cream-500)", "var(--color-mauve-400)"];
+                      if (pieData.length === 0) {
+                        return (
+                          <p className="flex h-full items-center justify-center font-body text-sm text-mauve-500">
+                            ยังไม่มีข้อมูลตามหมวด
+                          </p>
+                        );
+                      }
+                      return (
+                        <ResponsiveContainer width="100%" height="100%">
+                          <PieChart>
+                            <Pie
+                              data={pieData}
+                              dataKey="value"
+                              nameKey="name"
+                              cx="50%"
+                              cy="50%"
+                              outerRadius={80}
+                              label={({ name, value }) => `${name}: ${value}`}
+                            >
+                              {pieData.map((_, i) => (
+                                <Cell key={i} fill={colors[i % colors.length]!} />
+                              ))}
+                            </Pie>
+                            <Tooltip />
+                            <Legend />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      );
+                    })()}
+                  </div>
+                </div>
+              </div>
+
+              <div className="luxury-card p-6">
+                <h3 className="font-body text-sm font-semibold text-mauve-700 mb-4">แนวโน้มหัวข้อล้มเหลว (7 วัน)</h3>
+                <div className="h-56">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={analytics.failedTrend} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke={CHART.grid} />
+                      <XAxis dataKey="date" tick={{ fill: CHART.axis, fontSize: 10 }} />
+                      <YAxis tick={{ fill: CHART.axis, fontSize: 11 }} allowDecimals={false} />
+                      <Tooltip />
+                      <Line type="monotone" dataKey="count" stroke={CHART.primary} strokeWidth={2} dot name="ล้มเหลว" />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              <div className="luxury-card p-6">
+                <h3 className="font-body text-sm font-semibold text-mauve-700 mb-4">อัปเดตล่าสุด 5 อันดับ</h3>
+                {analytics.top5RecentTopics.length === 0 ? (
+                  <p className="font-body text-sm text-mauve-500">ยังไม่มีข้อมูล</p>
+                ) : (
+                  <ul className="divide-y divide-cream-200">
+                    {analytics.top5RecentTopics.map((t) => (
+                      <li key={t.id} className="flex flex-wrap items-center justify-between gap-2 py-3">
+                        <span className="font-body text-sm text-mauve-800">{t.topic}</span>
+                        <span className="font-body text-xs text-mauve-400">
+                          {t.category} · {new Date(t.lastUpdated).toLocaleString("th-TH")}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </>
+          )}
+        </section>
+      )}
 
       {activeTab === "learning" && (
         <LearningDashboard
@@ -492,59 +713,6 @@ export default function KnowledgeHealthPage() {
       )}
 
       {activeTab === "health" && (
-      <>
-      <section>
-        <h2 className="font-display text-lg font-semibold text-mauve-800 mb-4">Top Low-Quality Clinics</h2>
-        {data?.top_low_quality_clinics?.length ? (
-          <div className="luxury-card overflow-hidden">
-            <table className="min-w-full divide-y divide-cream-200">
-              <thead className="bg-cream-100">
-                <tr>
-                  <th className="px-4 py-2 text-left font-body text-sm font-medium text-mauve-700">Org ID</th>
-                  <th className="px-4 py-2 text-right font-body text-sm font-medium text-mauve-700">Count</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.top_low_quality_clinics.map((r) => (
-                  <tr key={r.org_id} className="border-t border-cream-200">
-                    <td className="px-4 py-2 font-mono text-sm text-mauve-800">{r.org_id}</td>
-                    <td className="px-4 py-2 font-body text-sm text-right text-red-600">{r.count}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <p className="font-body text-sm text-mauve-400">ไม่มีข้อมูล</p>
-        )}
-      </section>
-
-      <section>
-        <h2 className="font-display text-lg font-semibold text-mauve-800 mb-4">Most Duplicated Services</h2>
-        {data?.most_duplicated_services?.length ? (
-          <div className="luxury-card overflow-hidden">
-            <table className="min-w-full divide-y divide-cream-200">
-              <thead className="bg-cream-100">
-                <tr>
-                  <th className="px-4 py-2 text-left font-body text-sm font-medium text-mauve-700">Org ID</th>
-                  <th className="px-4 py-2 text-right font-body text-sm font-medium text-mauve-700">Count</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.most_duplicated_services.map((r) => (
-                  <tr key={r.org_id} className="border-t border-cream-200">
-                    <td className="px-4 py-2 font-mono text-sm text-mauve-800">{r.org_id}</td>
-                    <td className="px-4 py-2 font-body text-sm text-right text-amber-600">{r.count}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <p className="font-body text-sm text-mauve-400">ไม่มีข้อมูล</p>
-        )}
-      </section>
-
       <section>
         <h2 className="font-display text-lg font-semibold text-mauve-800 mb-4">Expiring Knowledge Alerts</h2>
         {data?.expiring_knowledge_alerts?.length ? (
@@ -574,7 +742,6 @@ export default function KnowledgeHealthPage() {
           <p className="font-body text-sm text-mauve-400">ไม่มีข้อมูลหมดอายุ</p>
         )}
       </section>
-      </>
       )}
 
       {activeTab === "health" && data?.by_org && typeof data.by_org === "object" && (

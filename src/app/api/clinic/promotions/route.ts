@@ -45,6 +45,14 @@ async function getAuthContext(request: NextRequest) {
   if (!orgId) return { error: NextResponse.json({ error: "Organization not found" }, { status: 404 }) };
   const user = await getEffectiveUser(session);
   const branchId = request.nextUrl.searchParams.get("branchId") ?? session.branch_id ?? null;
+  if ((user.role === "manager" || user.role === "staff") && !branchId) {
+    return {
+      error: NextResponse.json(
+        { error: "กรุณาเลือกสาขาก่อนดู Promotions (จำกัดสิทธิ์ตามสาขา)" },
+        { status: 403 }
+      ),
+    };
+  }
   if (!requireBranchAccess(user.role, user.branch_ids, user.branch_roles, branchId)) {
     return { error: NextResponse.json({ error: "จำกัดสิทธิ์: คุณไม่มีสิทธิ์เข้าถึง Promotions ของสาขานี้" }, { status: 403 }) };
   }

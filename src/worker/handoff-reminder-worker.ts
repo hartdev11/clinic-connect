@@ -77,6 +77,7 @@ async function processJob(job: { id: string; data: HandoffReminderJobData }): Pr
 }
 
 const connection = new Redis(REDIS_URL, { maxRetriesPerRequest: null });
+let shuttingDown = false;
 
 const worker = new Worker(
   QUEUE_NAME,
@@ -95,3 +96,19 @@ worker.on("failed", (job, err) => {
 });
 
 console.log("[Handoff Reminder Worker] Started, queue:", QUEUE_NAME);
+
+async function shutdown(signal: string) {
+  if (shuttingDown) return;
+  shuttingDown = true;
+  console.log(`[Handoff Reminder Worker] ${signal} received, shutting down...`);
+  await worker.close().catch(() => {});
+  await connection.quit().catch(() => {});
+  process.exit(0);
+}
+
+process.on("SIGINT", () => {
+  void shutdown("SIGINT");
+});
+process.on("SIGTERM", () => {
+  void shutdown("SIGTERM");
+});

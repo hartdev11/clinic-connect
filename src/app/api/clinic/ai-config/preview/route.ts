@@ -94,5 +94,14 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  return NextResponse.json({ previews: results });
+  return NextResponse.json({
+    previews: results,
+    effectiveConfig: {
+      voice_id: (mergedConfig.voice_id as string | undefined) ?? null,
+      medicalPolicy: (mergedConfig.medicalPolicy as string | undefined) ?? null,
+      sales_strategy: (mergedConfig.sales_strategy as string | undefined) ?? null,
+      show_price_range: (mergedConfig.show_price_range as boolean | undefined) ?? null,
+      show_exact_price: (mergedConfig.show_exact_price as boolean | undefined) ?? null,
+    },
+  });
 }

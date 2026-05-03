@@ -1,0 +1,296 @@
+[
+  {
+    "goal": "full_face_rejuvenation",
+    "recommended_package": [
+      "proc_001",
+      "proc_006",
+      "proc_021"
+    ]
+  },
+  {
+    "goal": "anti_aging",
+    "recommended_package": [
+      "proc_001",
+      "proc_010",
+      "proc_021"
+    ]
+  },
+  {
+    "goal": "acne_scar_repair",
+    "recommended_package": [
+      "proc_028",
+      "proc_026",
+      "proc_041"
+    ]
+  },
+  {
+    "goal": "skin_brightening",
+    "recommended_package": [
+      "proc_029",
+      "proc_041",
+      "proc_008"
+    ]
+  },
+  {
+    "goal": "lifting_tightening",
+    "recommended_package": [
+      "proc_021",
+      "proc_023",
+      "proc_061"
+    ]
+  },
+  {
+    "goal": "hydration_glow",
+    "recommended_package": [
+      "proc_008",
+      "proc_041",
+      "proc_042"
+    ]
+  },
+  {
+    "goal": "jawline_contour",
+    "recommended_package": [
+      "proc_001",
+      "proc_006",
+      "proc_004"
+    ]
+  },
+  {
+    "goal": "hair_restoration",
+    "recommended_package": [
+      "proc_077",
+      "proc_078"
+    ]
+  },
+  {
+    "goal": "fat_reduction",
+    "recommended_package": [
+      "proc_067",
+      "proc_069"
+    ]
+  },
+  {
+    "goal": "pigmentation_correction",
+    "recommended_package": [
+      "proc_029",
+      "proc_030",
+      "proc_041"
+    ]
+  },
+  {
+    "goal": "wrinkle_prevention",
+    "recommended_package": [
+      "proc_001",
+      "proc_008"
+    ]
+  },
+  {
+    "goal": "natural_rejuvenation",
+    "recommended_package": [
+      "proc_006",
+      "proc_008"
+    ]
+  },
+  {
+    "goal": "collagen_restoration",
+    "recommended_package": [
+      "proc_010",
+      "proc_021"
+    ]
+  },
+  {
+    "goal": "skin_tightening",
+    "recommended_package": [
+      "proc_021",
+      "proc_023"
+    ]
+  },
+  {
+    "goal": "acne_control",
+    "recommended_package": [
+      "proc_026",
+      "proc_029"
+    ]
+  },
+  {
+    "goal": "melasma_management",
+    "recommended_package": [
+      "proc_029",
+      "proc_042"
+    ]
+  },
+  {
+    "goal": "skin_glow",
+    "recommended_package": [
+      "proc_041",
+      "proc_042"
+    ]
+  },
+  {
+    "goal": "pore_refining",
+    "recommended_package": [
+      "proc_028",
+      "proc_041"
+    ]
+  },
+  {
+    "goal": "under_eye_rejuvenation",
+    "recommended_package": [
+      "proc_006",
+      "proc_030"
+    ]
+  },
+  {
+    "goal": "tear_trough_correction",
+    "recommended_package": [
+      "proc_006",
+      "proc_008"
+    ]
+  },
+  {
+    "goal": "chin_enhancement",
+    "recommended_package": [
+      "proc_004",
+      "proc_008"
+    ]
+  },
+  {
+    "goal": "cheek_volume_restoration",
+    "recommended_package": [
+      "proc_006",
+      "proc_010"
+    ]
+  },
+  {
+    "goal": "facial_symmetry",
+    "recommended_package": [
+      "proc_006",
+      "proc_004"
+    ]
+  },
+  {
+    "goal": "neck_tightening",
+    "recommended_package": [
+      "proc_023",
+      "proc_021"
+    ]
+  },
+  {
+    "goal": "anti_aging_starter",
+    "recommended_package": [
+      "proc_001",
+      "proc_008",
+      "proc_041"
+    ]
+  },
+  {
+    "goal": "premium_anti_aging",
+    "recommended_package": [
+      "proc_001",
+      "proc_006",
+      "proc_010",
+      "proc_021"
+    ]
+  },
+  {
+    "goal": "advanced_skin_glow",
+    "recommended_package": [
+      "proc_041",
+      "proc_008",
+      "proc_042"
+    ]
+  },
+  {
+    "goal": "hydration_repair",
+    "recommended_package": [
+      "proc_008",
+      "proc_041"
+    ]
+  },
+  {
+    "goal": "collagen_boost",
+    "recommended_package": [
+      "proc_010",
+      "proc_028"
+    ]
+  },
+  {
+    "goal": "texture_refinement",
+    "recommended_package": [
+      "proc_028",
+      "proc_041"
+    ]
+  },
+  {
+    "goal": "pigmentation_recovery",
+    "recommended_package": [
+      "proc_029",
+      "proc_042"
+    ]
+  },
+  {
+    "goal": "brightening_laser",
+    "recommended_package": [
+      "proc_030",
+      "proc_041"
+    ]
+  },
+  {
+    "goal": "facial_balance",
+    "recommended_package": [
+      "proc_004",
+      "proc_006"
+    ]
+  },
+  {
+    "goal": "premium_contour",
+    "recommended_package": [
+      "proc_004",
+      "proc_006",
+      "proc_021"
+    ]
+  },
+  {
+    "goal": "cheek_lifting",
+    "recommended_package": [
+      "proc_006",
+      "proc_021"
+    ]
+  },
+  {
+    "goal": "neck_rejuvenation",
+    "recommended_package": [
+      "proc_023",
+      "proc_008"
+    ]
+  },
+  {
+    "goal": "anti_aging_maintenance",
+    "recommended_package": [
+      "proc_001",
+      "proc_008",
+      "proc_042"
+    ]
+  },
+  {
+    "goal": "lifting_maintenance",
+    "recommended_package": [
+      "proc_021",
+      "proc_023",
+      "proc_008"
+    ]
+  },
+  {
+    "goal": "hair_restoration_starter",
+    "recommended_package": [
+      "proc_078"
+    ]
+  },
+  {
+    "goal": "hair_density_improvement",
+    "recommended_package": [
+      "proc_078",
+      "proc_008"
+    ]
+  }
+]

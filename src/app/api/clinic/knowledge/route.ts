@@ -5,9 +5,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionFromCookies } from "@/lib/auth-session";
 import { getOrgIdFromClinicId } from "@/lib/clinic-data";
-import { requireRole } from "@/lib/rbac";
 import { getEffectiveUser } from "@/lib/rbac";
-import { detectDuplicates, processKnowledgeInput } from "@/lib/knowledge-input";
+import { canAccessKnowledgeAction } from "@/lib/knowledge-permissions";
+import { processKnowledgeInput } from "@/lib/knowledge-input";
 import type { KnowledgeDocumentCreate, ConflictResolution } from "@/types/knowledge";
 import { runWithObservability } from "@/lib/observability/run-with-observability";
 
@@ -26,9 +26,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Organization not found" }, { status: 404 });
     }
     const user = await getEffectiveUser(session);
-    if (!requireRole(user.role, ["owner", "manager", "staff"])) {
+    if (!canAccessKnowledgeAction("create", session, user.role)) {
       return NextResponse.json(
-        { error: "จำกัดสิทธิ์: คุณไม่มีสิทธิ์เข้าถึง Knowledge" },
+        { error: "Forbidden", code: "INSUFFICIENT_ROLE" },
         { status: 403 }
       );
     }

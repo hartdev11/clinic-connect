@@ -3,15 +3,42 @@
  * Same Pinecone namespace as knowledge-brain (kb_orgId) so searchKnowledgeBrain returns these.
  * Embedding model: same as knowledge-brain (embedKnowledgeText).
  */
-import { getKnowledgeIndex } from "@/lib/pinecone";
-import { embedKnowledgeText } from "@/lib/knowledge-brain/vector";
 import { sanitizeServiceText, sanitizeFaqText } from "@/lib/unified-knowledge/sanitize";
 import type { GlobalService, ClinicService, ClinicFaq } from "@/types/unified-knowledge";
 
-const NAMESPACE_PREFIX = "kb";
+const KNOWLEDGE_UPLOAD_PATH = "/api/knowledge/upload";
 
-function getOrgNamespace(orgId: string): string {
-  return `${NAMESPACE_PREFIX}_${orgId.replace(/[^a-zA-Z0-9_-]/g, "_")}`;
+function resolveKnowledgeVectorBaseUrl(): string | null {
+  return (
+    process.env.KNOWLEDGE_VECTOR_URL?.trim().replace(/\/+$/, "") ??
+    process.env.PHASE_G_URL?.trim().replace(/\/+$/, "") ??
+    null
+  );
+}
+
+async function uploadKnowledgeToVm(payload: Record<string, unknown>): Promise<void> {
+  const baseUrl = resolveKnowledgeVectorBaseUrl();
+  if (!baseUrl) {
+    console.error("[Unified Knowledge Upload] Missing KNOWLEDGE_VECTOR_URL/PHASE_G_URL");
+    return;
+  }
+  const serviceSecret = process.env.PHASE_SERVICE_SECRET?.trim() ?? "";
+  try {
+    const res = await fetch(`${baseUrl}${KNOWLEDGE_UPLOAD_PATH}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Service-Secret": serviceSecret,
+      },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      const details = await res.text().catch(() => "");
+      console.error("[Unified Knowledge Upload] VM upload failed", res.status, details.slice(0, 300));
+    }
+  } catch (error) {
+    console.error("[Unified Knowledge Upload] VM upload request error", error);
+  }
 }
 
 /** Build embeddable text: global standard + clinic overrides (priority: clinic first) */
@@ -37,56 +64,57 @@ export async function upsertUnifiedServiceToVector(
 ): Promise<void> {
   const raw = buildServiceText(service, global);
   const { text } = sanitizeServiceText(raw);
-  const embedding = await embedKnowledgeText(text);
-  const index = getKnowledgeIndex();
-  const ns = index.namespace(getOrgNamespace(orgId));
   const vectorId = `unified_svc_${service.id}`;
-  await ns.upsert({
-    records: [
-      {
-        id: vectorId,
-        values: embedding,
-        metadata: {
-          type: "unified_service",
-          org_id: orgId,
-          service_id: service.id,
-          content: text.slice(0, 2000),
-          embedded_at: Date.now(),
-        },
-      },
-    ],
+  await uploadKnowledgeToVm({
+    tenant_id: orgId,
+    clinic_id: orgId,
+    scope: "clinic",
+    source_type: "procedure_knowledge",
+    content: text,
+    topic: service.custom_title?.trim() || global?.name || service.id,
+    language: "th",
+    document_id: vectorId,
+    document_version: "unified_service_v1",
   });
+
+  // DISABLED: Using ChromaDB via VM instead
+  // const embedding = await embedKnowledgeText(text);
+  // const index = getKnowledgeIndex();
+  // const ns = index.namespace(getOrgNamespace(orgId));
+  // await ns.upsert({ records: [...] });
 }
 
 export async function upsertUnifiedFaqToVector(orgId: string, faq: ClinicFaq): Promise<void> {
   const raw = buildFaqText(faq);
   const { text } = sanitizeFaqText(raw);
-  const embedding = await embedKnowledgeText(text);
-  const index = getKnowledgeIndex();
-  const ns = index.namespace(getOrgNamespace(orgId));
   const vectorId = `unified_faq_${faq.id}`;
-  await ns.upsert({
-    records: [
-      {
-        id: vectorId,
-        values: embedding,
-        metadata: {
-          type: "unified_faq",
-          org_id: orgId,
-          faq_id: faq.id,
-          content: text.slice(0, 2000),
-          embedded_at: Date.now(),
-        },
-      },
-    ],
+  await uploadKnowledgeToVm({
+    tenant_id: orgId,
+    clinic_id: orgId,
+    scope: "clinic",
+    source_type: "faq_knowledge",
+    content: text,
+    topic: faq.question?.slice(0, 120) || faq.id,
+    language: "th",
+    document_id: vectorId,
+    document_version: "unified_faq_v1",
   });
+
+  // DISABLED: Using ChromaDB via VM instead
+  // const embedding = await embedKnowledgeText(text);
+  // const index = getKnowledgeIndex();
+  // const ns = index.namespace(getOrgNamespace(orgId));
+  // await ns.upsert({ records: [...] });
 }
 
 export async function deleteUnifiedServiceFromVector(orgId: string, serviceId: string): Promise<void> {
   try {
-    const index = getKnowledgeIndex();
-    const ns = index.namespace(getOrgNamespace(orgId));
-    await ns.deleteOne({ id: `unified_svc_${serviceId}` });
+    await uploadKnowledgeToVm({
+      tenant_id: orgId,
+      clinic_id: orgId,
+      document_id: `unified_svc_${serviceId}`,
+      action: "delete",
+    });
   } catch {
     // ignore if not found
   }
@@ -94,9 +122,12 @@ export async function deleteUnifiedServiceFromVector(orgId: string, serviceId: s
 
 export async function deleteUnifiedFaqFromVector(orgId: string, faqId: string): Promise<void> {
   try {
-    const index = getKnowledgeIndex();
-    const ns = index.namespace(getOrgNamespace(orgId));
-    await ns.deleteOne({ id: `unified_faq_${faqId}` });
+    await uploadKnowledgeToVm({
+      tenant_id: orgId,
+      clinic_id: orgId,
+      document_id: `unified_faq_${faqId}`,
+      action: "delete",
+    });
   } catch {
     // ignore if not found
   }

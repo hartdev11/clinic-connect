@@ -36,6 +36,11 @@ export async function GET(request: NextRequest) {
         metricsList.length > 0
           ? metricsList.reduce((a, b) => a + b.avgConfidence, 0) / metricsList.length
           : 0;
+      const handoffTotal = metricsList.reduce((a, b) => a + b.handoffTotal, 0);
+      const handoffMedical = metricsList.reduce((a, b) => a + b.handoffMedical, 0);
+      const handoffBookingIntent = metricsList.reduce((a, b) => a + b.handoffBookingIntent, 0);
+      const handoffComplaint = metricsList.reduce((a, b) => a + b.handoffComplaint, 0);
+      const handoffLowAiConfidence = metricsList.reduce((a, b) => a + b.handoffLowAiConfidence, 0);
 
       return NextResponse.json({
         orgs: rows,
@@ -46,6 +51,11 @@ export async function GET(request: NextRequest) {
           costSavedThb: totalCostSaved,
           templateResponses: totalTemplates,
           avgConfidence,
+          handoffTotal,
+          handoffMedical,
+          handoffBookingIntent,
+          handoffComplaint,
+          handoffLowAiConfidence,
         },
         message: "List orgs by 7-day AI cost (sorted by highest usage)",
       });

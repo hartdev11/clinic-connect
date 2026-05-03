@@ -1,0 +1,2102 @@
+[
+  {
+    "id": "comp_001",
+    "procedure_a": "proc_001",
+    "procedure_b": "proc_006",
+    "best_for_a": "dynamic_wrinkles",
+    "best_for_b": "volume_loss"
+  },
+  {
+    "id": "comp_002",
+    "procedure_a": "proc_001",
+    "procedure_b": "proc_021",
+    "best_for_a": "forehead_lines",
+    "best_for_b": "skin_sagging"
+  },
+  {
+    "id": "comp_003",
+    "procedure_a": "proc_001",
+    "procedure_b": "proc_023",
+    "best_for_a": "wrinkle_relaxation",
+    "best_for_b": "skin_tightening"
+  },
+  {
+    "id": "comp_004",
+    "procedure_a": "proc_006",
+    "procedure_b": "proc_010",
+    "best_for_a": "immediate_volume",
+    "best_for_b": "gradual_collagen"
+  },
+  {
+    "id": "comp_005",
+    "procedure_a": "proc_006",
+    "procedure_b": "proc_011",
+    "best_for_a": "filler_volume",
+    "best_for_b": "collagen_stimulation"
+  },
+  {
+    "id": "comp_006",
+    "procedure_a": "proc_021",
+    "procedure_b": "proc_023",
+    "best_for_a": "ultrasound_lifting",
+    "best_for_b": "rf_tightening"
+  },
+  {
+    "id": "comp_007",
+    "procedure_a": "proc_021",
+    "procedure_b": "proc_061",
+    "best_for_a": "non_surgical_lift",
+    "best_for_b": "thread_lift"
+  },
+  {
+    "id": "comp_008",
+    "procedure_a": "proc_021",
+    "procedure_b": "proc_093",
+    "best_for_a": "non_surgical",
+    "best_for_b": "surgical_facelift"
+  },
+  {
+    "id": "comp_009",
+    "procedure_a": "proc_023",
+    "procedure_b": "proc_024",
+    "best_for_a": "rf_tightening",
+    "best_for_b": "rf_microneedling"
+  },
+  {
+    "id": "comp_010",
+    "procedure_a": "proc_024",
+    "procedure_b": "proc_025",
+    "best_for_a": "stronger_rf",
+    "best_for_b": "gentler_rf"
+  },
+  {
+    "id": "comp_011",
+    "procedure_a": "proc_026",
+    "procedure_b": "proc_028",
+    "best_for_a": "mild_scars",
+    "best_for_b": "deep_scars"
+  },
+  {
+    "id": "comp_012",
+    "procedure_a": "proc_028",
+    "procedure_b": "proc_057",
+    "best_for_a": "rolling_scars",
+    "best_for_b": "tethered_scars"
+  },
+  {
+    "id": "comp_013",
+    "procedure_a": "proc_029",
+    "procedure_b": "proc_030",
+    "best_for_a": "melasma",
+    "best_for_b": "freckles"
+  },
+  {
+    "id": "comp_014",
+    "procedure_a": "proc_029",
+    "procedure_b": "proc_038",
+    "best_for_a": "pico_laser",
+    "best_for_b": "picosure"
+  },
+  {
+    "id": "comp_015",
+    "procedure_a": "proc_030",
+    "procedure_b": "proc_028",
+    "best_for_a": "pigmentation",
+    "best_for_b": "resurfacing"
+  },
+  {
+    "id": "comp_016",
+    "procedure_a": "proc_008",
+    "procedure_b": "proc_009",
+    "best_for_a": "skin_repair",
+    "best_for_b": "hydration"
+  },
+  {
+    "id": "comp_017",
+    "procedure_a": "proc_008",
+    "procedure_b": "proc_084",
+    "best_for_a": "collagen_stimulation",
+    "best_for_b": "hydration"
+  },
+  {
+    "id": "comp_018",
+    "procedure_a": "proc_010",
+    "procedure_b": "proc_011",
+    "best_for_a": "long_term_collagen",
+    "best_for_b": "medium_term"
+  },
+  {
+    "id": "comp_019",
+    "procedure_a": "proc_010",
+    "procedure_b": "proc_025",
+    "best_for_a": "sculptra",
+    "best_for_b": "ellanse"
+  },
+  {
+    "id": "comp_020",
+    "procedure_a": "proc_067",
+    "procedure_b": "proc_069",
+    "best_for_a": "device_fat",
+    "best_for_b": "injection_fat"
+  },
+  {
+    "id": "comp_021",
+    "procedure_a": "proc_067",
+    "procedure_b": "proc_092",
+    "best_for_a": "non_surgical",
+    "best_for_b": "surgical_lipo"
+  },
+  {
+    "id": "comp_022",
+    "procedure_a": "proc_069",
+    "procedure_b": "proc_055",
+    "best_for_a": "fat_dissolve",
+    "best_for_b": "kybella"
+  },
+  {
+    "id": "comp_023",
+    "procedure_a": "proc_077",
+    "procedure_b": "proc_060",
+    "best_for_a": "prp_hair",
+    "best_for_b": "prp_skin"
+  },
+  {
+    "id": "comp_024",
+    "procedure_a": "proc_078",
+    "procedure_b": "proc_091",
+    "best_for_a": "fue_transplant",
+    "best_for_b": "dhi_transplant"
+  },
+  {
+    "id": "comp_025",
+    "procedure_a": "proc_078",
+    "procedure_b": "proc_077",
+    "best_for_a": "permanent_hair",
+    "best_for_b": "regenerative"
+  },
+  {
+    "id": "comp_026",
+    "procedure_a": "proc_041",
+    "procedure_b": "proc_058",
+    "best_for_a": "hydrafacial",
+    "best_for_b": "oxygeneo"
+  },
+  {
+    "id": "comp_027",
+    "procedure_a": "proc_041",
+    "procedure_b": "proc_059",
+    "best_for_a": "hydrafacial",
+    "best_for_b": "carbon_laser"
+  },
+  {
+    "id": "comp_028",
+    "procedure_a": "proc_042",
+    "procedure_b": "proc_041",
+    "best_for_a": "oxygen_facial",
+    "best_for_b": "hydrafacial"
+  },
+  {
+    "id": "comp_029",
+    "procedure_a": "proc_073",
+    "procedure_b": "proc_028",
+    "best_for_a": "chemical_peel",
+    "best_for_b": "fractional_laser"
+  },
+  {
+    "id": "comp_030",
+    "procedure_a": "proc_061",
+    "procedure_b": "proc_050",
+    "best_for_a": "pdo_thread",
+    "best_for_b": "cog_thread"
+  },
+  {
+    "id": "comp_031",
+    "procedure_a": "proc_001",
+    "procedure_b": "proc_006",
+    "best_for_a": "dynamic_wrinkles",
+    "best_for_b": "volume_loss"
+  },
+  {
+    "id": "comp_032",
+    "procedure_a": "proc_001",
+    "procedure_b": "proc_021",
+    "best_for_a": "forehead_lines",
+    "best_for_b": "skin_sagging"
+  },
+  {
+    "id": "comp_033",
+    "procedure_a": "proc_001",
+    "procedure_b": "proc_023",
+    "best_for_a": "wrinkle_relaxation",
+    "best_for_b": "skin_tightening"
+  },
+  {
+    "id": "comp_034",
+    "procedure_a": "proc_006",
+    "procedure_b": "proc_010",
+    "best_for_a": "immediate_volume",
+    "best_for_b": "gradual_collagen"
+  },
+  {
+    "id": "comp_035",
+    "procedure_a": "proc_006",
+    "procedure_b": "proc_011",
+    "best_for_a": "filler_volume",
+    "best_for_b": "collagen_stimulation"
+  },
+  {
+    "id": "comp_036",
+    "procedure_a": "proc_021",
+    "procedure_b": "proc_023",
+    "best_for_a": "ultrasound_lifting",
+    "best_for_b": "rf_tightening"
+  },
+  {
+    "id": "comp_037",
+    "procedure_a": "proc_021",
+    "procedure_b": "proc_061",
+    "best_for_a": "non_surgical_lift",
+    "best_for_b": "thread_lift"
+  },
+  {
+    "id": "comp_038",
+    "procedure_a": "proc_021",
+    "procedure_b": "proc_093",
+    "best_for_a": "non_surgical",
+    "best_for_b": "surgical_facelift"
+  },
+  {
+    "id": "comp_039",
+    "procedure_a": "proc_023",
+    "procedure_b": "proc_024",
+    "best_for_a": "rf_tightening",
+    "best_for_b": "rf_microneedling"
+  },
+  {
+    "id": "comp_040",
+    "procedure_a": "proc_024",
+    "procedure_b": "proc_025",
+    "best_for_a": "stronger_rf",
+    "best_for_b": "gentler_rf"
+  },
+  {
+    "id": "comp_041",
+    "procedure_a": "proc_026",
+    "procedure_b": "proc_028",
+    "best_for_a": "mild_scars",
+    "best_for_b": "deep_scars"
+  },
+  {
+    "id": "comp_042",
+    "procedure_a": "proc_028",
+    "procedure_b": "proc_057",
+    "best_for_a": "rolling_scars",
+    "best_for_b": "tethered_scars"
+  },
+  {
+    "id": "comp_043",
+    "procedure_a": "proc_029",
+    "procedure_b": "proc_030",
+    "best_for_a": "melasma",
+    "best_for_b": "freckles"
+  },
+  {
+    "id": "comp_044",
+    "procedure_a": "proc_029",
+    "procedure_b": "proc_038",
+    "best_for_a": "pico_laser",
+    "best_for_b": "picosure"
+  },
+  {
+    "id": "comp_045",
+    "procedure_a": "proc_030",
+    "procedure_b": "proc_028",
+    "best_for_a": "pigmentation",
+    "best_for_b": "resurfacing"
+  },
+  {
+    "id": "comp_046",
+    "procedure_a": "proc_008",
+    "procedure_b": "proc_009",
+    "best_for_a": "skin_repair",
+    "best_for_b": "hydration"
+  },
+  {
+    "id": "comp_047",
+    "procedure_a": "proc_008",
+    "procedure_b": "proc_084",
+    "best_for_a": "collagen_stimulation",
+    "best_for_b": "hydration"
+  },
+  {
+    "id": "comp_048",
+    "procedure_a": "proc_010",
+    "procedure_b": "proc_011",
+    "best_for_a": "long_term_collagen",
+    "best_for_b": "medium_term"
+  },
+  {
+    "id": "comp_049",
+    "procedure_a": "proc_010",
+    "procedure_b": "proc_025",
+    "best_for_a": "sculptra",
+    "best_for_b": "ellanse"
+  },
+  {
+    "id": "comp_050",
+    "procedure_a": "proc_067",
+    "procedure_b": "proc_069",
+    "best_for_a": "device_fat",
+    "best_for_b": "injection_fat"
+  },
+  {
+    "id": "comp_051",
+    "procedure_a": "proc_067",
+    "procedure_b": "proc_092",
+    "best_for_a": "non_surgical",
+    "best_for_b": "surgical_lipo"
+  },
+  {
+    "id": "comp_052",
+    "procedure_a": "proc_069",
+    "procedure_b": "proc_055",
+    "best_for_a": "fat_dissolve",
+    "best_for_b": "kybella"
+  },
+  {
+    "id": "comp_053",
+    "procedure_a": "proc_077",
+    "procedure_b": "proc_060",
+    "best_for_a": "prp_hair",
+    "best_for_b": "prp_skin"
+  },
+  {
+    "id": "comp_054",
+    "procedure_a": "proc_078",
+    "procedure_b": "proc_091",
+    "best_for_a": "fue_transplant",
+    "best_for_b": "dhi_transplant"
+  },
+  {
+    "id": "comp_055",
+    "procedure_a": "proc_078",
+    "procedure_b": "proc_077",
+    "best_for_a": "permanent_hair",
+    "best_for_b": "regenerative"
+  },
+  {
+    "id": "comp_056",
+    "procedure_a": "proc_041",
+    "procedure_b": "proc_058",
+    "best_for_a": "hydrafacial",
+    "best_for_b": "oxygeneo"
+  },
+  {
+    "id": "comp_057",
+    "procedure_a": "proc_041",
+    "procedure_b": "proc_059",
+    "best_for_a": "hydrafacial",
+    "best_for_b": "carbon_laser"
+  },
+  {
+    "id": "comp_058",
+    "procedure_a": "proc_042",
+    "procedure_b": "proc_041",
+    "best_for_a": "oxygen_facial",
+    "best_for_b": "hydrafacial"
+  },
+  {
+    "id": "comp_059",
+    "procedure_a": "proc_073",
+    "procedure_b": "proc_028",
+    "best_for_a": "chemical_peel",
+    "best_for_b": "fractional_laser"
+  },
+  {
+    "id": "comp_060",
+    "procedure_a": "proc_061",
+    "procedure_b": "proc_050",
+    "best_for_a": "pdo_thread",
+    "best_for_b": "cog_thread"
+  },
+  {
+    "id": "comp_061",
+    "procedure_a": "proc_001",
+    "procedure_b": "proc_006",
+    "best_for_a": "dynamic_wrinkles",
+    "best_for_b": "volume_loss"
+  },
+  {
+    "id": "comp_062",
+    "procedure_a": "proc_001",
+    "procedure_b": "proc_021",
+    "best_for_a": "forehead_lines",
+    "best_for_b": "skin_sagging"
+  },
+  {
+    "id": "comp_063",
+    "procedure_a": "proc_001",
+    "procedure_b": "proc_023",
+    "best_for_a": "wrinkle_relaxation",
+    "best_for_b": "skin_tightening"
+  },
+  {
+    "id": "comp_064",
+    "procedure_a": "proc_006",
+    "procedure_b": "proc_010",
+    "best_for_a": "immediate_volume",
+    "best_for_b": "gradual_collagen"
+  },
+  {
+    "id": "comp_065",
+    "procedure_a": "proc_006",
+    "procedure_b": "proc_011",
+    "best_for_a": "filler_volume",
+    "best_for_b": "collagen_stimulation"
+  },
+  {
+    "id": "comp_066",
+    "procedure_a": "proc_021",
+    "procedure_b": "proc_023",
+    "best_for_a": "ultrasound_lifting",
+    "best_for_b": "rf_tightening"
+  },
+  {
+    "id": "comp_067",
+    "procedure_a": "proc_021",
+    "procedure_b": "proc_061",
+    "best_for_a": "non_surgical_lift",
+    "best_for_b": "thread_lift"
+  },
+  {
+    "id": "comp_068",
+    "procedure_a": "proc_021",
+    "procedure_b": "proc_093",
+    "best_for_a": "non_surgical",
+    "best_for_b": "surgical_facelift"
+  },
+  {
+    "id": "comp_069",
+    "procedure_a": "proc_023",
+    "procedure_b": "proc_024",
+    "best_for_a": "rf_tightening",
+    "best_for_b": "rf_microneedling"
+  },
+  {
+    "id": "comp_070",
+    "procedure_a": "proc_024",
+    "procedure_b": "proc_025",
+    "best_for_a": "stronger_rf",
+    "best_for_b": "gentler_rf"
+  },
+  {
+    "id": "comp_071",
+    "procedure_a": "proc_026",
+    "procedure_b": "proc_028",
+    "best_for_a": "mild_scars",
+    "best_for_b": "deep_scars"
+  },
+  {
+    "id": "comp_072",
+    "procedure_a": "proc_028",
+    "procedure_b": "proc_057",
+    "best_for_a": "rolling_scars",
+    "best_for_b": "tethered_scars"
+  },
+  {
+    "id": "comp_073",
+    "procedure_a": "proc_029",
+    "procedure_b": "proc_030",
+    "best_for_a": "melasma",
+    "best_for_b": "freckles"
+  },
+  {
+    "id": "comp_074",
+    "procedure_a": "proc_029",
+    "procedure_b": "proc_038",
+    "best_for_a": "pico_laser",
+    "best_for_b": "picosure"
+  },
+  {
+    "id": "comp_075",
+    "procedure_a": "proc_030",
+    "procedure_b": "proc_028",
+    "best_for_a": "pigmentation",
+    "best_for_b": "resurfacing"
+  },
+  {
+    "id": "comp_076",
+    "procedure_a": "proc_008",
+    "procedure_b": "proc_009",
+    "best_for_a": "skin_repair",
+    "best_for_b": "hydration"
+  },
+  {
+    "id": "comp_077",
+    "procedure_a": "proc_008",
+    "procedure_b": "proc_084",
+    "best_for_a": "collagen_stimulation",
+    "best_for_b": "hydration"
+  },
+  {
+    "id": "comp_078",
+    "procedure_a": "proc_010",
+    "procedure_b": "proc_011",
+    "best_for_a": "long_term_collagen",
+    "best_for_b": "medium_term"
+  },
+  {
+    "id": "comp_079",
+    "procedure_a": "proc_010",
+    "procedure_b": "proc_025",
+    "best_for_a": "sculptra",
+    "best_for_b": "ellanse"
+  },
+  {
+    "id": "comp_080",
+    "procedure_a": "proc_067",
+    "procedure_b": "proc_069",
+    "best_for_a": "device_fat",
+    "best_for_b": "injection_fat"
+  },
+  {
+    "id": "comp_081",
+    "procedure_a": "proc_067",
+    "procedure_b": "proc_092",
+    "best_for_a": "non_surgical",
+    "best_for_b": "surgical_lipo"
+  },
+  {
+    "id": "comp_082",
+    "procedure_a": "proc_069",
+    "procedure_b": "proc_055",
+    "best_for_a": "fat_dissolve",
+    "best_for_b": "kybella"
+  },
+  {
+    "id": "comp_083",
+    "procedure_a": "proc_077",
+    "procedure_b": "proc_060",
+    "best_for_a": "prp_hair",
+    "best_for_b": "prp_skin"
+  },
+  {
+    "id": "comp_084",
+    "procedure_a": "proc_078",
+    "procedure_b": "proc_091",
+    "best_for_a": "fue_transplant",
+    "best_for_b": "dhi_transplant"
+  },
+  {
+    "id": "comp_085",
+    "procedure_a": "proc_078",
+    "procedure_b": "proc_077",
+    "best_for_a": "permanent_hair",
+    "best_for_b": "regenerative"
+  },
+  {
+    "id": "comp_086",
+    "procedure_a": "proc_041",
+    "procedure_b": "proc_058",
+    "best_for_a": "hydrafacial",
+    "best_for_b": "oxygeneo"
+  },
+  {
+    "id": "comp_087",
+    "procedure_a": "proc_041",
+    "procedure_b": "proc_059",
+    "best_for_a": "hydrafacial",
+    "best_for_b": "carbon_laser"
+  },
+  {
+    "id": "comp_088",
+    "procedure_a": "proc_042",
+    "procedure_b": "proc_041",
+    "best_for_a": "oxygen_facial",
+    "best_for_b": "hydrafacial"
+  },
+  {
+    "id": "comp_089",
+    "procedure_a": "proc_073",
+    "procedure_b": "proc_028",
+    "best_for_a": "chemical_peel",
+    "best_for_b": "fractional_laser"
+  },
+  {
+    "id": "comp_090",
+    "procedure_a": "proc_061",
+    "procedure_b": "proc_050",
+    "best_for_a": "pdo_thread",
+    "best_for_b": "cog_thread"
+  },
+  {
+    "id": "comp_091",
+    "procedure_a": "proc_001",
+    "procedure_b": "proc_006",
+    "best_for_a": "dynamic_wrinkles",
+    "best_for_b": "volume_loss"
+  },
+  {
+    "id": "comp_092",
+    "procedure_a": "proc_001",
+    "procedure_b": "proc_021",
+    "best_for_a": "forehead_lines",
+    "best_for_b": "skin_sagging"
+  },
+  {
+    "id": "comp_093",
+    "procedure_a": "proc_001",
+    "procedure_b": "proc_023",
+    "best_for_a": "wrinkle_relaxation",
+    "best_for_b": "skin_tightening"
+  },
+  {
+    "id": "comp_094",
+    "procedure_a": "proc_006",
+    "procedure_b": "proc_010",
+    "best_for_a": "immediate_volume",
+    "best_for_b": "gradual_collagen"
+  },
+  {
+    "id": "comp_095",
+    "procedure_a": "proc_006",
+    "procedure_b": "proc_011",
+    "best_for_a": "filler_volume",
+    "best_for_b": "collagen_stimulation"
+  },
+  {
+    "id": "comp_096",
+    "procedure_a": "proc_021",
+    "procedure_b": "proc_023",
+    "best_for_a": "ultrasound_lifting",
+    "best_for_b": "rf_tightening"
+  },
+  {
+    "id": "comp_097",
+    "procedure_a": "proc_021",
+    "procedure_b": "proc_061",
+    "best_for_a": "non_surgical_lift",
+    "best_for_b": "thread_lift"
+  },
+  {
+    "id": "comp_098",
+    "procedure_a": "proc_021",
+    "procedure_b": "proc_093",
+    "best_for_a": "non_surgical",
+    "best_for_b": "surgical_facelift"
+  },
+  {
+    "id": "comp_099",
+    "procedure_a": "proc_023",
+    "procedure_b": "proc_024",
+    "best_for_a": "rf_tightening",
+    "best_for_b": "rf_microneedling"
+  },
+  {
+    "id": "comp_100",
+    "procedure_a": "proc_024",
+    "procedure_b": "proc_025",
+    "best_for_a": "stronger_rf",
+    "best_for_b": "gentler_rf"
+  },
+  {
+    "id": "comp_101",
+    "procedure_a": "proc_026",
+    "procedure_b": "proc_028",
+    "best_for_a": "mild_scars",
+    "best_for_b": "deep_scars"
+  },
+  {
+    "id": "comp_102",
+    "procedure_a": "proc_028",
+    "procedure_b": "proc_057",
+    "best_for_a": "rolling_scars",
+    "best_for_b": "tethered_scars"
+  },
+  {
+    "id": "comp_103",
+    "procedure_a": "proc_029",
+    "procedure_b": "proc_030",
+    "best_for_a": "melasma",
+    "best_for_b": "freckles"
+  },
+  {
+    "id": "comp_104",
+    "procedure_a": "proc_029",
+    "procedure_b": "proc_038",
+    "best_for_a": "pico_laser",
+    "best_for_b": "picosure"
+  },
+  {
+    "id": "comp_105",
+    "procedure_a": "proc_030",
+    "procedure_b": "proc_028",
+    "best_for_a": "pigmentation",
+    "best_for_b": "resurfacing"
+  },
+  {
+    "id": "comp_106",
+    "procedure_a": "proc_008",
+    "procedure_b": "proc_009",
+    "best_for_a": "skin_repair",
+    "best_for_b": "hydration"
+  },
+  {
+    "id": "comp_107",
+    "procedure_a": "proc_008",
+    "procedure_b": "proc_084",
+    "best_for_a": "collagen_stimulation",
+    "best_for_b": "hydration"
+  },
+  {
+    "id": "comp_108",
+    "procedure_a": "proc_010",
+    "procedure_b": "proc_011",
+    "best_for_a": "long_term_collagen",
+    "best_for_b": "medium_term"
+  },
+  {
+    "id": "comp_109",
+    "procedure_a": "proc_010",
+    "procedure_b": "proc_025",
+    "best_for_a": "sculptra",
+    "best_for_b": "ellanse"
+  },
+  {
+    "id": "comp_110",
+    "procedure_a": "proc_067",
+    "procedure_b": "proc_069",
+    "best_for_a": "device_fat",
+    "best_for_b": "injection_fat"
+  },
+  {
+    "id": "comp_111",
+    "procedure_a": "proc_067",
+    "procedure_b": "proc_092",
+    "best_for_a": "non_surgical",
+    "best_for_b": "surgical_lipo"
+  },
+  {
+    "id": "comp_112",
+    "procedure_a": "proc_069",
+    "procedure_b": "proc_055",
+    "best_for_a": "fat_dissolve",
+    "best_for_b": "kybella"
+  },
+  {
+    "id": "comp_113",
+    "procedure_a": "proc_077",
+    "procedure_b": "proc_060",
+    "best_for_a": "prp_hair",
+    "best_for_b": "prp_skin"
+  },
+  {
+    "id": "comp_114",
+    "procedure_a": "proc_078",
+    "procedure_b": "proc_091",
+    "best_for_a": "fue_transplant",
+    "best_for_b": "dhi_transplant"
+  },
+  {
+    "id": "comp_115",
+    "procedure_a": "proc_078",
+    "procedure_b": "proc_077",
+    "best_for_a": "permanent_hair",
+    "best_for_b": "regenerative"
+  },
+  {
+    "id": "comp_116",
+    "procedure_a": "proc_041",
+    "procedure_b": "proc_058",
+    "best_for_a": "hydrafacial",
+    "best_for_b": "oxygeneo"
+  },
+  {
+    "id": "comp_117",
+    "procedure_a": "proc_041",
+    "procedure_b": "proc_059",
+    "best_for_a": "hydrafacial",
+    "best_for_b": "carbon_laser"
+  },
+  {
+    "id": "comp_118",
+    "procedure_a": "proc_042",
+    "procedure_b": "proc_041",
+    "best_for_a": "oxygen_facial",
+    "best_for_b": "hydrafacial"
+  },
+  {
+    "id": "comp_119",
+    "procedure_a": "proc_073",
+    "procedure_b": "proc_028",
+    "best_for_a": "chemical_peel",
+    "best_for_b": "fractional_laser"
+  },
+  {
+    "id": "comp_120",
+    "procedure_a": "proc_061",
+    "procedure_b": "proc_050",
+    "best_for_a": "pdo_thread",
+    "best_for_b": "cog_thread"
+  },
+  {
+    "id": "comp_121",
+    "procedure_a": "proc_001",
+    "procedure_b": "proc_006",
+    "best_for_a": "dynamic_wrinkles",
+    "best_for_b": "volume_loss"
+  },
+  {
+    "id": "comp_122",
+    "procedure_a": "proc_001",
+    "procedure_b": "proc_021",
+    "best_for_a": "forehead_lines",
+    "best_for_b": "skin_sagging"
+  },
+  {
+    "id": "comp_123",
+    "procedure_a": "proc_001",
+    "procedure_b": "proc_023",
+    "best_for_a": "wrinkle_relaxation",
+    "best_for_b": "skin_tightening"
+  },
+  {
+    "id": "comp_124",
+    "procedure_a": "proc_006",
+    "procedure_b": "proc_010",
+    "best_for_a": "immediate_volume",
+    "best_for_b": "gradual_collagen"
+  },
+  {
+    "id": "comp_125",
+    "procedure_a": "proc_006",
+    "procedure_b": "proc_011",
+    "best_for_a": "filler_volume",
+    "best_for_b": "collagen_stimulation"
+  },
+  {
+    "id": "comp_126",
+    "procedure_a": "proc_021",
+    "procedure_b": "proc_023",
+    "best_for_a": "ultrasound_lifting",
+    "best_for_b": "rf_tightening"
+  },
+  {
+    "id": "comp_127",
+    "procedure_a": "proc_021",
+    "procedure_b": "proc_061",
+    "best_for_a": "non_surgical_lift",
+    "best_for_b": "thread_lift"
+  },
+  {
+    "id": "comp_128",
+    "procedure_a": "proc_021",
+    "procedure_b": "proc_093",
+    "best_for_a": "non_surgical",
+    "best_for_b": "surgical_facelift"
+  },
+  {
+    "id": "comp_129",
+    "procedure_a": "proc_023",
+    "procedure_b": "proc_024",
+    "best_for_a": "rf_tightening",
+    "best_for_b": "rf_microneedling"
+  },
+  {
+    "id": "comp_130",
+    "procedure_a": "proc_024",
+    "procedure_b": "proc_025",
+    "best_for_a": "stronger_rf",
+    "best_for_b": "gentler_rf"
+  },
+  {
+    "id": "comp_131",
+    "procedure_a": "proc_026",
+    "procedure_b": "proc_028",
+    "best_for_a": "mild_scars",
+    "best_for_b": "deep_scars"
+  },
+  {
+    "id": "comp_132",
+    "procedure_a": "proc_028",
+    "procedure_b": "proc_057",
+    "best_for_a": "rolling_scars",
+    "best_for_b": "tethered_scars"
+  },
+  {
+    "id": "comp_133",
+    "procedure_a": "proc_029",
+    "procedure_b": "proc_030",
+    "best_for_a": "melasma",
+    "best_for_b": "freckles"
+  },
+  {
+    "id": "comp_134",
+    "procedure_a": "proc_029",
+    "procedure_b": "proc_038",
+    "best_for_a": "pico_laser",
+    "best_for_b": "picosure"
+  },
+  {
+    "id": "comp_135",
+    "procedure_a": "proc_030",
+    "procedure_b": "proc_028",
+    "best_for_a": "pigmentation",
+    "best_for_b": "resurfacing"
+  },
+  {
+    "id": "comp_136",
+    "procedure_a": "proc_008",
+    "procedure_b": "proc_009",
+    "best_for_a": "skin_repair",
+    "best_for_b": "hydration"
+  },
+  {
+    "id": "comp_137",
+    "procedure_a": "proc_008",
+    "procedure_b": "proc_084",
+    "best_for_a": "collagen_stimulation",
+    "best_for_b": "hydration"
+  },
+  {
+    "id": "comp_138",
+    "procedure_a": "proc_010",
+    "procedure_b": "proc_011",
+    "best_for_a": "long_term_collagen",
+    "best_for_b": "medium_term"
+  },
+  {
+    "id": "comp_139",
+    "procedure_a": "proc_010",
+    "procedure_b": "proc_025",
+    "best_for_a": "sculptra",
+    "best_for_b": "ellanse"
+  },
+  {
+    "id": "comp_140",
+    "procedure_a": "proc_067",
+    "procedure_b": "proc_069",
+    "best_for_a": "device_fat",
+    "best_for_b": "injection_fat"
+  },
+  {
+    "id": "comp_141",
+    "procedure_a": "proc_067",
+    "procedure_b": "proc_092",
+    "best_for_a": "non_surgical",
+    "best_for_b": "surgical_lipo"
+  },
+  {
+    "id": "comp_142",
+    "procedure_a": "proc_069",
+    "procedure_b": "proc_055",
+    "best_for_a": "fat_dissolve",
+    "best_for_b": "kybella"
+  },
+  {
+    "id": "comp_143",
+    "procedure_a": "proc_077",
+    "procedure_b": "proc_060",
+    "best_for_a": "prp_hair",
+    "best_for_b": "prp_skin"
+  },
+  {
+    "id": "comp_144",
+    "procedure_a": "proc_078",
+    "procedure_b": "proc_091",
+    "best_for_a": "fue_transplant",
+    "best_for_b": "dhi_transplant"
+  },
+  {
+    "id": "comp_145",
+    "procedure_a": "proc_078",
+    "procedure_b": "proc_077",
+    "best_for_a": "permanent_hair",
+    "best_for_b": "regenerative"
+  },
+  {
+    "id": "comp_146",
+    "procedure_a": "proc_041",
+    "procedure_b": "proc_058",
+    "best_for_a": "hydrafacial",
+    "best_for_b": "oxygeneo"
+  },
+  {
+    "id": "comp_147",
+    "procedure_a": "proc_041",
+    "procedure_b": "proc_059",
+    "best_for_a": "hydrafacial",
+    "best_for_b": "carbon_laser"
+  },
+  {
+    "id": "comp_148",
+    "procedure_a": "proc_042",
+    "procedure_b": "proc_041",
+    "best_for_a": "oxygen_facial",
+    "best_for_b": "hydrafacial"
+  },
+  {
+    "id": "comp_149",
+    "procedure_a": "proc_073",
+    "procedure_b": "proc_028",
+    "best_for_a": "chemical_peel",
+    "best_for_b": "fractional_laser"
+  },
+  {
+    "id": "comp_150",
+    "procedure_a": "proc_061",
+    "procedure_b": "proc_050",
+    "best_for_a": "pdo_thread",
+    "best_for_b": "cog_thread"
+  },
+  {
+    "id": "comp_151",
+    "procedure_a": "proc_001",
+    "procedure_b": "proc_006",
+    "best_for_a": "dynamic_wrinkles",
+    "best_for_b": "volume_loss"
+  },
+  {
+    "id": "comp_152",
+    "procedure_a": "proc_001",
+    "procedure_b": "proc_021",
+    "best_for_a": "forehead_lines",
+    "best_for_b": "skin_sagging"
+  },
+  {
+    "id": "comp_153",
+    "procedure_a": "proc_001",
+    "procedure_b": "proc_023",
+    "best_for_a": "wrinkle_relaxation",
+    "best_for_b": "skin_tightening"
+  },
+  {
+    "id": "comp_154",
+    "procedure_a": "proc_006",
+    "procedure_b": "proc_010",
+    "best_for_a": "immediate_volume",
+    "best_for_b": "gradual_collagen"
+  },
+  {
+    "id": "comp_155",
+    "procedure_a": "proc_006",
+    "procedure_b": "proc_011",
+    "best_for_a": "filler_volume",
+    "best_for_b": "collagen_stimulation"
+  },
+  {
+    "id": "comp_156",
+    "procedure_a": "proc_021",
+    "procedure_b": "proc_023",
+    "best_for_a": "ultrasound_lifting",
+    "best_for_b": "rf_tightening"
+  },
+  {
+    "id": "comp_157",
+    "procedure_a": "proc_021",
+    "procedure_b": "proc_061",
+    "best_for_a": "non_surgical_lift",
+    "best_for_b": "thread_lift"
+  },
+  {
+    "id": "comp_158",
+    "procedure_a": "proc_021",
+    "procedure_b": "proc_093",
+    "best_for_a": "non_surgical",
+    "best_for_b": "surgical_facelift"
+  },
+  {
+    "id": "comp_159",
+    "procedure_a": "proc_023",
+    "procedure_b": "proc_024",
+    "best_for_a": "rf_tightening",
+    "best_for_b": "rf_microneedling"
+  },
+  {
+    "id": "comp_160",
+    "procedure_a": "proc_024",
+    "procedure_b": "proc_025",
+    "best_for_a": "stronger_rf",
+    "best_for_b": "gentler_rf"
+  },
+  {
+    "id": "comp_161",
+    "procedure_a": "proc_026",
+    "procedure_b": "proc_028",
+    "best_for_a": "mild_scars",
+    "best_for_b": "deep_scars"
+  },
+  {
+    "id": "comp_162",
+    "procedure_a": "proc_028",
+    "procedure_b": "proc_057",
+    "best_for_a": "rolling_scars",
+    "best_for_b": "tethered_scars"
+  },
+  {
+    "id": "comp_163",
+    "procedure_a": "proc_029",
+    "procedure_b": "proc_030",
+    "best_for_a": "melasma",
+    "best_for_b": "freckles"
+  },
+  {
+    "id": "comp_164",
+    "procedure_a": "proc_029",
+    "procedure_b": "proc_038",
+    "best_for_a": "pico_laser",
+    "best_for_b": "picosure"
+  },
+  {
+    "id": "comp_165",
+    "procedure_a": "proc_030",
+    "procedure_b": "proc_028",
+    "best_for_a": "pigmentation",
+    "best_for_b": "resurfacing"
+  },
+  {
+    "id": "comp_166",
+    "procedure_a": "proc_008",
+    "procedure_b": "proc_009",
+    "best_for_a": "skin_repair",
+    "best_for_b": "hydration"
+  },
+  {
+    "id": "comp_167",
+    "procedure_a": "proc_008",
+    "procedure_b": "proc_084",
+    "best_for_a": "collagen_stimulation",
+    "best_for_b": "hydration"
+  },
+  {
+    "id": "comp_168",
+    "procedure_a": "proc_010",
+    "procedure_b": "proc_011",
+    "best_for_a": "long_term_collagen",
+    "best_for_b": "medium_term"
+  },
+  {
+    "id": "comp_169",
+    "procedure_a": "proc_010",
+    "procedure_b": "proc_025",
+    "best_for_a": "sculptra",
+    "best_for_b": "ellanse"
+  },
+  {
+    "id": "comp_170",
+    "procedure_a": "proc_067",
+    "procedure_b": "proc_069",
+    "best_for_a": "device_fat",
+    "best_for_b": "injection_fat"
+  },
+  {
+    "id": "comp_171",
+    "procedure_a": "proc_067",
+    "procedure_b": "proc_092",
+    "best_for_a": "non_surgical",
+    "best_for_b": "surgical_lipo"
+  },
+  {
+    "id": "comp_172",
+    "procedure_a": "proc_069",
+    "procedure_b": "proc_055",
+    "best_for_a": "fat_dissolve",
+    "best_for_b": "kybella"
+  },
+  {
+    "id": "comp_173",
+    "procedure_a": "proc_077",
+    "procedure_b": "proc_060",
+    "best_for_a": "prp_hair",
+    "best_for_b": "prp_skin"
+  },
+  {
+    "id": "comp_174",
+    "procedure_a": "proc_078",
+    "procedure_b": "proc_091",
+    "best_for_a": "fue_transplant",
+    "best_for_b": "dhi_transplant"
+  },
+  {
+    "id": "comp_175",
+    "procedure_a": "proc_078",
+    "procedure_b": "proc_077",
+    "best_for_a": "permanent_hair",
+    "best_for_b": "regenerative"
+  },
+  {
+    "id": "comp_176",
+    "procedure_a": "proc_041",
+    "procedure_b": "proc_058",
+    "best_for_a": "hydrafacial",
+    "best_for_b": "oxygeneo"
+  },
+  {
+    "id": "comp_177",
+    "procedure_a": "proc_041",
+    "procedure_b": "proc_059",
+    "best_for_a": "hydrafacial",
+    "best_for_b": "carbon_laser"
+  },
+  {
+    "id": "comp_178",
+    "procedure_a": "proc_042",
+    "procedure_b": "proc_041",
+    "best_for_a": "oxygen_facial",
+    "best_for_b": "hydrafacial"
+  },
+  {
+    "id": "comp_179",
+    "procedure_a": "proc_073",
+    "procedure_b": "proc_028",
+    "best_for_a": "chemical_peel",
+    "best_for_b": "fractional_laser"
+  },
+  {
+    "id": "comp_180",
+    "procedure_a": "proc_061",
+    "procedure_b": "proc_050",
+    "best_for_a": "pdo_thread",
+    "best_for_b": "cog_thread"
+  },
+  {
+    "id": "comp_181",
+    "procedure_a": "proc_001",
+    "procedure_b": "proc_006",
+    "best_for_a": "dynamic_wrinkles",
+    "best_for_b": "volume_loss"
+  },
+  {
+    "id": "comp_182",
+    "procedure_a": "proc_001",
+    "procedure_b": "proc_021",
+    "best_for_a": "forehead_lines",
+    "best_for_b": "skin_sagging"
+  },
+  {
+    "id": "comp_183",
+    "procedure_a": "proc_001",
+    "procedure_b": "proc_023",
+    "best_for_a": "wrinkle_relaxation",
+    "best_for_b": "skin_tightening"
+  },
+  {
+    "id": "comp_184",
+    "procedure_a": "proc_006",
+    "procedure_b": "proc_010",
+    "best_for_a": "immediate_volume",
+    "best_for_b": "gradual_collagen"
+  },
+  {
+    "id": "comp_185",
+    "procedure_a": "proc_006",
+    "procedure_b": "proc_011",
+    "best_for_a": "filler_volume",
+    "best_for_b": "collagen_stimulation"
+  },
+  {
+    "id": "comp_186",
+    "procedure_a": "proc_021",
+    "procedure_b": "proc_023",
+    "best_for_a": "ultrasound_lifting",
+    "best_for_b": "rf_tightening"
+  },
+  {
+    "id": "comp_187",
+    "procedure_a": "proc_021",
+    "procedure_b": "proc_061",
+    "best_for_a": "non_surgical_lift",
+    "best_for_b": "thread_lift"
+  },
+  {
+    "id": "comp_188",
+    "procedure_a": "proc_021",
+    "procedure_b": "proc_093",
+    "best_for_a": "non_surgical",
+    "best_for_b": "surgical_facelift"
+  },
+  {
+    "id": "comp_189",
+    "procedure_a": "proc_023",
+    "procedure_b": "proc_024",
+    "best_for_a": "rf_tightening",
+    "best_for_b": "rf_microneedling"
+  },
+  {
+    "id": "comp_190",
+    "procedure_a": "proc_024",
+    "procedure_b": "proc_025",
+    "best_for_a": "stronger_rf",
+    "best_for_b": "gentler_rf"
+  },
+  {
+    "id": "comp_191",
+    "procedure_a": "proc_026",
+    "procedure_b": "proc_028",
+    "best_for_a": "mild_scars",
+    "best_for_b": "deep_scars"
+  },
+  {
+    "id": "comp_192",
+    "procedure_a": "proc_028",
+    "procedure_b": "proc_057",
+    "best_for_a": "rolling_scars",
+    "best_for_b": "tethered_scars"
+  },
+  {
+    "id": "comp_193",
+    "procedure_a": "proc_029",
+    "procedure_b": "proc_030",
+    "best_for_a": "melasma",
+    "best_for_b": "freckles"
+  },
+  {
+    "id": "comp_194",
+    "procedure_a": "proc_029",
+    "procedure_b": "proc_038",
+    "best_for_a": "pico_laser",
+    "best_for_b": "picosure"
+  },
+  {
+    "id": "comp_195",
+    "procedure_a": "proc_030",
+    "procedure_b": "proc_028",
+    "best_for_a": "pigmentation",
+    "best_for_b": "resurfacing"
+  },
+  {
+    "id": "comp_196",
+    "procedure_a": "proc_008",
+    "procedure_b": "proc_009",
+    "best_for_a": "skin_repair",
+    "best_for_b": "hydration"
+  },
+  {
+    "id": "comp_197",
+    "procedure_a": "proc_008",
+    "procedure_b": "proc_084",
+    "best_for_a": "collagen_stimulation",
+    "best_for_b": "hydration"
+  },
+  {
+    "id": "comp_198",
+    "procedure_a": "proc_010",
+    "procedure_b": "proc_011",
+    "best_for_a": "long_term_collagen",
+    "best_for_b": "medium_term"
+  },
+  {
+    "id": "comp_199",
+    "procedure_a": "proc_010",
+    "procedure_b": "proc_025",
+    "best_for_a": "sculptra",
+    "best_for_b": "ellanse"
+  },
+  {
+    "id": "comp_200",
+    "procedure_a": "proc_067",
+    "procedure_b": "proc_069",
+    "best_for_a": "device_fat",
+    "best_for_b": "injection_fat"
+  },
+  {
+    "id": "comp_201",
+    "procedure_a": "proc_067",
+    "procedure_b": "proc_092",
+    "best_for_a": "non_surgical",
+    "best_for_b": "surgical_lipo"
+  },
+  {
+    "id": "comp_202",
+    "procedure_a": "proc_069",
+    "procedure_b": "proc_055",
+    "best_for_a": "fat_dissolve",
+    "best_for_b": "kybella"
+  },
+  {
+    "id": "comp_203",
+    "procedure_a": "proc_077",
+    "procedure_b": "proc_060",
+    "best_for_a": "prp_hair",
+    "best_for_b": "prp_skin"
+  },
+  {
+    "id": "comp_204",
+    "procedure_a": "proc_078",
+    "procedure_b": "proc_091",
+    "best_for_a": "fue_transplant",
+    "best_for_b": "dhi_transplant"
+  },
+  {
+    "id": "comp_205",
+    "procedure_a": "proc_078",
+    "procedure_b": "proc_077",
+    "best_for_a": "permanent_hair",
+    "best_for_b": "regenerative"
+  },
+  {
+    "id": "comp_206",
+    "procedure_a": "proc_041",
+    "procedure_b": "proc_058",
+    "best_for_a": "hydrafacial",
+    "best_for_b": "oxygeneo"
+  },
+  {
+    "id": "comp_207",
+    "procedure_a": "proc_041",
+    "procedure_b": "proc_059",
+    "best_for_a": "hydrafacial",
+    "best_for_b": "carbon_laser"
+  },
+  {
+    "id": "comp_208",
+    "procedure_a": "proc_042",
+    "procedure_b": "proc_041",
+    "best_for_a": "oxygen_facial",
+    "best_for_b": "hydrafacial"
+  },
+  {
+    "id": "comp_209",
+    "procedure_a": "proc_073",
+    "procedure_b": "proc_028",
+    "best_for_a": "chemical_peel",
+    "best_for_b": "fractional_laser"
+  },
+  {
+    "id": "comp_210",
+    "procedure_a": "proc_061",
+    "procedure_b": "proc_050",
+    "best_for_a": "pdo_thread",
+    "best_for_b": "cog_thread"
+  },
+  {
+    "id": "comp_211",
+    "procedure_a": "proc_001",
+    "procedure_b": "proc_006",
+    "best_for_a": "dynamic_wrinkles",
+    "best_for_b": "volume_loss"
+  },
+  {
+    "id": "comp_212",
+    "procedure_a": "proc_001",
+    "procedure_b": "proc_021",
+    "best_for_a": "forehead_lines",
+    "best_for_b": "skin_sagging"
+  },
+  {
+    "id": "comp_213",
+    "procedure_a": "proc_001",
+    "procedure_b": "proc_023",
+    "best_for_a": "wrinkle_relaxation",
+    "best_for_b": "skin_tightening"
+  },
+  {
+    "id": "comp_214",
+    "procedure_a": "proc_006",
+    "procedure_b": "proc_010",
+    "best_for_a": "immediate_volume",
+    "best_for_b": "gradual_collagen"
+  },
+  {
+    "id": "comp_215",
+    "procedure_a": "proc_006",
+    "procedure_b": "proc_011",
+    "best_for_a": "filler_volume",
+    "best_for_b": "collagen_stimulation"
+  },
+  {
+    "id": "comp_216",
+    "procedure_a": "proc_021",
+    "procedure_b": "proc_023",
+    "best_for_a": "ultrasound_lifting",
+    "best_for_b": "rf_tightening"
+  },
+  {
+    "id": "comp_217",
+    "procedure_a": "proc_021",
+    "procedure_b": "proc_061",
+    "best_for_a": "non_surgical_lift",
+    "best_for_b": "thread_lift"
+  },
+  {
+    "id": "comp_218",
+    "procedure_a": "proc_021",
+    "procedure_b": "proc_093",
+    "best_for_a": "non_surgical",
+    "best_for_b": "surgical_facelift"
+  },
+  {
+    "id": "comp_219",
+    "procedure_a": "proc_023",
+    "procedure_b": "proc_024",
+    "best_for_a": "rf_tightening",
+    "best_for_b": "rf_microneedling"
+  },
+  {
+    "id": "comp_220",
+    "procedure_a": "proc_024",
+    "procedure_b": "proc_025",
+    "best_for_a": "stronger_rf",
+    "best_for_b": "gentler_rf"
+  },
+  {
+    "id": "comp_221",
+    "procedure_a": "proc_026",
+    "procedure_b": "proc_028",
+    "best_for_a": "mild_scars",
+    "best_for_b": "deep_scars"
+  },
+  {
+    "id": "comp_222",
+    "procedure_a": "proc_028",
+    "procedure_b": "proc_057",
+    "best_for_a": "rolling_scars",
+    "best_for_b": "tethered_scars"
+  },
+  {
+    "id": "comp_223",
+    "procedure_a": "proc_029",
+    "procedure_b": "proc_030",
+    "best_for_a": "melasma",
+    "best_for_b": "freckles"
+  },
+  {
+    "id": "comp_224",
+    "procedure_a": "proc_029",
+    "procedure_b": "proc_038",
+    "best_for_a": "pico_laser",
+    "best_for_b": "picosure"
+  },
+  {
+    "id": "comp_225",
+    "procedure_a": "proc_030",
+    "procedure_b": "proc_028",
+    "best_for_a": "pigmentation",
+    "best_for_b": "resurfacing"
+  },
+  {
+    "id": "comp_226",
+    "procedure_a": "proc_008",
+    "procedure_b": "proc_009",
+    "best_for_a": "skin_repair",
+    "best_for_b": "hydration"
+  },
+  {
+    "id": "comp_227",
+    "procedure_a": "proc_008",
+    "procedure_b": "proc_084",
+    "best_for_a": "collagen_stimulation",
+    "best_for_b": "hydration"
+  },
+  {
+    "id": "comp_228",
+    "procedure_a": "proc_010",
+    "procedure_b": "proc_011",
+    "best_for_a": "long_term_collagen",
+    "best_for_b": "medium_term"
+  },
+  {
+    "id": "comp_229",
+    "procedure_a": "proc_010",
+    "procedure_b": "proc_025",
+    "best_for_a": "sculptra",
+    "best_for_b": "ellanse"
+  },
+  {
+    "id": "comp_230",
+    "procedure_a": "proc_067",
+    "procedure_b": "proc_069",
+    "best_for_a": "device_fat",
+    "best_for_b": "injection_fat"
+  },
+  {
+    "id": "comp_231",
+    "procedure_a": "proc_067",
+    "procedure_b": "proc_092",
+    "best_for_a": "non_surgical",
+    "best_for_b": "surgical_lipo"
+  },
+  {
+    "id": "comp_232",
+    "procedure_a": "proc_069",
+    "procedure_b": "proc_055",
+    "best_for_a": "fat_dissolve",
+    "best_for_b": "kybella"
+  },
+  {
+    "id": "comp_233",
+    "procedure_a": "proc_077",
+    "procedure_b": "proc_060",
+    "best_for_a": "prp_hair",
+    "best_for_b": "prp_skin"
+  },
+  {
+    "id": "comp_234",
+    "procedure_a": "proc_078",
+    "procedure_b": "proc_091",
+    "best_for_a": "fue_transplant",
+    "best_for_b": "dhi_transplant"
+  },
+  {
+    "id": "comp_235",
+    "procedure_a": "proc_078",
+    "procedure_b": "proc_077",
+    "best_for_a": "permanent_hair",
+    "best_for_b": "regenerative"
+  },
+  {
+    "id": "comp_236",
+    "procedure_a": "proc_041",
+    "procedure_b": "proc_058",
+    "best_for_a": "hydrafacial",
+    "best_for_b": "oxygeneo"
+  },
+  {
+    "id": "comp_237",
+    "procedure_a": "proc_041",
+    "procedure_b": "proc_059",
+    "best_for_a": "hydrafacial",
+    "best_for_b": "carbon_laser"
+  },
+  {
+    "id": "comp_238",
+    "procedure_a": "proc_042",
+    "procedure_b": "proc_041",
+    "best_for_a": "oxygen_facial",
+    "best_for_b": "hydrafacial"
+  },
+  {
+    "id": "comp_239",
+    "procedure_a": "proc_073",
+    "procedure_b": "proc_028",
+    "best_for_a": "chemical_peel",
+    "best_for_b": "fractional_laser"
+  },
+  {
+    "id": "comp_240",
+    "procedure_a": "proc_061",
+    "procedure_b": "proc_050",
+    "best_for_a": "pdo_thread",
+    "best_for_b": "cog_thread"
+  },
+  {
+    "id": "comp_241",
+    "procedure_a": "proc_001",
+    "procedure_b": "proc_006",
+    "best_for_a": "dynamic_wrinkles",
+    "best_for_b": "volume_loss"
+  },
+  {
+    "id": "comp_242",
+    "procedure_a": "proc_001",
+    "procedure_b": "proc_021",
+    "best_for_a": "forehead_lines",
+    "best_for_b": "skin_sagging"
+  },
+  {
+    "id": "comp_243",
+    "procedure_a": "proc_001",
+    "procedure_b": "proc_023",
+    "best_for_a": "wrinkle_relaxation",
+    "best_for_b": "skin_tightening"
+  },
+  {
+    "id": "comp_244",
+    "procedure_a": "proc_006",
+    "procedure_b": "proc_010",
+    "best_for_a": "immediate_volume",
+    "best_for_b": "gradual_collagen"
+  },
+  {
+    "id": "comp_245",
+    "procedure_a": "proc_006",
+    "procedure_b": "proc_011",
+    "best_for_a": "filler_volume",
+    "best_for_b": "collagen_stimulation"
+  },
+  {
+    "id": "comp_246",
+    "procedure_a": "proc_021",
+    "procedure_b": "proc_023",
+    "best_for_a": "ultrasound_lifting",
+    "best_for_b": "rf_tightening"
+  },
+  {
+    "id": "comp_247",
+    "procedure_a": "proc_021",
+    "procedure_b": "proc_061",
+    "best_for_a": "non_surgical_lift",
+    "best_for_b": "thread_lift"
+  },
+  {
+    "id": "comp_248",
+    "procedure_a": "proc_021",
+    "procedure_b": "proc_093",
+    "best_for_a": "non_surgical",
+    "best_for_b": "surgical_facelift"
+  },
+  {
+    "id": "comp_249",
+    "procedure_a": "proc_023",
+    "procedure_b": "proc_024",
+    "best_for_a": "rf_tightening",
+    "best_for_b": "rf_microneedling"
+  },
+  {
+    "id": "comp_250",
+    "procedure_a": "proc_024",
+    "procedure_b": "proc_025",
+    "best_for_a": "stronger_rf",
+    "best_for_b": "gentler_rf"
+  },
+  {
+    "id": "comp_251",
+    "procedure_a": "proc_026",
+    "procedure_b": "proc_028",
+    "best_for_a": "mild_scars",
+    "best_for_b": "deep_scars"
+  },
+  {
+    "id": "comp_252",
+    "procedure_a": "proc_028",
+    "procedure_b": "proc_057",
+    "best_for_a": "rolling_scars",
+    "best_for_b": "tethered_scars"
+  },
+  {
+    "id": "comp_253",
+    "procedure_a": "proc_029",
+    "procedure_b": "proc_030",
+    "best_for_a": "melasma",
+    "best_for_b": "freckles"
+  },
+  {
+    "id": "comp_254",
+    "procedure_a": "proc_029",
+    "procedure_b": "proc_038",
+    "best_for_a": "pico_laser",
+    "best_for_b": "picosure"
+  },
+  {
+    "id": "comp_255",
+    "procedure_a": "proc_030",
+    "procedure_b": "proc_028",
+    "best_for_a": "pigmentation",
+    "best_for_b": "resurfacing"
+  },
+  {
+    "id": "comp_256",
+    "procedure_a": "proc_008",
+    "procedure_b": "proc_009",
+    "best_for_a": "skin_repair",
+    "best_for_b": "hydration"
+  },
+  {
+    "id": "comp_257",
+    "procedure_a": "proc_008",
+    "procedure_b": "proc_084",
+    "best_for_a": "collagen_stimulation",
+    "best_for_b": "hydration"
+  },
+  {
+    "id": "comp_258",
+    "procedure_a": "proc_010",
+    "procedure_b": "proc_011",
+    "best_for_a": "long_term_collagen",
+    "best_for_b": "medium_term"
+  },
+  {
+    "id": "comp_259",
+    "procedure_a": "proc_010",
+    "procedure_b": "proc_025",
+    "best_for_a": "sculptra",
+    "best_for_b": "ellanse"
+  },
+  {
+    "id": "comp_260",
+    "procedure_a": "proc_067",
+    "procedure_b": "proc_069",
+    "best_for_a": "device_fat",
+    "best_for_b": "injection_fat"
+  },
+  {
+    "id": "comp_261",
+    "procedure_a": "proc_067",
+    "procedure_b": "proc_092",
+    "best_for_a": "non_surgical",
+    "best_for_b": "surgical_lipo"
+  },
+  {
+    "id": "comp_262",
+    "procedure_a": "proc_069",
+    "procedure_b": "proc_055",
+    "best_for_a": "fat_dissolve",
+    "best_for_b": "kybella"
+  },
+  {
+    "id": "comp_263",
+    "procedure_a": "proc_077",
+    "procedure_b": "proc_060",
+    "best_for_a": "prp_hair",
+    "best_for_b": "prp_skin"
+  },
+  {
+    "id": "comp_264",
+    "procedure_a": "proc_078",
+    "procedure_b": "proc_091",
+    "best_for_a": "fue_transplant",
+    "best_for_b": "dhi_transplant"
+  },
+  {
+    "id": "comp_265",
+    "procedure_a": "proc_078",
+    "procedure_b": "proc_077",
+    "best_for_a": "permanent_hair",
+    "best_for_b": "regenerative"
+  },
+  {
+    "id": "comp_266",
+    "procedure_a": "proc_041",
+    "procedure_b": "proc_058",
+    "best_for_a": "hydrafacial",
+    "best_for_b": "oxygeneo"
+  },
+  {
+    "id": "comp_267",
+    "procedure_a": "proc_041",
+    "procedure_b": "proc_059",
+    "best_for_a": "hydrafacial",
+    "best_for_b": "carbon_laser"
+  },
+  {
+    "id": "comp_268",
+    "procedure_a": "proc_042",
+    "procedure_b": "proc_041",
+    "best_for_a": "oxygen_facial",
+    "best_for_b": "hydrafacial"
+  },
+  {
+    "id": "comp_269",
+    "procedure_a": "proc_073",
+    "procedure_b": "proc_028",
+    "best_for_a": "chemical_peel",
+    "best_for_b": "fractional_laser"
+  },
+  {
+    "id": "comp_270",
+    "procedure_a": "proc_061",
+    "procedure_b": "proc_050",
+    "best_for_a": "pdo_thread",
+    "best_for_b": "cog_thread"
+  },
+  {
+    "id": "comp_271",
+    "procedure_a": "proc_001",
+    "procedure_b": "proc_006",
+    "best_for_a": "dynamic_wrinkles",
+    "best_for_b": "volume_loss"
+  },
+  {
+    "id": "comp_272",
+    "procedure_a": "proc_001",
+    "procedure_b": "proc_021",
+    "best_for_a": "forehead_lines",
+    "best_for_b": "skin_sagging"
+  },
+  {
+    "id": "comp_273",
+    "procedure_a": "proc_001",
+    "procedure_b": "proc_023",
+    "best_for_a": "wrinkle_relaxation",
+    "best_for_b": "skin_tightening"
+  },
+  {
+    "id": "comp_274",
+    "procedure_a": "proc_006",
+    "procedure_b": "proc_010",
+    "best_for_a": "immediate_volume",
+    "best_for_b": "gradual_collagen"
+  },
+  {
+    "id": "comp_275",
+    "procedure_a": "proc_006",
+    "procedure_b": "proc_011",
+    "best_for_a": "filler_volume",
+    "best_for_b": "collagen_stimulation"
+  },
+  {
+    "id": "comp_276",
+    "procedure_a": "proc_021",
+    "procedure_b": "proc_023",
+    "best_for_a": "ultrasound_lifting",
+    "best_for_b": "rf_tightening"
+  },
+  {
+    "id": "comp_277",
+    "procedure_a": "proc_021",
+    "procedure_b": "proc_061",
+    "best_for_a": "non_surgical_lift",
+    "best_for_b": "thread_lift"
+  },
+  {
+    "id": "comp_278",
+    "procedure_a": "proc_021",
+    "procedure_b": "proc_093",
+    "best_for_a": "non_surgical",
+    "best_for_b": "surgical_facelift"
+  },
+  {
+    "id": "comp_279",
+    "procedure_a": "proc_023",
+    "procedure_b": "proc_024",
+    "best_for_a": "rf_tightening",
+    "best_for_b": "rf_microneedling"
+  },
+  {
+    "id": "comp_280",
+    "procedure_a": "proc_024",
+    "procedure_b": "proc_025",
+    "best_for_a": "stronger_rf",
+    "best_for_b": "gentler_rf"
+  },
+  {
+    "id": "comp_281",
+    "procedure_a": "proc_026",
+    "procedure_b": "proc_028",
+    "best_for_a": "mild_scars",
+    "best_for_b": "deep_scars"
+  },
+  {
+    "id": "comp_282",
+    "procedure_a": "proc_028",
+    "procedure_b": "proc_057",
+    "best_for_a": "rolling_scars",
+    "best_for_b": "tethered_scars"
+  },
+  {
+    "id": "comp_283",
+    "procedure_a": "proc_029",
+    "procedure_b": "proc_030",
+    "best_for_a": "melasma",
+    "best_for_b": "freckles"
+  },
+  {
+    "id": "comp_284",
+    "procedure_a": "proc_029",
+    "procedure_b": "proc_038",
+    "best_for_a": "pico_laser",
+    "best_for_b": "picosure"
+  },
+  {
+    "id": "comp_285",
+    "procedure_a": "proc_030",
+    "procedure_b": "proc_028",
+    "best_for_a": "pigmentation",
+    "best_for_b": "resurfacing"
+  },
+  {
+    "id": "comp_286",
+    "procedure_a": "proc_008",
+    "procedure_b": "proc_009",
+    "best_for_a": "skin_repair",
+    "best_for_b": "hydration"
+  },
+  {
+    "id": "comp_287",
+    "procedure_a": "proc_008",
+    "procedure_b": "proc_084",
+    "best_for_a": "collagen_stimulation",
+    "best_for_b": "hydration"
+  },
+  {
+    "id": "comp_288",
+    "procedure_a": "proc_010",
+    "procedure_b": "proc_011",
+    "best_for_a": "long_term_collagen",
+    "best_for_b": "medium_term"
+  },
+  {
+    "id": "comp_289",
+    "procedure_a": "proc_010",
+    "procedure_b": "proc_025",
+    "best_for_a": "sculptra",
+    "best_for_b": "ellanse"
+  },
+  {
+    "id": "comp_290",
+    "procedure_a": "proc_067",
+    "procedure_b": "proc_069",
+    "best_for_a": "device_fat",
+    "best_for_b": "injection_fat"
+  },
+  {
+    "id": "comp_291",
+    "procedure_a": "proc_067",
+    "procedure_b": "proc_092",
+    "best_for_a": "non_surgical",
+    "best_for_b": "surgical_lipo"
+  },
+  {
+    "id": "comp_292",
+    "procedure_a": "proc_069",
+    "procedure_b": "proc_055",
+    "best_for_a": "fat_dissolve",
+    "best_for_b": "kybella"
+  },
+  {
+    "id": "comp_293",
+    "procedure_a": "proc_077",
+    "procedure_b": "proc_060",
+    "best_for_a": "prp_hair",
+    "best_for_b": "prp_skin"
+  },
+  {
+    "id": "comp_294",
+    "procedure_a": "proc_078",
+    "procedure_b": "proc_091",
+    "best_for_a": "fue_transplant",
+    "best_for_b": "dhi_transplant"
+  },
+  {
+    "id": "comp_295",
+    "procedure_a": "proc_078",
+    "procedure_b": "proc_077",
+    "best_for_a": "permanent_hair",
+    "best_for_b": "regenerative"
+  },
+  {
+    "id": "comp_296",
+    "procedure_a": "proc_041",
+    "procedure_b": "proc_058",
+    "best_for_a": "hydrafacial",
+    "best_for_b": "oxygeneo"
+  },
+  {
+    "id": "comp_297",
+    "procedure_a": "proc_041",
+    "procedure_b": "proc_059",
+    "best_for_a": "hydrafacial",
+    "best_for_b": "carbon_laser"
+  },
+  {
+    "id": "comp_298",
+    "procedure_a": "proc_042",
+    "procedure_b": "proc_041",
+    "best_for_a": "oxygen_facial",
+    "best_for_b": "hydrafacial"
+  },
+  {
+    "id": "comp_299",
+    "procedure_a": "proc_073",
+    "procedure_b": "proc_028",
+    "best_for_a": "chemical_peel",
+    "best_for_b": "fractional_laser"
+  },
+  {
+    "id": "comp_300",
+    "procedure_a": "proc_061",
+    "procedure_b": "proc_050",
+    "best_for_a": "pdo_thread",
+    "best_for_b": "cog_thread"
+  }
+]

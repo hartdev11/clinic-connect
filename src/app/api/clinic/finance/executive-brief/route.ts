@@ -34,6 +34,12 @@ export async function GET(request: NextRequest) {
       );
     }
     const branchId = request.nextUrl.searchParams.get("branchId") ?? session.branch_id ?? null;
+    if (user.role === "manager" && !branchId) {
+      return NextResponse.json(
+        { error: "กรุณาเลือกสาขาก่อนดู Executive Brief (จำกัดสิทธิ์ตามสาขา)" },
+        { status: 403 }
+      );
+    }
     if (!requireBranchAccess(user.role, user.branch_ids, user.branch_roles, branchId)) {
       return NextResponse.json(
         { error: "จำกัดสิทธิ์: คุณไม่มีสิทธิ์เข้าถึง Finance ของสาขานี้" },

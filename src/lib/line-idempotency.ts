@@ -31,6 +31,29 @@ export async function markLineEventProcessed(
   });
 }
 
+/**
+ * Atomic claim for LINE event processing.
+ * Returns false when already claimed/processed.
+ */
+export async function claimLineEventProcessing(
+  replyToken: string,
+  userId: string,
+  messageHash: string,
+  ttlMinutes = 60
+): Promise<boolean> {
+  const key = `${replyToken}_${userId}_${messageHash}`.slice(0, 150);
+  const expiresAt = new Date(Date.now() + ttlMinutes * 60 * 1000);
+  try {
+    await db.collection(COLLECTION).doc(key).create({
+      processed_at: FieldValue.serverTimestamp(),
+      expires_at: expiresAt,
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function hashMessage(text: string): string {
   let h = 0;
   for (let i = 0; i < Math.min(text.length, 200); i++) {

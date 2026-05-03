@@ -1,0 +1,29 @@
+{
+  "agent_d43419597c": {
+    "agent_id": "agent_d43419597c",
+    "tenant_id": "t_001",
+    "clinic_id": "c_001",
+    "branch_id": "b_001",
+    "full_name": "PG Agent",
+    "email": "pg_agent@example.com",
+    "phone": "0890000001",
+    "status": "approved",
+    "role_type": "closer",
+    "commission_type": "percent",
+    "commission_value": 0.05,
+    "bonus_rules": [],
+    "assigned_affiliate_id": null,
+    "tags": [],
+    "notes": [
+      "agent_created",
+      "status=pending",
+      "status:approved",
+      "auto_approve",
+      "perf:leads+5,bookings+1,rev+10000"
+    ],
+    "total_leads": 5,
+    "total_bookings": 1,
+    "total_revenue": 10000.0,
+    "total_commission_earned": 500.0
+  }
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const DURATION = 400;
 const EASING = (t: number) => 1 - Math.pow(1 - t, 3);
@@ -19,6 +19,11 @@ export function AnimatedCounter({
   className?: string;
 }) {
   const [display, setDisplay] = useState(start ? value : 0);
+  const previousValueRef = useRef(display);
+
+  useEffect(() => {
+    previousValueRef.current = display;
+  }, [display]);
 
   useEffect(() => {
     if (!start) return;
@@ -26,7 +31,7 @@ export function AnimatedCounter({
       setDisplay(0);
       return;
     }
-    const startVal = display;
+    const startVal = previousValueRef.current;
     const endVal = value;
     if (startVal === endVal) return;
     const startTime = performance.now();

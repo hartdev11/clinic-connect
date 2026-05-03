@@ -7,7 +7,6 @@ import { getSessionFromCookies } from "@/lib/auth-session";
 import { getOrgIdFromClinicId } from "@/lib/clinic-data";
 import { getEffectiveUser, requireRole } from "@/lib/rbac";
 import { getAgencyById, getOrgsByAgencyId, getCommissionStatsForAgency } from "@/lib/agency-data";
-import { getCurrentMonthConversationsUsed } from "@/lib/ai-usage-daily";
 import { getSubscriptionByOrgId } from "@/lib/clinic-data";
 import { PLAN_CONVERSATIONS_LIMIT } from "@/types/subscription";
 import type { OrgPlan } from "@/types/organization";

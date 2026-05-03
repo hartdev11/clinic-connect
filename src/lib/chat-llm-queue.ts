@@ -4,33 +4,33 @@
  * Worker processes job, calls chatOrchestrate, stores result in Redis.
  */
 import { Queue } from "bullmq";
-import Redis from "ioredis";
-import { getRedisClient } from "@/lib/redis-client";
 import type { ChatOrchestratorInput, ChatOrchestratorOutput } from "@/lib/ai/orchestrator";
+import { getRedisClient, getSharedRedisConnection, isRedisConfigured, REDIS_URL } from "@/lib/redis-client";
+import { buildRetryJobOptions } from "@/lib/queue-defaults";
 
 const QUEUE_NAME = "chat-llm";
 const RESULT_KEY_PREFIX = "job:result:";
 const RESULT_TTL_SEC = 60;
 const POLL_INTERVAL_MS = 500;
 
-export const REDIS_URL = process.env.REDIS_URL ?? "";
+export { REDIS_URL };
 
 function isQueueConfigured(): boolean {
-  return typeof REDIS_URL === "string" && REDIS_URL.length > 0;
+  return isRedisConfigured();
 }
 
 let _queue: Queue | null = null;
-let _queueConnection: Redis | null = null;
 
 /**
- * Get BullMQ Queue (lazy init). Returns null if REDIS_URL not set.
+ * Get BullMQ Queue (lazy init). Returns null if Redis not configured.
  */
 export function getChatLlmQueue(): Queue | null {
   if (!isQueueConfigured()) return null;
   if (_queue) return _queue;
-  _queueConnection = new Redis(REDIS_URL, { maxRetriesPerRequest: 2 });
+  const conn = getSharedRedisConnection();
+  if (!conn) return null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  _queue = new Queue(QUEUE_NAME, { connection: _queueConnection as any });
+  _queue = new Queue(QUEUE_NAME, { connection: conn as any });
   return _queue;
 }
 
@@ -43,7 +43,11 @@ export async function enqueueChatLlmJob(data: ChatLlmJobData): Promise<string | 
   const queue = getChatLlmQueue();
   if (!queue) return null;
   try {
-    const job = await queue.add("orchestrate", data);
+    const job = await queue.add(
+      "orchestrate",
+      data,
+      buildRetryJobOptions(undefined, { attempts: 3, backoffDelayMs: 30_000 })
+    );
     return job.id ?? null;
   } catch {
     return null;

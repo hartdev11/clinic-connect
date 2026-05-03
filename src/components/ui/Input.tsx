@@ -4,6 +4,7 @@ import {
   type TextareaHTMLAttributes,
   forwardRef,
 } from 'react'
+import { ExclamationTriangleIcon } from "@heroicons/react/24/solid";
 import { cn } from '@/lib/utils'
 
 const baseInputClass = cn(
@@ -45,7 +46,7 @@ function FieldWrapper({
       {children}
       {error != null && (
         <p className="text-xs text-red-500 font-body flex items-center gap-1">
-          <span>⚠</span> {error}
+          <ExclamationTriangleIcon className="h-3.5 w-3.5" /> {error}
         </p>
       )}
       {hint != null && !error && (

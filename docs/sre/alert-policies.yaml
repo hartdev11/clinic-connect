@@ -1,0 +1,51 @@
+version: 1
+owner: sre@clinic-connect
+defaults:
+  dedupe_window_minutes: 15
+  route:
+    warning: "slack:#ops-warning"
+    critical: "pagerduty:clinic-oncall"
+policies:
+  - id: api_availability_warning
+    name: API availability below 99.7% (1h)
+    severity: WARNING
+    condition: "availability_pct_1h < 99.7"
+    source: "/api/internal/observability/sre-dashboard"
+    runbook: "docs/sre/runbooks/api-latency-spike.md"
+  - id: api_availability_critical
+    name: API availability below 99.5% (1h)
+    severity: CRITICAL
+    condition: "availability_pct_1h < 99.5"
+    source: "/api/internal/observability/sre-dashboard"
+    runbook: "docs/sre/runbooks/api-latency-spike.md"
+  - id: api_latency_p95_critical
+    name: API p95 latency above 1200ms (15m)
+    severity: CRITICAL
+    condition: "p95_latency_ms_15m > 1200"
+    source: "/api/internal/observability/sre-dashboard"
+    runbook: "docs/sre/runbooks/api-latency-spike.md"
+  - id: readiness_degraded
+    name: Readiness degraded for 5 minutes
+    severity: CRITICAL
+    condition: "health_ready_status != 200 for 5m"
+    source: "/api/health/ready"
+    runbook: "docs/sre/runbooks/firestore-unreachable.md"
+  - id: ai_cost_spike_high
+    name: AI cost spike high
+    severity: CRITICAL
+    condition: "ai_cost_today > ai_cost_yesterday * 3"
+    source: "/api/admin/anomalies"
+    runbook: "docs/sre/runbooks/ai-cost-spike.md"
+  - id: usage_spike_medium
+    name: Usage spike
+    severity: WARNING
+    condition: "usage_today > avg_7d * 3"
+    source: "/api/admin/anomalies"
+    runbook: "docs/sre/runbooks/ai-cost-spike.md"
+  - id: conversation_drop_high
+    name: Conversation drop
+    severity: CRITICAL
+    condition: "usage_today < avg_7d * 0.3"
+    source: "/api/admin/anomalies"
+    runbook: "docs/sre/runbooks/api-latency-spike.md"
+

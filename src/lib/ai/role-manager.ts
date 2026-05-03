@@ -34,7 +34,6 @@ const ENABLE_LLM_JUDGE = process.env.ENABLE_LLM_JUDGE !== "false";
 
 const LLM_TIMEOUT_MS = 8000;
 const MAX_INPUT_CHARS = 6000;
-const MAX_OUTPUT_TOKENS = 220;
 
 /** บีบ context ให้ไม่เกินขีดจำกัด token (ประมาณ 4 chars/token) */
 function truncateContext(json: string, maxChars: number): string {
@@ -45,10 +44,6 @@ function truncateContext(json: string, maxChars: number): string {
 /** Phase 2 #16 / Phase 3 #11: Safe fallback — โทนมนุษย์ ไม่ template */
 const SAFE_FALLBACK_LOW_CONFIDENCE =
   "เรื่องนี้ให้ทีมงานตรวจสอบให้จะแม่นยำกว่าค่ะ โทรหรือแชทมาคลินิกได้เลยนะคะ";
-
-/** Phase 3 #2: Restricted response template (0.70–0.84 confidence) */
-const RESTRICTED_RESPONSE_PREFIX =
-  "จากข้อมูลที่เรามี: ";
 
 /** Phase 2 #22 / Phase 3 #16: Mandatory disclaimer + escalation path */
 const SURGERY_DISCLAIMER =
@@ -181,6 +176,17 @@ export async function runRoleManager(
   input: RoleManagerInput
 ): Promise<RoleManagerOutput> {
   const start = Date.now();
+
+  const forwardChatToPhaseG = process.env.FORWARD_CHAT_TO_PHASE_G?.trim().toLowerCase() === "true";
+  if (forwardChatToPhaseG) {
+    // New architecture: chat generation is owned by Phase backends.
+    return {
+      reply: "ขออภัยค่ะ ระบบกำลังประมวลผลผ่านบริการภายนอก กรุณาลองใหม่อีกครั้ง",
+      success: false,
+      totalMs: Date.now() - start,
+      error: "FORWARDED_CHAT_TO_PHASE_G",
+    };
+  }
 
   const openai = getOpenAI();
   if (!openai) {
@@ -350,7 +356,7 @@ export async function runRoleManager(
 
     // Phase 3 #2: Schema-based + self-consistency + LLM-as-judge (world-class)
     if (knowledgeSummary) {
-      const validation = validateOutputAgainstContext(reply, knowledgeSummary);
+      const validation = validateOutputAgainstContext(reply);
       const consistent = selfConsistencyCheck(reply, knowledgeSummary);
       if (!validation.valid || !consistent) {
         log.warn("Role Manager output validation failed", {

@@ -1,0 +1,81 @@
+{
+  "insights": [
+    {
+      "type": "conversion",
+      "title": "Conversion ต่ำกว่ามาตรฐาน",
+      "message": "ควรตรวจจุด drop ใน funnel",
+      "priority": "high"
+    },
+    {
+      "type": "ctr",
+      "title": "CTR อยู่ในเกณฑ์",
+      "message": "CTR = 0.0944",
+      "priority": "low"
+    },
+    {
+      "type": "procedure",
+      "title": "Procedure ที่ทำเงินดีที่สุด",
+      "message": "ควร push Botox ลดกราม รายได้ 117100.0",
+      "priority": "high"
+    },
+    {
+      "type": "channel",
+      "title": "ช่องทางที่ทำรายได้ดีที่สุด",
+      "message": "facebook ทำรายได้ 94052.0",
+      "priority": "medium"
+    },
+    {
+      "type": "branch",
+      "title": "สาขา performance ต่ำสุด",
+      "message": "สาขา hkt_oldtown รายได้ 46740.0",
+      "priority": "medium"
+    },
+    {
+      "type": "business",
+      "title": "มูลค่าเฉลี่ยต่อ session",
+      "message": "Revenue per session = 572.56",
+      "priority": "low"
+    },
+    {
+      "type": "business",
+      "title": "มูลค่าเฉลี่ยต่อ user",
+      "message": "Revenue per user = 1143.48",
+      "priority": "low"
+    },
+    {
+      "type": "affiliate",
+      "title": "Affiliate channel กำลังทำงาน",
+      "message": "clicks 41 bookings 24",
+      "priority": "medium"
+    },
+    {
+      "type": "agent",
+      "title": "ภาพรวม sales agent",
+      "message": "Close rate = 0.0574",
+      "priority": "medium"
+    },
+    {
+      "type": "owner",
+      "title": "ภาพรวม owner",
+      "message": "รายได้รวม 400218.0 สาขา 4",
+      "priority": "low"
+    }
+  ],
+  "alerts": [
+    {
+      "code": "LOW_CONVERSION",
+      "message": "Conversion rate ต่ำ (0.0501) ควรปรับ CTA",
+      "severity": "high"
+    },
+    {
+      "code": "LOW_AGENT_CLOSE_RATE",
+      "message": "Close rate ต่ำ (0.0574)",
+      "severity": "medium"
+    },
+    {
+      "code": "LOW_BRANCH_CONVERSION",
+      "message": "มี 4 สาขา conversion ต่ำ",
+      "severity": "medium"
+    }
+  ]
+}

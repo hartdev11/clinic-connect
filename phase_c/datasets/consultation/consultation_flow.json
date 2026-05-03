@@ -1,0 +1,132 @@
+[
+  {
+    "problem": "forehead_wrinkles",
+    "recommendation": [
+      "proc_001"
+    ]
+  },
+  {
+    "problem": "nasolabial_folds",
+    "recommendation": [
+      "proc_006"
+    ]
+  },
+  {
+    "problem": "skin_laxity",
+    "recommendation": [
+      "proc_021",
+      "proc_023"
+    ]
+  },
+  {
+    "problem": "acne_scars",
+    "recommendation": [
+      "proc_028",
+      "proc_026"
+    ]
+  },
+  {
+    "problem": "dull_skin",
+    "recommendation": [
+      "proc_041",
+      "proc_042"
+    ]
+  },
+  {
+    "problem": "melasma",
+    "recommendation": [
+      "proc_029"
+    ]
+  },
+  {
+    "problem": "facial_sagging",
+    "recommendation": [
+      "proc_061",
+      "proc_021"
+    ]
+  },
+  {
+    "problem": "jawline_contour",
+    "recommendation": [
+      "proc_004"
+    ]
+  },
+  {
+    "problem": "under_eye_hollow",
+    "recommendation": [
+      "proc_006"
+    ]
+  },
+  {
+    "problem": "enlarged_pores",
+    "recommendation": [
+      "proc_041"
+    ]
+  },
+  {
+    "problem": "volume_loss",
+    "recommendation": [
+      "proc_006",
+      "proc_010"
+    ]
+  },
+  {
+    "problem": "collagen_loss",
+    "recommendation": [
+      "proc_010",
+      "proc_011"
+    ]
+  },
+  {
+    "problem": "freckles",
+    "recommendation": [
+      "proc_030"
+    ]
+  },
+  {
+    "problem": "hair_loss",
+    "recommendation": [
+      "proc_077",
+      "proc_078"
+    ]
+  },
+  {
+    "problem": "fine_lines",
+    "recommendation": [
+      "proc_001"
+    ]
+  },
+  {
+    "problem": "dehydrated_skin",
+    "recommendation": [
+      "proc_008",
+      "proc_009"
+    ]
+  },
+  {
+    "problem": "jaw_slimming",
+    "recommendation": [
+      "proc_001"
+    ]
+  },
+  {
+    "problem": "double_chin",
+    "recommendation": [
+      "proc_069",
+      "proc_070"
+    ]
+  },
+  {
+    "problem": "pigmentation",
+    "recommendation": [
+      "proc_029",
+      "proc_030"
+    ]
+  },
+  {
+    "problem": "neck_laxity",
+    "recommendation": [
+      "proc_023"
+    ]
+  }
+]

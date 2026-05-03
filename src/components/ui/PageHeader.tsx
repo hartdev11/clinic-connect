@@ -27,8 +27,8 @@ export function PageHeader({
       className={cn('flex flex-col gap-1 mb-8', className)}
     >
       {breadcrumb != null && <div className="mb-2">{breadcrumb}</div>}
-      <div className="flex items-start justify-between gap-4">
-        <div>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+        <div className="min-w-0">
           <h1
             className={cn(
               'font-sans text-xl font-semibold text-mauve-800',
@@ -44,7 +44,7 @@ export function PageHeader({
           )}
         </div>
         {actions != null && (
-          <div className="flex items-center gap-3 flex-shrink-0 pt-1">
+          <div className="flex w-full flex-wrap items-center gap-2 pt-1 sm:w-auto sm:justify-end sm:gap-3 sm:flex-shrink-0">
             {actions}
           </div>
         )}

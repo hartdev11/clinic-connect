@@ -6,8 +6,29 @@ import { verifyToken, COOKIE_NAME } from "@/lib/session";
 const REQUEST_ID_HEADER = "x-request-id";
 
 /** CSP — Content Security Policy (Enterprise Security) */
-const CSP_HEADER =
-  "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self'; connect-src 'self' https: wss:; frame-ancestors 'self'";
+function getCspHeader(): string {
+  const googleScriptAllowlist = "https://apis.google.com https://accounts.google.com https://www.gstatic.com";
+  const frameSrcAllowlist =
+    "'self' https://clinic-connect-dcbc4.firebaseapp.com https://*.firebaseapp.com https://accounts.google.com https://*.gstatic.com";
+  const scriptSrc =
+    process.env.NODE_ENV === "development"
+      ? `script-src 'self' 'unsafe-inline' 'unsafe-eval' ${googleScriptAllowlist}`
+      : `script-src 'self' 'unsafe-inline' ${googleScriptAllowlist}`;
+  return [
+    "default-src 'self'",
+    scriptSrc,
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: https: blob:",
+    "font-src 'self' data:",
+    "connect-src 'self' https: wss:",
+    `frame-src ${frameSrcAllowlist}`,
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "frame-ancestors 'self'",
+    "upgrade-insecure-requests",
+  ].join("; ");
+}
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -50,9 +71,11 @@ export async function middleware(request: NextRequest) {
 
 function addEnterpriseHeaders(res: NextResponse, requestId: string): NextResponse {
   res.headers.set(REQUEST_ID_HEADER, requestId);
-  res.headers.set("Content-Security-Policy", CSP_HEADER);
+  res.headers.set("Content-Security-Policy", getCspHeader());
   res.headers.set("X-Content-Type-Options", "nosniff");
   res.headers.set("X-Frame-Options", "SAMEORIGIN");
+  res.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
   return res;
 }
 

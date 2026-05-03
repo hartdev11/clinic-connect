@@ -24,6 +24,12 @@ export async function GET(request: NextRequest) {
     const user = await getEffectiveUser(session);
     const { searchParams } = new URL(request.url);
     const branchId = searchParams.get("branchId") ?? session.branch_id ?? null;
+    if ((user.role === "manager" || user.role === "staff") && !branchId) {
+      return NextResponse.json(
+        { error: "กรุณาเลือกสาขาก่อนดูลูกค้า (จำกัดสิทธิ์ตามสาขา)" },
+        { status: 403 }
+      );
+    }
     if (!requireBranchAccess(user.role, user.branch_ids, user.branch_roles, branchId)) {
       return NextResponse.json(
         { error: "จำกัดสิทธิ์: คุณไม่มีสิทธิ์เข้าถึงลูกค้าของสาขานี้" },
@@ -45,6 +51,12 @@ export async function GET(request: NextRequest) {
     const startAfter = searchParams.get("startAfter") ?? undefined;
     const search = searchParams.get("search")?.trim().toLowerCase() ?? "";
     const allBranches = searchParams.get("allBranches") === "true";
+    if (allBranches && !(user.role === "owner" || user.role === "super_admin")) {
+      return NextResponse.json(
+        { error: "allBranches ใช้ได้เฉพาะ Owner เท่านั้น" },
+        { status: 403 }
+      );
+    }
     const sourceParam = searchParams.get("source");
     const validSource = ["line", "facebook", "instagram", "tiktok", "web"].includes(sourceParam || "")
       ? (sourceParam as "line" | "facebook" | "instagram" | "tiktok" | "web")

@@ -16,6 +16,7 @@ export function getSessionSecret(): string {
 export interface TokenPayload {
   sub: string;
   email: string;
+  tenant_id?: string | null;
   org_id?: string | null;
   branch_id?: string | null;
   user_id?: string | null;
@@ -24,6 +25,7 @@ export interface TokenPayload {
 
 /** ผลจาก verify — org_id อาจเป็น null (legacy token) */
 export type VerifiedPayload = Omit<TokenPayload, "org_id"> & {
+  tenant_id: string | null;
   org_id: string | null;
   branch_id: string | null;
   user_id: string | null;
@@ -36,6 +38,7 @@ export async function createToken(payload: TokenPayload): Promise<string> {
     sub: payload.sub,
     email: payload.email,
   };
+  if (payload.tenant_id) claims.tenant_id = payload.tenant_id;
   if (payload.org_id) claims.org_id = payload.org_id;
   if (payload.branch_id) claims.branch_id = payload.branch_id;
   if (payload.user_id) claims.user_id = payload.user_id;
@@ -53,11 +56,13 @@ export async function verifyToken(token: string): Promise<VerifiedPayload | null
     const { payload } = await jose.jwtVerify(token, secret);
     const sub = payload.sub as string;
     const email = payload.email as string;
+    const tenant_id = payload.tenant_id as string;
     const org_id = payload.org_id as string;
     if (!sub || !email) return null;
     return {
       sub,
       email,
+      tenant_id: tenant_id || null,
       org_id: org_id || null,
       branch_id: (payload.branch_id as string) || null,
       user_id: (payload.user_id as string) || null,

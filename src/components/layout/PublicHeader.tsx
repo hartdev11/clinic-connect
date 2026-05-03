@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { SparklesIcon } from "@heroicons/react/24/solid";
 
 export function PublicHeader() {
   const [scrolled, setScrolled] = useState(false);
@@ -34,7 +35,7 @@ export function PublicHeader() {
             className="flex items-center gap-3 group transition-transform duration-300 hover:scale-[1.02] active:scale-[0.98]"
           >
             <span className="flex items-center justify-center w-10 h-10 rounded-2xl bg-gradient-to-br from-rg-400 via-rg-500 to-rg-600 text-white font-bold text-lg shadow-md shadow-rg-400/30 transition-shadow duration-300 group-hover:shadow-lg group-hover:shadow-rg-400/35">
-              ✦
+              <SparklesIcon className="h-5 w-5" />
             </span>
             <span className="font-display text-lg font-semibold text-mauve-800">
               Clinic Connect

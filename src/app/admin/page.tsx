@@ -51,7 +51,7 @@ function MetricCard({
 }
 
 export default function AdminDashboardPage() {
-  const { data: metrics, isLoading } = useSWR<PlatformMetrics>(
+  const { data: metrics, isLoading, error, mutate } = useSWR<PlatformMetrics>(
     "/api/admin/platform-metrics",
     apiFetcher,
     { refreshInterval: 60_000 }
@@ -73,6 +73,18 @@ export default function AdminDashboardPage() {
           loading={isLoading}
         />
       </section>
+      {error && (
+        <section className="luxury-card p-4 border border-red-200 bg-red-50">
+          <p className="text-sm text-red-700">โหลด Platform Metrics ไม่สำเร็จ กรุณาลองรีเฟรชอีกครั้ง</p>
+          <button
+            type="button"
+            onClick={() => mutate()}
+            className="mt-2 text-sm text-red-700 underline underline-offset-2"
+          >
+            รีเฟรช
+          </button>
+        </section>
+      )}
       {/* Phase 21: Cost & Margin row */}
       {(metrics?.total_ai_cost != null || metrics?.platform_margin != null) && (
         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

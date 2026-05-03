@@ -47,6 +47,12 @@ export async function GET(request: NextRequest) {
       }
       const user = await getEffectiveUser(session);
       const branchId = request.nextUrl.searchParams.get("branchId") ?? session.branch_id ?? null;
+      if ((user.role === "manager" || user.role === "staff") && !branchId) {
+        return NextResponse.json(
+          { error: "กรุณาเลือกสาขาก่อนดู Dashboard (จำกัดสิทธิ์ตามสาขา)" },
+          { status: 403 }
+        );
+      }
       if (!requireBranchAccess(user.role, user.branch_ids, user.branch_roles, branchId)) {
         return NextResponse.json(
           { error: "จำกัดสิทธิ์: คุณไม่มีสิทธิ์เข้าถึงสาขานี้" },

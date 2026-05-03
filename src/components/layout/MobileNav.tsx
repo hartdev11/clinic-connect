@@ -4,13 +4,20 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import {
+  Squares2X2Icon,
+  UserGroupIcon,
+  CalendarDaysIcon,
+  ChartBarIcon,
+  Cog6ToothIcon,
+} from "@heroicons/react/24/outline";
 
 const mobileNavItems = [
-  { href: "/clinic", label: "หน้าหลัก", icon: "◈" },
-  { href: "/clinic/customers", label: "ลูกค้า", icon: "◎" },
-  { href: "/clinic/booking", label: "จอง", icon: "⬡" },
-  { href: "/clinic/insights", label: "Insights", icon: "△" },
-  { href: "/clinic/settings", label: "ตั้งค่า", icon: "⊙" },
+  { href: "/clinic", label: "หน้าหลัก", Icon: Squares2X2Icon },
+  { href: "/clinic/customers", label: "ลูกค้า", Icon: UserGroupIcon },
+  { href: "/clinic/booking", label: "จอง", Icon: CalendarDaysIcon },
+  { href: "/clinic/insights", label: "Insights", Icon: ChartBarIcon },
+  { href: "/clinic/settings", label: "ตั้งค่า", Icon: Cog6ToothIcon },
 ];
 
 export function MobileNav() {
@@ -38,8 +45,8 @@ export function MobileNav() {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex flex-col items-center gap-1 px-3 py-2 rounded-2xl relative",
-                "transition-all duration-200 min-w-[56px]",
+                "flex flex-1 flex-col items-center gap-1 px-2 py-2 rounded-2xl relative min-w-0",
+                "transition-all duration-200",
                 isActive ? "text-rg-600" : "text-mauve-400 hover:text-mauve-600"
               )}
             >
@@ -52,7 +59,7 @@ export function MobileNav() {
                     : "text-mauve-400"
                 )}
               >
-                {item.icon}
+                <item.Icon className="h-4 w-4" />
               </span>
               <span
                 className={cn(

@@ -41,7 +41,9 @@ export async function GET(request: NextRequest) {
             : user.branch_roles
               ? Object.keys(user.branch_roles)
               : [];
-        if (allowedBranchIds.length > 0) {
+        if (allowedBranchIds.length === 0) {
+          scores = [];
+        } else {
           scores = allScores.filter((s) => allowedBranchIds.includes(s.branchId));
         }
       }

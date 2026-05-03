@@ -17,6 +17,16 @@ const VALID_VOICE_IDS = ["V01", "V02", "V03", "V04", "V05", "V06"] as const;
 const VALID_SALES_STRATEGIES = ["consultative", "direct", "education_first"] as const;
 const VALID_PROMOTION_DISPLAY = ["always", "by_promotion_only", "never"] as const;
 
+function toIso(value: unknown): string | null {
+  if (!value) return null;
+  if (typeof value === "string") return value;
+  if (value instanceof Date) return value.toISOString();
+  if (typeof value === "object" && value && "toDate" in value && typeof (value as { toDate?: () => Date }).toDate === "function") {
+    return (value as { toDate: () => Date }).toDate().toISOString();
+  }
+  return null;
+}
+
 /** GET — ดึง ai_config settings */
 export async function GET() {
   const session = await getSessionFromCookies();
@@ -26,10 +36,12 @@ export async function GET() {
   if (!orgId) return NextResponse.json({ error: "Organization not found" }, { status: 404 });
 
   const settings = await getAiConfig(orgId);
+  const orgSnap = await db.collection("organizations").doc(orgId).get();
+  const orgData = orgSnap.exists ? orgSnap.data() ?? {} : {};
+  const appliedAtIso = toIso(orgData?.ai_config_applied_at) ?? toIso(orgData?.updatedAt);
   if (!settings) {
     return NextResponse.json({
       clinic_style: "friendly",
-      ai_tone: "casual",
       usp: "",
       competitors: [],
       greeting_message: "",
@@ -43,9 +55,15 @@ export async function GET() {
       negotiation_allowed: false,
       promotion_display: "by_promotion_only",
       max_emoji_per_message: undefined,
+      appliedToLiveChat: true,
+      appliedAt: appliedAtIso,
     });
   }
-  return NextResponse.json(settings);
+  return NextResponse.json({
+    ...settings,
+    appliedToLiveChat: true,
+    appliedAt: appliedAtIso,
+  });
 }
 
 /** PATCH — อัปเดต ai_config settings (merge กับของเดิม) */
@@ -71,7 +89,6 @@ export async function PATCH(request: NextRequest) {
     body.clinic_style != null && VALID_CLINIC_STYLES.includes(body.clinic_style)
       ? body.clinic_style
       : existing?.clinic_style ?? "friendly";
-  const ai_tone = body.ai_tone ?? existing?.ai_tone ?? "casual";
   const usp = body.usp ?? existing?.usp ?? "";
   const competitors = Array.isArray(body.competitors)
     ? body.competitors
@@ -105,7 +122,6 @@ export async function PATCH(request: NextRequest) {
 
   const newSettings = {
     clinic_style,
-    ai_tone,
     usp,
     competitors,
     greeting_message,
@@ -143,6 +159,7 @@ export async function PATCH(request: NextRequest) {
       ...aiConfig,
       settings: newSettings,
     },
+    ai_config_applied_at: FieldValue.serverTimestamp(),
     updatedAt: FieldValue.serverTimestamp(),
   });
 
@@ -161,10 +178,15 @@ export async function PATCH(request: NextRequest) {
   void invalidateOrgCache(orgId);
   void invalidateAICache({ org_id: orgId, scope: "org" });
 
+  const updated = await ref.get();
+  const updatedData = updated.exists ? updated.data() ?? {} : {};
+  const appliedAt = toIso(updatedData?.ai_config_applied_at) ?? toIso(updatedData?.updatedAt);
+
   return NextResponse.json({
     success: true,
+    appliedToLiveChat: true,
+    appliedAt,
     clinic_style,
-    ai_tone,
     usp,
     competitors,
     greeting_message,

@@ -4,27 +4,28 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionFromCookies } from "@/lib/auth-session";
 import { getOrgIdFromClinicId } from "@/lib/clinic-data";
-import { getEffectiveUser, requireRole } from "@/lib/rbac";
+import { getEffectiveUser } from "@/lib/rbac";
+import { canAccessKnowledgeAction } from "@/lib/knowledge-permissions";
 import { listKnowledgeChangeLog } from "@/lib/knowledge-topics-data";
 import { runWithObservability } from "@/lib/observability/run-with-observability";
 
 export const dynamic = "force-dynamic";
 
-async function getAuth(request: NextRequest) {
+async function getAuth() {
   const session = await getSessionFromCookies();
   if (!session) return { error: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) };
   const orgId = session.org_id ?? (await getOrgIdFromClinicId(session.clinicId));
   if (!orgId) return { error: NextResponse.json({ error: "Organization not found" }, { status: 404 }) };
   const user = await getEffectiveUser(session);
-  if (!requireRole(user.role, ["owner", "manager", "staff"])) {
-    return { error: NextResponse.json({ error: "จำกัดสิทธิ์: คุณไม่มีสิทธิ์เข้าถึงข้อมูล Knowledge" }, { status: 403 }) };
+  if (!canAccessKnowledgeAction("read", session, user.role)) {
+    return { error: NextResponse.json({ error: "Forbidden", code: "INSUFFICIENT_ROLE" }, { status: 403 }) };
   }
   return { orgId, user };
 }
 
 export async function GET(request: NextRequest) {
   return runWithObservability("/api/clinic/knowledge/change-log", request, async () => {
-    const auth = await getAuth(request);
+    const auth = await getAuth();
     if ("error" in auth) return auth.error;
 
     const limit = Math.min(

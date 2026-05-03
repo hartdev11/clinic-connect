@@ -35,7 +35,13 @@ export async function GET(request: NextRequest) {
     }
 
     const status = await getLineChannelStatus(session.org_id);
-    return { response: NextResponse.json(status), orgId: session.org_id };
+    return {
+      response: NextResponse.json({
+        ...status,
+        org_id: session.org_id,
+      }),
+      orgId: session.org_id,
+    };
   } catch (err) {
     console.error("[API /api/clinic/line] GET:", err);
     return NextResponse.json(
@@ -98,7 +104,13 @@ export async function PUT(request: NextRequest) {
     );
 
     const status = await getLineChannelStatus(session.org_id);
-    return { response: NextResponse.json(status), orgId: session.org_id };
+    return {
+      response: NextResponse.json({
+        ...status,
+        org_id: session.org_id,
+      }),
+      orgId: session.org_id,
+    };
   } catch (err) {
     console.error("[API /api/clinic/line] PUT:", err);
     return NextResponse.json(

@@ -1,78 +1,62 @@
 import crypto from "crypto";
 
 /**
- * ตรวจสอบ X-Line-Signature — ใช้ Channel Secret เป็น key, HMAC-SHA256(body) แล้ว encode base64
+ * ตรวจสอบ X-Line-Signature — Channel Secret = key, HMAC-SHA256(**raw body bytes**) → Base64
  * @see https://developers.line.biz/en/docs/messaging-api/receiving-messages/#signature-validation
- */
-/**
- * ตรวจสอบ X-Line-Signature
- * LINE ส่ง signature มาเป็น base64-encoded HMAC-SHA256 hash
- * 
- * @see https://developers.line.biz/en/docs/messaging-api/receiving-messages/#signature-validation
+ *
+ * **Body must be the exact bytes LINE POSTed** (use `Buffer` from `request.arrayBuffer()`, not
+ * re-stringified JSON). Passing a UTF-8 `string` is OK if it matches those bytes exactly.
  */
 export function verifyLineSignature(
-  body: string,
+  body: string | Buffer,
   signature: string,
   channelSecret: string
 ): boolean {
-  if (!channelSecret || !signature) {
+  const secret = channelSecret.trim();
+  const sigHeader = signature.trim();
+  if (!secret || !sigHeader) {
     if (process.env.NODE_ENV === "development") {
-      console.log("[LINE Signature] Missing:", { 
-        channelSecret: !!channelSecret, 
-        signature: !!signature 
+      console.log("[LINE Signature] Missing:", {
+        channelSecret: !!secret,
+        signature: !!sigHeader,
       });
     }
     return false;
   }
-  
-  try {
-    // คำนวณ HMAC-SHA256 hash จาก raw body
-    const expected = crypto
-      .createHmac("sha256", channelSecret)
-      .update(body, "utf8")
-      .digest("base64");
-    
-    // LINE ส่ง signature มาเป็น base64 string โดยตรง
-    // เปรียบเทียบแบบ case-sensitive (LINE spec)
-    const sigNormalized = signature.trim();
-    const expNormalized = expected.trim();
-    
-    if (process.env.NODE_ENV === "development") {
-      console.log("[LINE Signature] Verification:", {
-        signatureLength: sigNormalized.length,
-        expectedLength: expNormalized.length,
-        signaturePreview: sigNormalized.slice(0, 30) + "...",
-        expectedPreview: expNormalized.slice(0, 30) + "...",
-        match: sigNormalized === expNormalized,
-      });
-    }
-    
-    // ใช้ timingSafeEqual เพื่อป้องกัน timing attack
-    // แต่ต้อง decode base64 ก่อน
-    let sigBuf: Buffer;
-    try {
-      sigBuf = Buffer.from(sigNormalized, "base64");
-    } catch {
-      // ถ้า decode ไม่ได้ → ลองใช้ string comparison แทน
-      if (process.env.NODE_ENV === "development") {
-        console.log("[LINE Signature] Signature is not valid base64, using string comparison");
-      }
-      return sigNormalized === expNormalized;
-    }
 
-    const expBuf = Buffer.from(expNormalized, "base64");
-    
-    if (sigBuf.length !== expBuf.length) {
+  try {
+    const bodyBuf = Buffer.isBuffer(body) ? body : Buffer.from(body, "utf8");
+    const expectedB64 = crypto.createHmac("sha256", secret).update(bodyBuf).digest("base64");
+
+    // LINE compares Base64 digest strings; use length-safe timing-safe compare on UTF-8 bytes
+    if (sigHeader.length !== expectedB64.length) {
       if (process.env.NODE_ENV === "development") {
         console.log("[LINE Signature] Length mismatch:", {
-          sigLength: sigBuf.length,
-          expLength: expBuf.length,
+          sigLen: sigHeader.length,
+          expectedLen: expectedB64.length,
+          bodyBytes: bodyBuf.length,
         });
       }
       return false;
     }
-    
-    return crypto.timingSafeEqual(sigBuf, expBuf);
+
+    const match = crypto.timingSafeEqual(
+      Buffer.from(sigHeader, "utf8"),
+      Buffer.from(expectedB64, "utf8")
+    );
+
+    if (process.env.NODE_ENV === "development") {
+      console.log("[LINE Signature] Verification:", {
+        bodyBytes: bodyBuf.length,
+        signatureLength: sigHeader.length,
+        expectedLength: expectedB64.length,
+        signaturePreview: sigHeader.slice(0, 30) + "...",
+        expectedPreview: expectedB64.slice(0, 30) + "...",
+        match,
+      });
+    }
+
+    return match;
   } catch (err) {
     if (process.env.NODE_ENV === "development") {
       console.error("[LINE Signature] Verification error:", err);

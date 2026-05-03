@@ -12,6 +12,7 @@ import type {
   KnowledgeVersion,
   KnowledgeVersionPayload,
   KnowledgeVersionStatus,
+  KnowledgeIndexingStatus,
   KnowledgeTopicListItem,
   KnowledgeChangeLogEntry,
   KnowledgeChangeAction,
@@ -78,6 +79,12 @@ function toVersion(id: string, d: Record<string, unknown>): KnowledgeVersion {
     createdBy: (d.createdBy as string) ?? "",
     createdAt: toISO(d.createdAt as Timestamp),
     status: (d.status as KnowledgeVersionStatus) ?? "draft",
+    indexingStatus: (d.indexing_status as KnowledgeIndexingStatus) ?? "queued",
+    indexingError: typeof d.indexing_error === "string" ? d.indexing_error : null,
+    indexedAt: d.indexed_at ? toISO(d.indexed_at as Timestamp) : null,
+    indexingAutoRetryCount:
+      typeof d.indexing_auto_retry_count === "number" ? d.indexing_auto_retry_count : undefined,
+    indexingAutoRetryExhausted: d.indexing_auto_retry_exhausted === true,
     dataClassification: ((d.dataClassification as string) ?? KNOWLEDGE_DATA_CLASSIFICATION) as typeof KNOWLEDGE_DATA_CLASSIFICATION,
   };
 }
@@ -103,11 +110,13 @@ export async function listKnowledgeTopics(
     const activeVersion = t.activeVersionId
       ? await getKnowledgeVersion(orgId, t.activeVersionId)
       : null;
+    const latestVersion = !activeVersion ? (await listKnowledgeVersions(orgId, t.id))[0] ?? null : null;
+    const selectedVersion = activeVersion ?? latestVersion;
     const preview =
-      activeVersion?.content?.slice(0, 120).replace(/\n/g, " ").trim() ||
-      activeVersion?.summary?.[0] ||
+      selectedVersion?.content?.slice(0, 120).replace(/\n/g, " ").trim() ||
+      selectedVersion?.summary?.[0] ||
       "";
-    const status = activeVersion?.status ?? "draft";
+    const status = selectedVersion?.status ?? "draft";
     const staleStatus = getStaleStatus(t.updatedAt);
     list.push({
       id: t.id,
@@ -117,8 +126,12 @@ export async function listKnowledgeTopics(
       lastUpdated: t.updatedAt,
       updatedBy: t.updatedBy || "—",
       status,
+      indexingStatus: selectedVersion?.indexingStatus ?? "queued",
+      indexingError: selectedVersion?.indexingError ?? null,
+      lastIndexedAt: selectedVersion?.indexedAt ?? null,
       activeVersionId: t.activeVersionId,
       staleStatus,
+      indexingAutoRetryExhausted: selectedVersion?.indexingAutoRetryExhausted === true,
     });
   }
   return list;
@@ -200,6 +213,10 @@ export async function createKnowledgeTopicWithVersion(
     createdBy: userId,
     createdAt: now,
     status: "updating",
+    indexing_status: "queued",
+    indexing_error: null,
+    indexing_auto_retry_count: 0,
+    indexing_auto_retry_exhausted: false,
     dataClassification: KNOWLEDGE_DATA_CLASSIFICATION,
   });
 
@@ -252,6 +269,10 @@ export async function createKnowledgeVersion(
     createdBy: userId,
     createdAt: now,
     status: "updating",
+    indexing_status: "queued",
+    indexing_error: null,
+    indexing_auto_retry_count: 0,
+    indexing_auto_retry_exhausted: false,
     dataClassification: KNOWLEDGE_DATA_CLASSIFICATION,
   });
 
@@ -281,6 +302,18 @@ export async function setKnowledgeVersionStatus(
   await versionsRef(orgId).doc(versionId).update({ status });
 }
 
+export async function setKnowledgeVersionIndexingStatus(
+  orgId: string,
+  versionId: string,
+  status: KnowledgeIndexingStatus,
+  errorMessage?: string | null
+): Promise<void> {
+  await versionsRef(orgId).doc(versionId).update({
+    indexing_status: status,
+    indexing_error: errorMessage ? errorMessage.slice(0, 500) : null,
+  });
+}
+
 /** Mark version as active and previous active as archived. Call after successful embed. */
 export async function setActiveVersionAndArchivePrevious(
   orgId: string,
@@ -294,7 +327,15 @@ export async function setActiveVersionAndArchivePrevious(
   if (topic.activeVersionId) {
     await versionsRef(orgId).doc(topic.activeVersionId).update({ status: "archived" });
   }
-  await versionsRef(orgId).doc(newActiveVersionId).update({ status: "active" });
+  await versionsRef(orgId).doc(newActiveVersionId).update({
+    status: "active",
+    indexing_status: "indexed",
+    indexing_error: null,
+    indexed_at: FieldValue.serverTimestamp(),
+    indexing_auto_retry_count: FieldValue.delete(),
+    indexing_auto_retry_exhausted: FieldValue.delete(),
+    indexing_next_retry_at: FieldValue.delete(),
+  });
   await topicsRef(orgId).doc(topicId).update({
     activeVersionId: newActiveVersionId,
     updatedAt: FieldValue.serverTimestamp(),
@@ -303,7 +344,68 @@ export async function setActiveVersionAndArchivePrevious(
 
 /** Mark version as failed (worker only). */
 export async function markVersionFailed(orgId: string, versionId: string): Promise<void> {
-  await versionsRef(orgId).doc(versionId).update({ status: "failed" });
+  await versionsRef(orgId).doc(versionId).update({
+    status: "failed",
+    indexing_status: "failed",
+  });
+}
+
+/**
+ * P2-5: Embedding worker — on knowledge_version job failure, schedule auto-retry (5 min) or permanent fail.
+ * Max 3 auto-retries (4th failure → permanent failed + exhausted badge).
+ */
+export async function recordKnowledgeVersionIndexingFailure(
+  orgId: string,
+  versionId: string,
+  errorMessage: string
+): Promise<"scheduled_retry" | "permanent_failed"> {
+  const ref = versionsRef(orgId).doc(versionId);
+  const snap = await ref.get();
+  if (!snap.exists) return "permanent_failed";
+  const d = snap.data()!;
+  const prev = typeof d.indexing_auto_retry_count === "number" ? d.indexing_auto_retry_count : 0;
+  const msg = errorMessage.slice(0, 500);
+  if (prev >= 3) {
+    await ref.update({
+      status: "failed",
+      indexing_status: "failed",
+      indexing_error: msg,
+      indexing_auto_retry_exhausted: true,
+    });
+    return "permanent_failed";
+  }
+  await ref.update({
+    indexing_auto_retry_count: prev + 1,
+    indexing_status: "retrying",
+    indexing_error: msg,
+    indexing_next_retry_at: new Date(Date.now() + 5 * 60 * 1000),
+  });
+  return "scheduled_retry";
+}
+
+/** Find topic id when title matches (case-insensitive), for duplicate detection. */
+export async function findKnowledgeTopicIdByNormalizedTitle(
+  orgId: string,
+  title: string
+): Promise<string | null> {
+  const normalized = title.trim().toLowerCase();
+  if (!normalized) return null;
+  const snap = await topicsRef(orgId).limit(MAX_TOPICS_PER_ORG).get();
+  for (const doc of snap.docs) {
+    const t = doc.data();
+    if (((t.topic as string) ?? "").trim().toLowerCase() === normalized) return doc.id;
+  }
+  return null;
+}
+
+/** Manual retry: reset auto-retry counters so user gets a fresh attempt. */
+export async function resetKnowledgeVersionAutoRetryCounters(orgId: string, versionId: string): Promise<void> {
+  const { FieldValue } = await import("firebase-admin/firestore");
+  await versionsRef(orgId).doc(versionId).update({
+    indexing_auto_retry_count: 0,
+    indexing_auto_retry_exhausted: false,
+    indexing_next_retry_at: FieldValue.delete(),
+  });
 }
 
 /** Rollback: create new version from selected version content; status = "updating". Returns versionId. */

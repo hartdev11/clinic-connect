@@ -3,8 +3,8 @@
  * ทำให้บอท "ดูเหมือนแอดมินมืออาชีพทุกสาขา"
  */
 import type { ConversationState } from "./conversation-state";
-import { getServiceKnowledge, getServicesForArea } from "./knowledge-base";
-import type { ServiceCategory, Area } from "./types";
+import { getServiceKnowledge } from "./knowledge-base";
+import type { ServiceCategory } from "./types";
 import { hasFixedArea } from "./types";
 
 /**
@@ -12,7 +12,7 @@ import { hasFixedArea } from "./types";
  * ใช้เมื่อ: stage = exploring, service ยังไม่ชัด, ไม่ใช่ศัลยกรรม
  * ✅ FIX 2: แยก Template Exploring เป็น 2 แบบ (ผิว / ศัลยกรรม)
  */
-export function templateExploringSkin(state: ConversationState): string {
+export function templateExploringSkin(): string {
   return `ได้เลยค่ะ 😊  
 ด้านนี้เรามีหลายตัวเลือก ขึ้นอยู่กับผลลัพธ์ที่อยากได้ เช่น  
 • ฟิลเลอร์ → ปรับรูปหน้า เติมเต็ม  
@@ -28,7 +28,7 @@ export function templateExploringSkin(state: ConversationState): string {
  * ใช้เมื่อ: stage = exploring, service ยังไม่ชัด, เป็นศัลยกรรม
  * ✅ FIX 2: แยก Template Exploring เป็น 2 แบบ (ผิว / ศัลยกรรม)
  */
-export function templateExploringSurgery(state: ConversationState): string {
+export function templateExploringSurgery(): string {
   return `ได้เลยค่ะ 😊  
 แอดมินขอทราบเพิ่มนิดนึงนะคะ ว่าสนใจศัลยกรรมด้านไหนเป็นพิเศษ  
 
@@ -49,11 +49,11 @@ export function templateExploringSurgery(state: ConversationState): string {
 export function templateExploring(state: ConversationState): string {
   // ถ้ามี service ที่เป็น surgery → ใช้ templateExploringSurgery
   if (state.service === "surgery") {
-    return templateExploringSurgery(state);
+    return templateExploringSurgery();
   }
   
   // Default: ใช้ templateExploringSkin (หัตถการผิว)
-  return templateExploringSkin(state);
+  return templateExploringSkin();
 }
 
 /**
@@ -84,7 +84,7 @@ export function templateServiceSelected(state: ConversationState): string {
   }
   
   const serviceInfo = state.service ? getServiceKnowledge(state.service, state.area) : null;
-  const serviceName = state.service === "filler" ? "ฟิลเลอร์" 
+  const serviceName = state.service === "filler" ? "ฟิลเลอร์"
     : state.service === "rejuran" ? "รีจูรัน"
     : state.service === "botox" ? "โบท็อกซ์"
     : state.service === "laser" ? "เลเซอร์"
@@ -605,14 +605,6 @@ export function templateRefinement(
   } else if (/หวาน/.test(lower)) {
     refinementType = "หวาน";
   }
-  
-  const serviceName = state.service === "surgery" && state.area === "nose" 
-    ? "จมูก"
-    : state.service === "filler" ? "ฟิลเลอร์"
-    : state.service === "rejuran" ? "รีจูรัน"
-    : state.service === "botox" ? "โบท็อกซ์"
-    : state.service === "laser" ? "เลเซอร์"
-    : String(state.service);
   
   // ✅ Human First Rule: ถ้าเป็น surgery + nose และมี preference แล้ว
   // → ให้ข้อมูลสั้น ๆ ตาม preference (ไม่เทข้อมูลทั้งหมด)
@@ -1138,15 +1130,15 @@ export function selectTemplate(
     const lower = userMessage.toLowerCase();
     // ถ้ามี keyword ที่บ่งชี้ว่าเป็นศัลยกรรม → ใช้ templateExploringSurgery
     if (/จมูก|เสริมจมูก|ทำจมูก|แก้จมูก|ตาสองชั้น|คาง|กราม|ศัลยกรรม/.test(lower)) {
-      return templateExploringSurgery(state);
+      return templateExploringSurgery();
     }
     // Default: ใช้ templateExploringSkin (หัตถการผิว)
-    return templateExploringSkin(state);
+    return templateExploringSkin();
   }
   
   // ถ้ามี service แล้ว → route ตาม service
   if (state.service === "surgery") {
-    return templateExploringSurgery(state);
+    return templateExploringSurgery();
   }
   
   // exploring หรือยังไม่มี service (fallback)

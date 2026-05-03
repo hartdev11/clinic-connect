@@ -1,12 +1,5 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
-
-const plusJakarta = Plus_Jakarta_Sans({
-  variable: "--font-plus-jakarta",
-  subsets: ["latin"],
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: "Clinic Connect | AI-Powered Clinic Platform",
@@ -20,7 +13,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="th" className={plusJakarta.variable}>
+    <html lang="th">
       <body className="min-h-screen font-sans antialiased">{children}</body>
     </html>
   );

@@ -20,7 +20,7 @@ import { runWithObservability } from "@/lib/observability/run-with-observability
 
 export const dynamic = "force-dynamic";
 
-async function getAuth(request: NextRequest) {
+async function getAuth() {
   const session = await getSessionFromCookies();
   if (!session) return { error: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) };
   const orgId = session.org_id ?? (await getOrgIdFromClinicId(session.clinicId));
@@ -29,7 +29,7 @@ async function getAuth(request: NextRequest) {
   if (!requireRole(user.role, ["owner", "manager", "staff"])) {
     return { error: NextResponse.json({ error: "Forbidden" }, { status: 403 }) };
   }
-  return { orgId, userId: session.user_id ?? "", user };
+  return { orgId, userId: session.user_id ?? "" };
 }
 
 function parseBody(body: unknown): ClinicServiceUpdate | null {
@@ -49,7 +49,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   return runWithObservability("/api/clinic/unified-knowledge/services/[id]", request, async () => {
-    const auth = await getAuth(request);
+    const auth = await getAuth();
     if ("error" in auth) return auth.error;
     const { id } = await params;
     if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
@@ -73,7 +73,7 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   return runWithObservability("/api/clinic/unified-knowledge/services/[id]", request, async () => {
-    const auth = await getAuth(request);
+    const auth = await getAuth();
     if ("error" in auth) return auth.error;
     const { id } = await params;
     if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
@@ -117,7 +117,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   return runWithObservability("/api/clinic/unified-knowledge/services/[id]", request, async () => {
-    const auth = await getAuth(request);
+    const auth = await getAuth();
     if ("error" in auth) return auth.error;
     const { id } = await params;
     if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });

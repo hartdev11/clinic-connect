@@ -1,0 +1,1170 @@
+[
+  {
+    "procedure_id": "proc_001",
+    "name": "Botox",
+    "category": "neurotoxin",
+    "indications": [
+      "forehead_lines",
+      "crow_feet",
+      "jaw_slimming"
+    ],
+    "downtime": "none",
+    "pain_level": "low",
+    "duration": "4-6 months"
+  },
+  {
+    "procedure_id": "proc_002",
+    "name": "Dysport",
+    "category": "neurotoxin",
+    "indications": [
+      "wrinkles",
+      "forehead_lines"
+    ],
+    "downtime": "none",
+    "pain_level": "low",
+    "duration": "4-6 months"
+  },
+  {
+    "procedure_id": "proc_003",
+    "name": "Xeomin",
+    "category": "neurotoxin",
+    "indications": [
+      "wrinkles",
+      "crow_feet"
+    ],
+    "downtime": "none",
+    "pain_level": "low",
+    "duration": "4-6 months"
+  },
+  {
+    "procedure_id": "proc_004",
+    "name": "Nabota",
+    "category": "neurotoxin",
+    "indications": [
+      "wrinkles",
+      "jaw_slimming"
+    ],
+    "downtime": "none",
+    "pain_level": "low",
+    "duration": "4-6 months"
+  },
+  {
+    "procedure_id": "proc_005",
+    "name": "Neuronox",
+    "category": "neurotoxin",
+    "indications": [
+      "wrinkles",
+      "jaw_slimming"
+    ],
+    "downtime": "none",
+    "pain_level": "low",
+    "duration": "4-6 months"
+  },
+  {
+    "procedure_id": "proc_006",
+    "name": "Juvederm Filler",
+    "category": "filler",
+    "indications": [
+      "nasolabial_fold",
+      "lips",
+      "chin",
+      "cheek_volume"
+    ],
+    "downtime": "low",
+    "pain_level": "medium",
+    "duration": "9-12 months"
+  },
+  {
+    "procedure_id": "proc_007",
+    "name": "Restylane Filler",
+    "category": "filler",
+    "indications": [
+      "nasolabial_fold",
+      "lips",
+      "under_eye"
+    ],
+    "downtime": "low",
+    "pain_level": "medium",
+    "duration": "9-12 months"
+  },
+  {
+    "procedure_id": "proc_008",
+    "name": "Rejuran Healer",
+    "category": "skin_booster",
+    "indications": [
+      "skin_repair",
+      "pores",
+      "acne_scars"
+    ],
+    "downtime": "low",
+    "pain_level": "medium",
+    "duration": "6 months"
+  },
+  {
+    "procedure_id": "proc_009",
+    "name": "Profhilo",
+    "category": "skin_booster",
+    "indications": [
+      "skin_laxity",
+      "hydration"
+    ],
+    "downtime": "low",
+    "pain_level": "low",
+    "duration": "6 months"
+  },
+  {
+    "procedure_id": "proc_010",
+    "name": "Sculptra",
+    "category": "collagen_stimulator",
+    "indications": [
+      "volume_loss",
+      "skin_laxity"
+    ],
+    "downtime": "low",
+    "pain_level": "medium",
+    "duration": "24 months"
+  },
+  {
+    "procedure_id": "proc_011",
+    "name": "Radiesse",
+    "category": "collagen_stimulator",
+    "indications": [
+      "volume_loss",
+      "lifting"
+    ],
+    "downtime": "low",
+    "pain_level": "medium",
+    "duration": "12 months"
+  },
+  {
+    "procedure_id": "proc_012",
+    "name": "Juvelook",
+    "category": "collagen_stimulator",
+    "indications": [
+      "acne_scars",
+      "skin_texture"
+    ],
+    "downtime": "low",
+    "pain_level": "medium",
+    "duration": "12 months"
+  },
+  {
+    "procedure_id": "proc_021",
+    "name": "Ulthera",
+    "category": "energy_lifting",
+    "indications": [
+      "sagging",
+      "lifting"
+    ],
+    "downtime": "none",
+    "pain_level": "medium",
+    "duration": "12 months"
+  },
+  {
+    "procedure_id": "proc_022",
+    "name": "HIFU",
+    "category": "energy_lifting",
+    "indications": [
+      "lifting",
+      "jawline"
+    ],
+    "downtime": "none",
+    "pain_level": "medium",
+    "duration": "6-12 months"
+  },
+  {
+    "procedure_id": "proc_023",
+    "name": "Thermage FLX",
+    "category": "energy_lifting",
+    "indications": [
+      "skin_tightening"
+    ],
+    "downtime": "none",
+    "pain_level": "medium",
+    "duration": "12 months"
+  },
+  {
+    "procedure_id": "proc_024",
+    "name": "Morpheus8",
+    "category": "rf_microneedling",
+    "indications": [
+      "acne_scars",
+      "pores",
+      "skin_tightening"
+    ],
+    "downtime": "low",
+    "pain_level": "medium",
+    "duration": "12 months"
+  },
+  {
+    "procedure_id": "proc_025",
+    "name": "Secret RF",
+    "category": "rf_microneedling",
+    "indications": [
+      "acne_scars",
+      "pores"
+    ],
+    "downtime": "low",
+    "pain_level": "medium",
+    "duration": "12 months"
+  },
+  {
+    "procedure_id": "proc_026",
+    "name": "Microneedling",
+    "category": "skin_rejuvenation",
+    "indications": [
+      "pores",
+      "acne_scars",
+      "skin_texture"
+    ],
+    "downtime": "low",
+    "pain_level": "medium",
+    "duration": "varies"
+  },
+  {
+    "procedure_id": "proc_028",
+    "name": "Fractional CO2 Laser",
+    "category": "laser",
+    "indications": [
+      "acne_scars",
+      "wrinkles"
+    ],
+    "downtime": "medium",
+    "pain_level": "medium",
+    "duration": "long_term"
+  },
+  {
+    "procedure_id": "proc_029",
+    "name": "Pico Laser",
+    "category": "laser",
+    "indications": [
+      "pigmentation",
+      "melasma",
+      "acne_scars"
+    ],
+    "downtime": "none",
+    "pain_level": "low",
+    "duration": "varies"
+  },
+  {
+    "procedure_id": "proc_030",
+    "name": "Q-Switch Laser",
+    "category": "laser",
+    "indications": [
+      "melasma",
+      "pigmentation"
+    ],
+    "downtime": "none",
+    "pain_level": "low",
+    "duration": "varies"
+  },
+  {
+    "procedure_id": "proc_031",
+    "name": "IPL",
+    "category": "laser",
+    "indications": [
+      "dull_skin",
+      "redness"
+    ],
+    "downtime": "none",
+    "pain_level": "low",
+    "duration": "varies"
+  },
+  {
+    "procedure_id": "proc_041",
+    "name": "HydraFacial",
+    "category": "facial",
+    "indications": [
+      "dull_skin",
+      "pores",
+      "hydration"
+    ],
+    "downtime": "none",
+    "pain_level": "none",
+    "duration": "short_term"
+  },
+  {
+    "procedure_id": "proc_042",
+    "name": "Oxygen Facial",
+    "category": "facial",
+    "indications": [
+      "dull_skin",
+      "hydration"
+    ],
+    "downtime": "none",
+    "pain_level": "none",
+    "duration": "short_term"
+  },
+  {
+    "procedure_id": "proc_057",
+    "name": "Subcision",
+    "category": "scar_treatment",
+    "indications": [
+      "acne_scars"
+    ],
+    "downtime": "medium",
+    "pain_level": "medium",
+    "duration": "long_term"
+  },
+  {
+    "procedure_id": "proc_061",
+    "name": "PDO Thread Lift",
+    "category": "thread_lift",
+    "indications": [
+      "lifting",
+      "sagging"
+    ],
+    "downtime": "low",
+    "pain_level": "medium",
+    "duration": "12 months"
+  },
+  {
+    "procedure_id": "proc_062",
+    "name": "Mint Thread Lift",
+    "category": "thread_lift",
+    "indications": [
+      "lifting",
+      "jawline"
+    ],
+    "downtime": "low",
+    "pain_level": "medium",
+    "duration": "12 months"
+  },
+  {
+    "procedure_id": "proc_067",
+    "name": "CoolSculpting",
+    "category": "fat_reduction",
+    "indications": [
+      "body_fat"
+    ],
+    "downtime": "none",
+    "pain_level": "low",
+    "duration": "permanent_fat_reduction"
+  },
+  {
+    "procedure_id": "proc_069",
+    "name": "Fat Dissolving Injection",
+    "category": "fat_reduction",
+    "indications": [
+      "double_chin",
+      "localized_fat"
+    ],
+    "downtime": "low",
+    "pain_level": "medium",
+    "duration": "varies"
+  },
+  {
+    "procedure_id": "proc_070",
+    "name": "Meso Fat Injection",
+    "category": "fat_reduction",
+    "indications": [
+      "localized_fat"
+    ],
+    "downtime": "low",
+    "pain_level": "medium",
+    "duration": "varies"
+  },
+  {
+    "procedure_id": "proc_073",
+    "name": "Chemical Peel",
+    "category": "skin_rejuvenation",
+    "indications": [
+      "dull_skin",
+      "acne",
+      "pigmentation"
+    ],
+    "downtime": "low",
+    "pain_level": "low",
+    "duration": "varies"
+  },
+  {
+    "procedure_id": "proc_077",
+    "name": "PRP Hair Treatment",
+    "category": "hair",
+    "indications": [
+      "hair_loss",
+      "hair_thinning"
+    ],
+    "downtime": "none",
+    "pain_level": "medium",
+    "duration": "varies"
+  },
+  {
+    "procedure_id": "proc_078",
+    "name": "Hair Transplant FUE",
+    "category": "hair",
+    "indications": [
+      "hair_loss"
+    ],
+    "downtime": "medium",
+    "pain_level": "medium",
+    "duration": "permanent"
+  },
+  {
+    "procedure_id": "proc_087",
+    "name": "Thread Lift",
+    "category": "thread_lift",
+    "indications": [
+      "lifting",
+      "sagging"
+    ],
+    "downtime": "low",
+    "pain_level": "medium",
+    "duration": "12 months"
+  },
+  {
+    "procedure_id": "proc_013",
+    "name": "Belotero Filler",
+    "category": "filler",
+    "indications": [
+      "fine_lines",
+      "tear_trough"
+    ],
+    "downtime": "low",
+    "pain_level": "medium",
+    "duration": "9-12 months"
+  },
+  {
+    "procedure_id": "proc_014",
+    "name": "Yvoire Filler",
+    "category": "filler",
+    "indications": [
+      "lips",
+      "chin",
+      "cheek"
+    ],
+    "downtime": "low",
+    "pain_level": "medium",
+    "duration": "9-12 months"
+  },
+  {
+    "procedure_id": "proc_015",
+    "name": "Neuramis Filler",
+    "category": "filler",
+    "indications": [
+      "lips",
+      "nasolabial_fold"
+    ],
+    "downtime": "low",
+    "pain_level": "medium",
+    "duration": "9-12 months"
+  },
+  {
+    "procedure_id": "proc_016",
+    "name": "Revolax Filler",
+    "category": "filler",
+    "indications": [
+      "lips",
+      "chin"
+    ],
+    "downtime": "low",
+    "pain_level": "medium",
+    "duration": "9-12 months"
+  },
+  {
+    "procedure_id": "proc_017",
+    "name": "Teosyal Filler",
+    "category": "filler",
+    "indications": [
+      "cheek_volume",
+      "nasolabial_fold"
+    ],
+    "downtime": "low",
+    "pain_level": "medium",
+    "duration": "9-12 months"
+  },
+  {
+    "procedure_id": "proc_018",
+    "name": "Rejuran HB",
+    "category": "skin_booster",
+    "indications": [
+      "hydration",
+      "skin_texture"
+    ],
+    "downtime": "low",
+    "pain_level": "medium",
+    "duration": "6 months"
+  },
+  {
+    "procedure_id": "proc_019",
+    "name": "Skinvive",
+    "category": "skin_booster",
+    "indications": [
+      "hydration",
+      "dull_skin"
+    ],
+    "downtime": "low",
+    "pain_level": "low",
+    "duration": "6 months"
+  },
+  {
+    "procedure_id": "proc_020",
+    "name": "Filorga NCTF",
+    "category": "skin_booster",
+    "indications": [
+      "dull_skin",
+      "hydration"
+    ],
+    "downtime": "low",
+    "pain_level": "low",
+    "duration": "4 months"
+  },
+  {
+    "procedure_id": "proc_027",
+    "name": "Lenisna",
+    "category": "collagen_stimulator",
+    "indications": [
+      "skin_texture"
+    ],
+    "downtime": "low",
+    "pain_level": "medium",
+    "duration": "12 months"
+  },
+  {
+    "procedure_id": "proc_032",
+    "name": "Oligio",
+    "category": "energy_lifting",
+    "indications": [
+      "skin_tightening"
+    ],
+    "downtime": "none",
+    "pain_level": "medium",
+    "duration": "12 months"
+  },
+  {
+    "procedure_id": "proc_033",
+    "name": "Sofwave",
+    "category": "energy_lifting",
+    "indications": [
+      "lifting"
+    ],
+    "downtime": "none",
+    "pain_level": "medium",
+    "duration": "12 months"
+  },
+  {
+    "procedure_id": "proc_034",
+    "name": "Doublo Gold",
+    "category": "energy_lifting",
+    "indications": [
+      "lifting"
+    ],
+    "downtime": "none",
+    "pain_level": "medium",
+    "duration": "6 months"
+  },
+  {
+    "procedure_id": "proc_035",
+    "name": "Liftera",
+    "category": "energy_lifting",
+    "indications": [
+      "lifting"
+    ],
+    "downtime": "none",
+    "pain_level": "medium",
+    "duration": "6 months"
+  },
+  {
+    "procedure_id": "proc_036",
+    "name": "Potenza RF",
+    "category": "rf_microneedling",
+    "indications": [
+      "pores",
+      "acne_scars"
+    ],
+    "downtime": "low",
+    "pain_level": "medium",
+    "duration": "12 months"
+  },
+  {
+    "procedure_id": "proc_037",
+    "name": "Sylfirm X",
+    "category": "rf_microneedling",
+    "indications": [
+      "melasma",
+      "redness"
+    ],
+    "downtime": "low",
+    "pain_level": "medium",
+    "duration": "12 months"
+  },
+  {
+    "procedure_id": "proc_038",
+    "name": "PicoSure",
+    "category": "laser",
+    "indications": [
+      "pigmentation"
+    ],
+    "downtime": "none",
+    "pain_level": "low",
+    "duration": "varies"
+  },
+  {
+    "procedure_id": "proc_039",
+    "name": "PicoWay",
+    "category": "laser",
+    "indications": [
+      "pigmentation"
+    ],
+    "downtime": "none",
+    "pain_level": "low",
+    "duration": "varies"
+  },
+  {
+    "procedure_id": "proc_040",
+    "name": "Fraxel Laser",
+    "category": "laser",
+    "indications": [
+      "skin_texture",
+      "pores"
+    ],
+    "downtime": "medium",
+    "pain_level": "medium",
+    "duration": "long_term"
+  },
+  {
+    "procedure_id": "proc_043",
+    "name": "Nd:YAG Laser",
+    "category": "laser",
+    "indications": [
+      "vascular_lesions",
+      "hair_removal"
+    ],
+    "downtime": "none",
+    "pain_level": "low",
+    "duration": "varies"
+  },
+  {
+    "procedure_id": "proc_044",
+    "name": "Vbeam Laser",
+    "category": "laser",
+    "indications": [
+      "redness",
+      "rosacea"
+    ],
+    "downtime": "low",
+    "pain_level": "low",
+    "duration": "varies"
+  },
+  {
+    "procedure_id": "proc_045",
+    "name": "Clear Brilliant Laser",
+    "category": "laser",
+    "indications": [
+      "pores",
+      "dull_skin"
+    ],
+    "downtime": "low",
+    "pain_level": "low",
+    "duration": "varies"
+  },
+  {
+    "procedure_id": "proc_046",
+    "name": "Acne Laser Treatment",
+    "category": "acne_treatment",
+    "indications": [
+      "acne",
+      "inflammation"
+    ],
+    "downtime": "none",
+    "pain_level": "low",
+    "duration": "varies"
+  },
+  {
+    "procedure_id": "proc_047",
+    "name": "Acne Injection",
+    "category": "acne_treatment",
+    "indications": [
+      "inflamed_acne"
+    ],
+    "downtime": "none",
+    "pain_level": "low",
+    "duration": "short_term"
+  },
+  {
+    "procedure_id": "proc_048",
+    "name": "TCA Cross",
+    "category": "scar_treatment",
+    "indications": [
+      "ice_pick_scars"
+    ],
+    "downtime": "medium",
+    "pain_level": "medium",
+    "duration": "long_term"
+  },
+  {
+    "procedure_id": "proc_049",
+    "name": "PRP Skin Rejuvenation",
+    "category": "regenerative",
+    "indications": [
+      "skin_rejuvenation",
+      "acne_scars"
+    ],
+    "downtime": "low",
+    "pain_level": "medium",
+    "duration": "varies"
+  },
+  {
+    "procedure_id": "proc_050",
+    "name": "Cog Thread Lift",
+    "category": "thread_lift",
+    "indications": [
+      "lifting",
+      "sagging"
+    ],
+    "downtime": "low",
+    "pain_level": "medium",
+    "duration": "12 months"
+  },
+  {
+    "procedure_id": "proc_051",
+    "name": "Silhouette Soft Thread",
+    "category": "thread_lift",
+    "indications": [
+      "lifting"
+    ],
+    "downtime": "low",
+    "pain_level": "medium",
+    "duration": "18 months"
+  },
+  {
+    "procedure_id": "proc_052",
+    "name": "Fox Eye Thread Lift",
+    "category": "thread_lift",
+    "indications": [
+      "eyebrow_lift"
+    ],
+    "downtime": "low",
+    "pain_level": "medium",
+    "duration": "12 months"
+  },
+  {
+    "procedure_id": "proc_053",
+    "name": "Nose Thread Lift",
+    "category": "thread_lift",
+    "indications": [
+      "nose_bridge"
+    ],
+    "downtime": "low",
+    "pain_level": "medium",
+    "duration": "12 months"
+  },
+  {
+    "procedure_id": "proc_054",
+    "name": "Body HIFU Fat Reduction",
+    "category": "fat_reduction",
+    "indications": [
+      "body_fat"
+    ],
+    "downtime": "none",
+    "pain_level": "medium",
+    "duration": "varies"
+  },
+  {
+    "procedure_id": "proc_055",
+    "name": "Kybella",
+    "category": "fat_reduction",
+    "indications": [
+      "double_chin"
+    ],
+    "downtime": "low",
+    "pain_level": "medium",
+    "duration": "permanent_fat_reduction"
+  },
+  {
+    "procedure_id": "proc_056",
+    "name": "Liposonix",
+    "category": "fat_reduction",
+    "indications": [
+      "body_fat"
+    ],
+    "downtime": "none",
+    "pain_level": "medium",
+    "duration": "varies"
+  },
+  {
+    "procedure_id": "proc_058",
+    "name": "OxyGeneo Facial",
+    "category": "facial",
+    "indications": [
+      "dull_skin",
+      "hydration"
+    ],
+    "downtime": "none",
+    "pain_level": "none",
+    "duration": "short_term"
+  },
+  {
+    "procedure_id": "proc_059",
+    "name": "Carbon Laser Facial",
+    "category": "facial",
+    "indications": [
+      "oily_skin",
+      "pores"
+    ],
+    "downtime": "none",
+    "pain_level": "low",
+    "duration": "short_term"
+  },
+  {
+    "procedure_id": "proc_060",
+    "name": "PRP Hair Treatment",
+    "category": "hair",
+    "indications": [
+      "hair_loss",
+      "hair_thinning"
+    ],
+    "downtime": "none",
+    "pain_level": "medium",
+    "duration": "varies"
+  },
+  {
+    "procedure_id": "proc_063",
+    "name": "Hair Laser Therapy",
+    "category": "hair",
+    "indications": [
+      "hair_thinning"
+    ],
+    "downtime": "none",
+    "pain_level": "none",
+    "duration": "varies"
+  },
+  {
+    "procedure_id": "proc_064",
+    "name": "Exosome Hair Therapy",
+    "category": "hair",
+    "indications": [
+      "hair_loss"
+    ],
+    "downtime": "low",
+    "pain_level": "medium",
+    "duration": "varies"
+  },
+  {
+    "procedure_id": "proc_065",
+    "name": "Melasma Laser Treatment",
+    "category": "pigmentation",
+    "indications": [
+      "melasma"
+    ],
+    "downtime": "low",
+    "pain_level": "low",
+    "duration": "varies"
+  },
+  {
+    "procedure_id": "proc_066",
+    "name": "Skin Whitening Injection",
+    "category": "skin_rejuvenation",
+    "indications": [
+      "dull_skin"
+    ],
+    "downtime": "none",
+    "pain_level": "low",
+    "duration": "varies"
+  },
+  {
+    "procedure_id": "proc_068",
+    "name": "Glutathione Injection",
+    "category": "skin_rejuvenation",
+    "indications": [
+      "dull_skin"
+    ],
+    "downtime": "none",
+    "pain_level": "low",
+    "duration": "varies"
+  },
+  {
+    "procedure_id": "proc_071",
+    "name": "Vitamin Drip Therapy",
+    "category": "skin_rejuvenation",
+    "indications": [
+      "dull_skin",
+      "fatigue"
+    ],
+    "downtime": "none",
+    "pain_level": "low",
+    "duration": "short_term"
+  },
+  {
+    "procedure_id": "proc_072",
+    "name": "Exosome Skin Therapy",
+    "category": "regenerative",
+    "indications": [
+      "skin_repair",
+      "skin_rejuvenation"
+    ],
+    "downtime": "low",
+    "pain_level": "medium",
+    "duration": "varies"
+  },
+  {
+    "procedure_id": "proc_074",
+    "name": "Body RF Skin Tightening",
+    "category": "energy_lifting",
+    "indications": [
+      "skin_tightening"
+    ],
+    "downtime": "none",
+    "pain_level": "medium",
+    "duration": "varies"
+  },
+  {
+    "procedure_id": "proc_075",
+    "name": "Stretch Mark Laser",
+    "category": "scar_treatment",
+    "indications": [
+      "stretch_marks"
+    ],
+    "downtime": "low",
+    "pain_level": "medium",
+    "duration": "varies"
+  },
+  {
+    "procedure_id": "proc_076",
+    "name": "Tattoo Removal Laser",
+    "category": "laser",
+    "indications": [
+      "tattoo_removal"
+    ],
+    "downtime": "low",
+    "pain_level": "medium",
+    "duration": "varies"
+  },
+  {
+    "procedure_id": "proc_079",
+    "name": "Mole Removal Laser",
+    "category": "laser",
+    "indications": [
+      "mole_removal"
+    ],
+    "downtime": "low",
+    "pain_level": "medium",
+    "duration": "permanent"
+  },
+  {
+    "procedure_id": "proc_080",
+    "name": "Skin Tag Removal",
+    "category": "dermatology",
+    "indications": [
+      "skin_tags"
+    ],
+    "downtime": "low",
+    "pain_level": "low",
+    "duration": "permanent"
+  },
+  {
+    "procedure_id": "proc_081",
+    "name": "Wart Removal",
+    "category": "dermatology",
+    "indications": [
+      "warts"
+    ],
+    "downtime": "low",
+    "pain_level": "low",
+    "duration": "permanent"
+  },
+  {
+    "procedure_id": "proc_082",
+    "name": "Facial Lymphatic Massage",
+    "category": "facial",
+    "indications": [
+      "puffiness"
+    ],
+    "downtime": "none",
+    "pain_level": "none",
+    "duration": "short_term"
+  },
+  {
+    "procedure_id": "proc_083",
+    "name": "Stem Cell Skin Therapy",
+    "category": "regenerative",
+    "indications": [
+      "skin_rejuvenation"
+    ],
+    "downtime": "low",
+    "pain_level": "medium",
+    "duration": "varies"
+  },
+  {
+    "procedure_id": "proc_084",
+    "name": "Aquashine Skin Booster",
+    "category": "skin_booster",
+    "indications": [
+      "hydration",
+      "wrinkles"
+    ],
+    "downtime": "low",
+    "pain_level": "low",
+    "duration": "4 months"
+  },
+  {
+    "procedure_id": "proc_085",
+    "name": "AestheFill",
+    "category": "collagen_stimulator",
+    "indications": [
+      "skin_rejuvenation"
+    ],
+    "downtime": "low",
+    "pain_level": "medium",
+    "duration": "12 months"
+  },
+  {
+    "procedure_id": "proc_086",
+    "name": "Skin Booster Mesotherapy",
+    "category": "skin_booster",
+    "indications": [
+      "hydration",
+      "skin_texture"
+    ],
+    "downtime": "low",
+    "pain_level": "medium",
+    "duration": "varies"
+  },
+  {
+    "procedure_id": "proc_088",
+    "name": "Scar Laser Treatment",
+    "category": "scar_treatment",
+    "indications": [
+      "surgical_scars"
+    ],
+    "downtime": "low",
+    "pain_level": "medium",
+    "duration": "varies"
+  },
+  {
+    "procedure_id": "proc_089",
+    "name": "Erbium Laser",
+    "category": "laser",
+    "indications": [
+      "skin_resurfacing"
+    ],
+    "downtime": "medium",
+    "pain_level": "medium",
+    "duration": "long_term"
+  },
+  {
+    "procedure_id": "proc_090",
+    "name": "Fractional Laser",
+    "category": "laser",
+    "indications": [
+      "acne_scars",
+      "skin_texture"
+    ],
+    "downtime": "medium",
+    "pain_level": "medium",
+    "duration": "long_term"
+  },
+  {
+    "procedure_id": "proc_091",
+    "name": "Hair Transplant DHI",
+    "category": "hair",
+    "indications": [
+      "hair_loss"
+    ],
+    "downtime": "medium",
+    "pain_level": "medium",
+    "duration": "permanent"
+  },
+  {
+    "procedure_id": "proc_092",
+    "name": "Liposuction",
+    "category": "fat_reduction",
+    "indications": [
+      "body_fat"
+    ],
+    "downtime": "high",
+    "pain_level": "high",
+    "duration": "permanent"
+  },
+  {
+    "procedure_id": "proc_093",
+    "name": "Facelift Surgery",
+    "category": "surgery",
+    "indications": [
+      "severe_sagging"
+    ],
+    "downtime": "high",
+    "pain_level": "high",
+    "duration": "permanent"
+  },
+  {
+    "procedure_id": "proc_094",
+    "name": "Eyelid Surgery",
+    "category": "surgery",
+    "indications": [
+      "droopy_eyelids"
+    ],
+    "downtime": "high",
+    "pain_level": "high",
+    "duration": "permanent"
+  },
+  {
+    "procedure_id": "proc_095",
+    "name": "Chin Implant",
+    "category": "surgery",
+    "indications": [
+      "chin_augmentation"
+    ],
+    "downtime": "high",
+    "pain_level": "high",
+    "duration": "permanent"
+  },
+  {
+    "procedure_id": "proc_096",
+    "name": "Nose Surgery",
+    "category": "surgery",
+    "indications": [
+      "nose_reshaping"
+    ],
+    "downtime": "high",
+    "pain_level": "high",
+    "duration": "permanent"
+  },
+  {
+    "procedure_id": "proc_097",
+    "name": "Dermabrasion",
+    "category": "skin_rejuvenation",
+    "indications": [
+      "acne_scars",
+      "skin_texture"
+    ],
+    "downtime": "medium",
+    "pain_level": "medium",
+    "duration": "varies"
+  },
+  {
+    "procedure_id": "proc_098",
+    "name": "Microdermabrasion",
+    "category": "skin_rejuvenation",
+    "indications": [
+      "dull_skin",
+      "pores"
+    ],
+    "downtime": "none",
+    "pain_level": "low",
+    "duration": "varies"
+  },
+  {
+    "procedure_id": "proc_099",
+    "name": "Stem Cell Hair Therapy",
+    "category": "hair",
+    "indications": [
+      "hair_loss"
+    ],
+    "downtime": "low",
+    "pain_level": "medium",
+    "duration": "varies"
+  },
+  {
+    "procedure_id": "proc_100",
+    "name": "Exosome Facial Treatment",
+    "category": "regenerative",
+    "indications": [
+      "skin_repair",
+      "anti_aging"
+    ],
+    "downtime": "low",
+    "pain_level": "low",
+    "duration": "varies"
+  }
+]

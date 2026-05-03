@@ -3,8 +3,11 @@
  * Enterprise: Sentry error tracking (optional — ต้องตั้ง SENTRY_DSN)
  */
 import * as Sentry from "@sentry/nextjs";
+import { validateEnv } from "@/lib/env-validator";
 
 export async function register() {
+  validateEnv();
+
   if (!process.env.SENTRY_DSN?.trim()) return;
 
   if (process.env.NEXT_RUNTIME === "nodejs") {

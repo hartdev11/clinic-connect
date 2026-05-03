@@ -34,6 +34,7 @@ if (!REDIS_URL) {
 }
 
 const connection = new Redis(REDIS_URL, { maxRetriesPerRequest: null });
+let shuttingDown = false;
 
 const worker = new Worker(
   QUEUE_NAME,
@@ -69,4 +70,20 @@ async function main() {
 main().catch((err) => {
   console.error("[Quota Check Worker] Startup error:", err);
   process.exit(1);
+});
+
+async function shutdown(signal: string) {
+  if (shuttingDown) return;
+  shuttingDown = true;
+  console.log(`[Quota Check Worker] ${signal} received, shutting down...`);
+  await worker.close().catch(() => {});
+  await connection.quit().catch(() => {});
+  process.exit(0);
+}
+
+process.on("SIGINT", () => {
+  void shutdown("SIGINT");
+});
+process.on("SIGTERM", () => {
+  void shutdown("SIGTERM");
 });

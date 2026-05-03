@@ -40,7 +40,6 @@ export async function runDecayPredictionJob(): Promise<{ marked: number; notifie
   for (const doc of clinicSnap.docs) {
     const d = doc.data();
     const orgId = d.org_id ?? "";
-    const baseServiceId = d.base_service_id ?? "";
 
     const lastReviewed = d.last_reviewed_at ? toISO(d.last_reviewed_at) : toISO(d.updated_at);
     const daysSinceReview = Math.floor(

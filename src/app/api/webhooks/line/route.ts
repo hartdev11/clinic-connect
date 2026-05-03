@@ -1,309 +1,40 @@
-import { NextRequest, NextResponse } from "next/server";
-import { verifyLineSignature, parseLineWebhook } from "@/lib/line-webhook";
-import { chatAgentReply } from "@/lib/chat-agent";
-import { runPipeline } from "@/lib/agents/pipeline";
-import { composeSafeFallbackMessage } from "@/lib/agents/safe-fallback";
-import {
-  createConversationFeedback,
-  getSubscriptionByOrgId,
-  upsertLineCustomer,
-} from "@/lib/clinic-data";
-import {
-  isLineEventProcessed,
-  markLineEventProcessed,
-  getMessageHash,
-} from "@/lib/line-idempotency";
-import { checkOrSetIdempotency, setLineEventReply } from "@/lib/idempotency";
-import { isPipelineEnabled, is7AgentChatEnabled } from "@/lib/feature-flags";
-import { chatOrchestrate } from "@/lib/ai/orchestrator";
-import { triggerHandoff } from "@/lib/handoff-trigger";
-import { toSignedUrlsForLine } from "@/lib/promotion-storage";
+import { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
+import { randomUUID } from "crypto";
+import { verifyLineSignature } from "@/lib/line-webhook";
+import { getRequestId } from "@/lib/request-context";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
-/** ใช้ Node.js runtime เพื่อให้อ่าน request body ได้ถูกต้อง (LINE ส่ง JSON body) */
 export const runtime = "nodejs";
 
-const LINE_REPLY_URL = "https://api.line.me/v2/bot/message/reply";
-/** LINE จำกัดข้อความต่อ 1 message ไม่เกิน 5,000 ตัวอักษร */
-const LINE_MAX_TEXT_LENGTH = 5000;
-
-function truncateForLine(text: string): string {
-  if (text.length <= LINE_MAX_TEXT_LENGTH) return text;
-  return text.slice(0, LINE_MAX_TEXT_LENGTH - 3) + "...";
-}
-
-type LineMessage = { type: "text"; text: string } | { type: "image"; originalContentUrl: string; previewImageUrl: string } | { type: "video"; originalContentUrl: string; previewImageUrl: string };
-
-async function sendLineReply(
-  replyToken: string,
-  text: string,
-  accessToken: string,
-  mediaUrls?: string[]
-): Promise<boolean> {
-  const safeText = truncateForLine(text);
-  const messages: LineMessage[] = [{ type: "text", text: safeText }];
-  if (mediaUrls && mediaUrls.length > 0) {
-    for (const url of mediaUrls.slice(0, 4)) {
-      const isVideo = /\.(mp4|mov|webm)(\?|$)/i.test(url) || /video/i.test(url);
-      if (isVideo) {
-        messages.push({ type: "video", originalContentUrl: url, previewImageUrl: url });
-      } else {
-        messages.push({ type: "image", originalContentUrl: url, previewImageUrl: url });
-      }
-    }
-  }
-  try {
-    const res = await fetch(LINE_REPLY_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      },
-      body: JSON.stringify({ replyToken, messages }),
-    });
-    if (!res.ok) {
-      const err = await res.text();
-      console.error("[LINE Reply] API error:", res.status, err);
-      return false;
-    }
-    return true;
-  } catch (err) {
-    console.error("[LINE Reply] Error:", err);
-    return false;
-  }
-}
-
-/** อ่าน body จาก stream — ใน Next.js บาง env request.text() คืนว่างแม้มี Content-Length */
-async function readRequestBody(request: Request): Promise<string> {
-  const stream = request.body;
-  if (!stream) return await request.text();
-  const reader = stream.getReader();
-  const chunks: Uint8Array[] = [];
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    if (value) chunks.push(value);
-  }
-  const totalLength = chunks.reduce((sum, c) => sum + c.length, 0);
-  const combined = new Uint8Array(totalLength);
-  let offset = 0;
-  for (const c of chunks) {
-    combined.set(c, offset);
-    offset += c.length;
-  }
-  return new TextDecoder().decode(combined);
-}
-
 export async function POST(request: NextRequest) {
-  // อ่าน body ก่อนสิ่งอื่นใด — อ่านจาก clone แล้วใช้ stream (ลดโอกาส body ถูก consume ไปก่อน)
-  let body: string;
-  try {
-    const toRead = request.clone();
-    body = await readRequestBody(toRead);
-  } catch (err) {
-    console.error("[LINE Webhook] Read body error:", err);
-    return new NextResponse("Error", { status: 500 });
-  }
-
-  const isDevelopment = process.env.NODE_ENV === "development";
-  const contentLength = request.headers.get("content-length");
-  const channelSecret = process.env.LINE_CHANNEL_SECRET?.trim();
-  const channelToken = process.env.LINE_CHANNEL_ACCESS_TOKEN?.trim();
+  const correlationId = getRequestId(request) ?? randomUUID();
   const signature = request.headers.get("x-line-signature") ?? "";
-  console.log("[LINE Webhook] POST received", { contentLength: contentLength ?? "none", bodyLength: body.length });
+  const lineSecret = process.env.LINE_CHANNEL_SECRET?.trim() ?? "";
 
-  if (!body || body.length === 0) {
-    console.warn(
-      "[LINE Webhook] Empty body (Content-Length=" + contentLength + ") — แนะนำใช้ Webhook แบบมี orgId: ไปที่ Settings → LINE Connection ในแอป แล้วใช้ URL ที่แสดง (เช่น https://your-domain/api/webhooks/line/xxxx) ไปตั้งใน LINE Developers. ดู docs/SETUP-WEBHOOK-URL.md"
-    );
+  let rawBodyBytes: Buffer;
+  try {
+    rawBodyBytes = Buffer.from(await request.arrayBuffer());
+  } catch (err) {
+    console.error("[LINE Global Webhook] body read failed", { correlationId, err });
     return new NextResponse("OK", { status: 200 });
   }
 
-  // Debug logging ใน development mode
-  if (isDevelopment) {
-    console.log("[LINE Webhook] Debug info:", {
-      hasChannelSecret: !!channelSecret,
-      hasSignature: !!signature,
-      bodyLength: body.length,
-      bodyPreview: body.slice(0, 200),
-    });
-  }
-
-  // ✅ ใน development mode: ถ้าไม่มี signature หรือ verify ไม่ผ่าน → skip verification
-  // (เพราะ LINE webhook อาจส่งมาจาก production URL แต่เรารับที่ local)
-  // ⚠️ ใน production: ต้อง verify signature เสมอ
-  if (channelSecret) {
-    if (signature && !verifyLineSignature(body, signature, channelSecret)) {
-      if (isDevelopment) {
-        console.warn("[LINE Webhook] Invalid signature (skipping in dev mode)");
-        // ใน development mode: ยังให้ผ่านต่อ (เพื่อทดสอบ)
-      } else {
-        console.warn("[LINE Webhook] Invalid signature");
-        return new NextResponse("Forbidden", { status: 403 });
+  try {
+    if (lineSecret) {
+      const validSig = verifyLineSignature(rawBodyBytes, signature, lineSecret);
+      if (!validSig) {
+        console.warn("[LINE Global Webhook] invalid signature", { correlationId });
+        return new NextResponse("OK", { status: 200 });
       }
-    } else if (!signature && !isDevelopment) {
-      // ใน production: ถ้าไม่มี signature → reject
-      console.warn("[LINE Webhook] Missing signature");
-      return new NextResponse("Forbidden", { status: 403 });
+    } else {
+      console.warn("[LINE Global Webhook] LINE_CHANNEL_SECRET not configured", { correlationId });
     }
-  } else if (!isDevelopment) {
-    // ใน production: ถ้าไม่มี channel secret → reject
-    console.warn("[LINE Webhook] Missing channel secret");
-    return new NextResponse("Forbidden", { status: 403 });
-  }
 
-  const parsed = parseLineWebhook(body);
-  const events = parsed.events ?? [];
-  console.log("[LINE Webhook] Events count:", events.length);
-  if (events.length > 0) {
-    console.log(
-      "[LINE Webhook] Events:",
-      events.map((e) => ({ type: e.type, msgType: e.message?.type }))
-    );
-  }
-
-  let messageProcessed = false;
-  for (const event of events) {
-    if (event.type !== "message" || event.message?.type !== "text") continue;
-    const replyToken = event.replyToken;
-    const userText = event.message.text?.trim();
-    const userId = event.source?.userId || "";
-    if (!replyToken || !userText) continue;
-
-    const { duplicate } = await checkOrSetIdempotency(replyToken);
-    if (duplicate) return new NextResponse("OK", { status: 200 });
-
-    const msgHash = getMessageHash(userText);
-    if (await isLineEventProcessed(replyToken, userId, msgHash)) continue;
-    await markLineEventProcessed(replyToken, userId, msgHash).catch(() => {});
-    messageProcessed = true;
-
-    const token = channelToken;
-    console.log("[LINE Webhook] Received message:", userText.slice(0, 60));
-    if (userId && process.env.NODE_ENV === "development") {
-      console.log("[LINE Webhook] User ID:", userId.slice(0, 10) + "...");
-    }
-    const shouldUse7Agent = is7AgentChatEnabled();
-    const shouldUsePipeline = isPipelineEnabled();
-    const lineOrgId = process.env.LINE_ORG_ID?.trim() || null;
-
-    void (async () => {
-      try {
-        const BLOCKED_MSG = "บริการถูกระงับชั่วคราว กรุณาติดต่อผู้ดูแลระบบ";
-        if (lineOrgId) {
-          const sub = await getSubscriptionByOrgId(lineOrgId);
-          if (sub?.aiBlocked) {
-            if (token) await sendLineReply(replyToken, BLOCKED_MSG, token);
-            return;
-          }
-        }
-
-        let replyText: string;
-        let intent: { intent?: string; service?: string; area?: string } | undefined;
-        let mediaUrls: string[] | undefined;
-
-        if (shouldUse7Agent && lineOrgId) {
-          const result = await chatOrchestrate({
-            message: userText,
-            org_id: lineOrgId,
-            branch_id: null,
-            userId: userId ?? null,
-            channel: "line",
-          });
-          replyText = result.reply?.trim() || "";
-          mediaUrls = result.media;
-          intent = { intent: "general_chat" };
-          if (result.handoffTriggered?.triggerType === "low_ai_confidence" && userId) {
-            const pct = Math.round((result.handoffTriggered.confidence ?? 0) * 100);
-            triggerHandoff({
-              orgId: lineOrgId,
-              lineUserId: userId,
-              triggerType: "low_ai_confidence",
-              triggerMessage: `⚠️ AI ไม่แน่ใจ (confidence: ${pct}%) — ข้อความลูกค้า: ${userText.slice(0, 80)}`,
-            }).catch((err) => {
-              if (process.env.NODE_ENV === "development") {
-                console.warn("[LINE Webhook] triggerHandoff error:", (err as Error)?.message?.slice(0, 60));
-              }
-            });
-          }
-        } else if (shouldUsePipeline) {
-          // FE-5 — ดึง subscription plan สำหรับ context
-          let subscriptionPlan: string | undefined;
-          if (lineOrgId) {
-            try {
-              const subscription = await getSubscriptionByOrgId(lineOrgId);
-              subscriptionPlan = subscription?.plan;
-            } catch (err) {
-              if (process.env.NODE_ENV === "development") {
-                console.warn("[LINE Webhook] Failed to fetch subscription:", (err as Error)?.message?.slice(0, 60));
-              }
-            }
-          }
-          const result = await runPipeline(userText, userId, undefined, {
-            org_id: lineOrgId ?? undefined,
-            branch_id: undefined,
-            role: undefined,
-            subscriptionPlan,
-            channel: "line",
-          });
-          replyText = result.reply?.trim() || "";
-          intent = result.intent ?? undefined;
-          mediaUrls = result.media && result.media.length > 0 ? result.media : undefined;
-        } else {
-          replyText = (await chatAgentReply(userText))?.trim() || "";
-        }
-        const finalText = replyText || composeSafeFallbackMessage();
-        if (token) {
-          const lineMediaUrls = mediaUrls && mediaUrls.length > 0 ? await toSignedUrlsForLine(mediaUrls) : undefined;
-          const ok = await sendLineReply(replyToken, finalText, token, lineMediaUrls);
-          console.log("[LINE Webhook] Reply sent:", ok ? "OK" : "FAIL");
-          setLineEventReply(replyToken, JSON.stringify({ text: finalText })).catch(() => {});
-        } else if (process.env.NODE_ENV === "development") {
-          console.log("[LINE Webhook] Would reply:", finalText.slice(0, 80));
-        }
-        // E5.1 — save conversation_feedback (fire-and-forget)
-        if (lineOrgId && finalText) {
-          if (userId) {
-            upsertLineCustomer(lineOrgId, userId).catch((err) => {
-              if (process.env.NODE_ENV === "development") {
-                console.warn("[LINE Webhook] upsertLineCustomer error:", (err as Error)?.message?.slice(0, 60));
-              }
-            });
-          }
-          createConversationFeedback({
-            org_id: lineOrgId,
-            user_id: userId ?? null,
-            userMessage: userText,
-            botReply: finalText,
-            intent: intent?.intent ?? null,
-            service: intent?.service ?? null,
-            area: intent?.area ?? null,
-            source: "line",
-          }).catch((err) => {
-            if (process.env.NODE_ENV === "development") {
-              console.warn("[LINE Webhook] Feedback save error:", (err as Error)?.message?.slice(0, 60));
-            }
-          });
-        }
-        if (lineOrgId && userId && userText) {
-          const { updateCustomerLeadScore } = await import("@/lib/ai/lead-score-updater");
-          updateCustomerLeadScore(lineOrgId, userId, userText).catch((err) => {
-            if (process.env.NODE_ENV === "development") {
-              console.warn("[LINE Webhook] Lead score update error:", (err as Error)?.message?.slice(0, 60));
-            }
-          });
-        }
-      } catch (err) {
-        console.error("[LINE Webhook] Background reply error:", err);
-        if (token) {
-          await sendLineReply(replyToken, composeSafeFallbackMessage(), token);
-        }
-      }
-    })();
-  }
-  if (events.length > 0 && !messageProcessed) {
-    console.log("[LINE Webhook] No text message in events (skipped)");
+    // Legacy global route: signature validation only.
+  } catch (err) {
+    console.error("[LINE Global Webhook] unexpected error", { correlationId, err });
   }
 
   return new NextResponse("OK", { status: 200 });

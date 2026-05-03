@@ -44,6 +44,12 @@ export async function GET(request: NextRequest) {
     const fromStr = searchParams.get("from") ?? new Date().toISOString().slice(0, 10);
     const days = Math.min(Math.max(Number(searchParams.get("days")) || 7, 1), 14);
 
+    if ((user.role === "manager" || user.role === "staff") && !branchId) {
+      return NextResponse.json(
+        { error: "กรุณาเลือกสาขาก่อนดูตารางว่าง (จำกัดสิทธิ์ตามสาขา)", code: "FORBIDDEN" },
+        { status: 403 }
+      );
+    }
     if (!requireBranchAccess(user.role, user.branch_ids, user.branch_roles, branchId)) {
       return NextResponse.json({ error: "Forbidden", code: "FORBIDDEN" }, { status: 403 });
     }

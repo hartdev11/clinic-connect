@@ -1,0 +1,7002 @@
+[
+  {
+    "id": "consult_001",
+    "user_profile": {
+      "age": 29,
+      "gender": "female",
+      "concern": "forehead wrinkles",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox is best for dynamic forehead wrinkles with minimal downtime"
+  },
+  {
+    "id": "consult_002",
+    "user_profile": {
+      "age": 34,
+      "gender": "female",
+      "concern": "nasolabial folds",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "hyaluronic filler restores volume in nasolabial folds effectively"
+  },
+  {
+    "id": "consult_003",
+    "user_profile": {
+      "age": 42,
+      "gender": "female",
+      "concern": "skin laxity",
+      "budget": "high",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_021"
+    ],
+    "reasoning": "hifu provides non surgical lifting for moderate skin laxity"
+  },
+  {
+    "id": "consult_004",
+    "user_profile": {
+      "age": 27,
+      "gender": "female",
+      "concern": "acne scars",
+      "budget": "medium",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_028"
+    ],
+    "reasoning": "fractional co2 laser improves acne scar texture"
+  },
+  {
+    "id": "consult_005",
+    "user_profile": {
+      "age": 31,
+      "gender": "female",
+      "concern": "dull skin",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_008"
+    ],
+    "reasoning": "skin booster improves hydration and glow"
+  },
+  {
+    "id": "consult_006",
+    "user_profile": {
+      "age": 36,
+      "gender": "female",
+      "concern": "melasma",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_029"
+    ],
+    "reasoning": "pico laser targets pigment with minimal downtime"
+  },
+  {
+    "id": "consult_007",
+    "user_profile": {
+      "age": 45,
+      "gender": "female",
+      "concern": "facial sagging",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_061"
+    ],
+    "reasoning": "thread lifting improves sagging with immediate lifting effect"
+  },
+  {
+    "id": "consult_008",
+    "user_profile": {
+      "age": 33,
+      "gender": "male",
+      "concern": "jawline contour",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_004"
+    ],
+    "reasoning": "jawline filler enhances facial contour definition"
+  },
+  {
+    "id": "consult_009",
+    "user_profile": {
+      "age": 39,
+      "gender": "female",
+      "concern": "under eye hollows",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "tear trough filler restores volume under eyes"
+  },
+  {
+    "id": "consult_010",
+    "user_profile": {
+      "age": 28,
+      "gender": "female",
+      "concern": "enlarged pores",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_041"
+    ],
+    "reasoning": "hydrafacial helps cleanse pores and improve skin texture"
+  },
+  {
+    "id": "consult_011",
+    "user_profile": {
+      "age": 34,
+      "gender": "female",
+      "concern": "volume loss",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "dermal filler restores facial volume"
+  },
+  {
+    "id": "consult_012",
+    "user_profile": {
+      "age": 35,
+      "gender": "male",
+      "concern": "collagen loss",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_010"
+    ],
+    "reasoning": "sculptra stimulates collagen production"
+  },
+  {
+    "id": "consult_013",
+    "user_profile": {
+      "age": 36,
+      "gender": "female",
+      "concern": "freckles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_030"
+    ],
+    "reasoning": "q switched laser removes freckles"
+  },
+  {
+    "id": "consult_014",
+    "user_profile": {
+      "age": 37,
+      "gender": "male",
+      "concern": "hair loss",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_078"
+    ],
+    "reasoning": "hair transplant restores density"
+  },
+  {
+    "id": "consult_015",
+    "user_profile": {
+      "age": 38,
+      "gender": "female",
+      "concern": "fine lines",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic wrinkles"
+  },
+  {
+    "id": "consult_016",
+    "user_profile": {
+      "age": 39,
+      "gender": "male",
+      "concern": "dehydrated skin",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_008"
+    ],
+    "reasoning": "skin booster hydrates skin"
+  },
+  {
+    "id": "consult_017",
+    "user_profile": {
+      "age": 40,
+      "gender": "female",
+      "concern": "jaw slimming",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "masseter botox reduces jaw muscle"
+  },
+  {
+    "id": "consult_018",
+    "user_profile": {
+      "age": 41,
+      "gender": "male",
+      "concern": "double chin",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_069"
+    ],
+    "reasoning": "fat dissolving injections reduce chin fat"
+  },
+  {
+    "id": "consult_019",
+    "user_profile": {
+      "age": 42,
+      "gender": "female",
+      "concern": "neck laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_023"
+    ],
+    "reasoning": "thermage tightens neck skin"
+  },
+  {
+    "id": "consult_020",
+    "user_profile": {
+      "age": 43,
+      "gender": "male",
+      "concern": "severe sagging",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_093"
+    ],
+    "reasoning": "facelift surgery provides strongest lifting"
+  },
+  {
+    "id": "consult_021",
+    "user_profile": {
+      "age": 44,
+      "gender": "female",
+      "concern": "forehead wrinkles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic forehead wrinkles"
+  },
+  {
+    "id": "consult_022",
+    "user_profile": {
+      "age": 45,
+      "gender": "male",
+      "concern": "nasolabial folds",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "filler restores volume in smile lines"
+  },
+  {
+    "id": "consult_023",
+    "user_profile": {
+      "age": 46,
+      "gender": "female",
+      "concern": "skin laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_021"
+    ],
+    "reasoning": "hifu tightens deeper skin layers"
+  },
+  {
+    "id": "consult_024",
+    "user_profile": {
+      "age": 47,
+      "gender": "male",
+      "concern": "acne scars",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_028"
+    ],
+    "reasoning": "fractional laser improves acne scars"
+  },
+  {
+    "id": "consult_025",
+    "user_profile": {
+      "age": 48,
+      "gender": "female",
+      "concern": "dull skin",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_042"
+    ],
+    "reasoning": "oxygen facial improves skin glow"
+  },
+  {
+    "id": "consult_026",
+    "user_profile": {
+      "age": 49,
+      "gender": "male",
+      "concern": "pigmentation",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_029"
+    ],
+    "reasoning": "pico laser treats pigmentation"
+  },
+  {
+    "id": "consult_027",
+    "user_profile": {
+      "age": 50,
+      "gender": "female",
+      "concern": "sagging cheeks",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_061"
+    ],
+    "reasoning": "thread lift improves sagging cheeks"
+  },
+  {
+    "id": "consult_028",
+    "user_profile": {
+      "age": 51,
+      "gender": "male",
+      "concern": "jawline contour",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_004"
+    ],
+    "reasoning": "jawline filler improves facial contour"
+  },
+  {
+    "id": "consult_029",
+    "user_profile": {
+      "age": 52,
+      "gender": "female",
+      "concern": "under eye hollow",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "tear trough filler restores volume"
+  },
+  {
+    "id": "consult_030",
+    "user_profile": {
+      "age": 53,
+      "gender": "male",
+      "concern": "enlarged pores",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_041"
+    ],
+    "reasoning": "hydrafacial cleans pores"
+  },
+  {
+    "id": "consult_031",
+    "user_profile": {
+      "age": 54,
+      "gender": "female",
+      "concern": "volume loss",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "dermal filler restores facial volume"
+  },
+  {
+    "id": "consult_032",
+    "user_profile": {
+      "age": 55,
+      "gender": "male",
+      "concern": "collagen loss",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_010"
+    ],
+    "reasoning": "sculptra stimulates collagen production"
+  },
+  {
+    "id": "consult_033",
+    "user_profile": {
+      "age": 24,
+      "gender": "female",
+      "concern": "freckles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_030"
+    ],
+    "reasoning": "q switched laser removes freckles"
+  },
+  {
+    "id": "consult_034",
+    "user_profile": {
+      "age": 25,
+      "gender": "male",
+      "concern": "hair loss",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_078"
+    ],
+    "reasoning": "hair transplant restores density"
+  },
+  {
+    "id": "consult_035",
+    "user_profile": {
+      "age": 26,
+      "gender": "female",
+      "concern": "fine lines",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic wrinkles"
+  },
+  {
+    "id": "consult_036",
+    "user_profile": {
+      "age": 27,
+      "gender": "male",
+      "concern": "dehydrated skin",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_008"
+    ],
+    "reasoning": "skin booster hydrates skin"
+  },
+  {
+    "id": "consult_037",
+    "user_profile": {
+      "age": 28,
+      "gender": "female",
+      "concern": "jaw slimming",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "masseter botox reduces jaw muscle"
+  },
+  {
+    "id": "consult_038",
+    "user_profile": {
+      "age": 29,
+      "gender": "male",
+      "concern": "double chin",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_069"
+    ],
+    "reasoning": "fat dissolving injections reduce chin fat"
+  },
+  {
+    "id": "consult_039",
+    "user_profile": {
+      "age": 30,
+      "gender": "female",
+      "concern": "neck laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_023"
+    ],
+    "reasoning": "thermage tightens neck skin"
+  },
+  {
+    "id": "consult_040",
+    "user_profile": {
+      "age": 31,
+      "gender": "male",
+      "concern": "severe sagging",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_093"
+    ],
+    "reasoning": "facelift surgery provides strongest lifting"
+  },
+  {
+    "id": "consult_041",
+    "user_profile": {
+      "age": 32,
+      "gender": "female",
+      "concern": "forehead wrinkles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic forehead wrinkles"
+  },
+  {
+    "id": "consult_042",
+    "user_profile": {
+      "age": 33,
+      "gender": "male",
+      "concern": "nasolabial folds",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "filler restores volume in smile lines"
+  },
+  {
+    "id": "consult_043",
+    "user_profile": {
+      "age": 34,
+      "gender": "female",
+      "concern": "skin laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_021"
+    ],
+    "reasoning": "hifu tightens deeper skin layers"
+  },
+  {
+    "id": "consult_044",
+    "user_profile": {
+      "age": 35,
+      "gender": "male",
+      "concern": "acne scars",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_028"
+    ],
+    "reasoning": "fractional laser improves acne scars"
+  },
+  {
+    "id": "consult_045",
+    "user_profile": {
+      "age": 36,
+      "gender": "female",
+      "concern": "dull skin",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_042"
+    ],
+    "reasoning": "oxygen facial improves skin glow"
+  },
+  {
+    "id": "consult_046",
+    "user_profile": {
+      "age": 37,
+      "gender": "male",
+      "concern": "pigmentation",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_029"
+    ],
+    "reasoning": "pico laser treats pigmentation"
+  },
+  {
+    "id": "consult_047",
+    "user_profile": {
+      "age": 38,
+      "gender": "female",
+      "concern": "sagging cheeks",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_061"
+    ],
+    "reasoning": "thread lift improves sagging cheeks"
+  },
+  {
+    "id": "consult_048",
+    "user_profile": {
+      "age": 39,
+      "gender": "male",
+      "concern": "jawline contour",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_004"
+    ],
+    "reasoning": "jawline filler improves facial contour"
+  },
+  {
+    "id": "consult_049",
+    "user_profile": {
+      "age": 40,
+      "gender": "female",
+      "concern": "under eye hollow",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "tear trough filler restores volume"
+  },
+  {
+    "id": "consult_050",
+    "user_profile": {
+      "age": 41,
+      "gender": "male",
+      "concern": "enlarged pores",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_041"
+    ],
+    "reasoning": "hydrafacial cleans pores"
+  },
+  {
+    "id": "consult_051",
+    "user_profile": {
+      "age": 42,
+      "gender": "female",
+      "concern": "volume loss",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "dermal filler restores facial volume"
+  },
+  {
+    "id": "consult_052",
+    "user_profile": {
+      "age": 43,
+      "gender": "male",
+      "concern": "collagen loss",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_010"
+    ],
+    "reasoning": "sculptra stimulates collagen production"
+  },
+  {
+    "id": "consult_053",
+    "user_profile": {
+      "age": 44,
+      "gender": "female",
+      "concern": "freckles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_030"
+    ],
+    "reasoning": "q switched laser removes freckles"
+  },
+  {
+    "id": "consult_054",
+    "user_profile": {
+      "age": 45,
+      "gender": "male",
+      "concern": "hair loss",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_078"
+    ],
+    "reasoning": "hair transplant restores density"
+  },
+  {
+    "id": "consult_055",
+    "user_profile": {
+      "age": 46,
+      "gender": "female",
+      "concern": "fine lines",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic wrinkles"
+  },
+  {
+    "id": "consult_056",
+    "user_profile": {
+      "age": 47,
+      "gender": "male",
+      "concern": "dehydrated skin",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_008"
+    ],
+    "reasoning": "skin booster hydrates skin"
+  },
+  {
+    "id": "consult_057",
+    "user_profile": {
+      "age": 48,
+      "gender": "female",
+      "concern": "jaw slimming",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "masseter botox reduces jaw muscle"
+  },
+  {
+    "id": "consult_058",
+    "user_profile": {
+      "age": 49,
+      "gender": "male",
+      "concern": "double chin",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_069"
+    ],
+    "reasoning": "fat dissolving injections reduce chin fat"
+  },
+  {
+    "id": "consult_059",
+    "user_profile": {
+      "age": 50,
+      "gender": "female",
+      "concern": "neck laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_023"
+    ],
+    "reasoning": "thermage tightens neck skin"
+  },
+  {
+    "id": "consult_060",
+    "user_profile": {
+      "age": 51,
+      "gender": "male",
+      "concern": "severe sagging",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_093"
+    ],
+    "reasoning": "facelift surgery provides strongest lifting"
+  },
+  {
+    "id": "consult_061",
+    "user_profile": {
+      "age": 52,
+      "gender": "female",
+      "concern": "forehead wrinkles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic forehead wrinkles"
+  },
+  {
+    "id": "consult_062",
+    "user_profile": {
+      "age": 53,
+      "gender": "male",
+      "concern": "nasolabial folds",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "filler restores volume in smile lines"
+  },
+  {
+    "id": "consult_063",
+    "user_profile": {
+      "age": 54,
+      "gender": "female",
+      "concern": "skin laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_021"
+    ],
+    "reasoning": "hifu tightens deeper skin layers"
+  },
+  {
+    "id": "consult_064",
+    "user_profile": {
+      "age": 55,
+      "gender": "male",
+      "concern": "acne scars",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_028"
+    ],
+    "reasoning": "fractional laser improves acne scars"
+  },
+  {
+    "id": "consult_065",
+    "user_profile": {
+      "age": 24,
+      "gender": "female",
+      "concern": "dull skin",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_042"
+    ],
+    "reasoning": "oxygen facial improves skin glow"
+  },
+  {
+    "id": "consult_066",
+    "user_profile": {
+      "age": 25,
+      "gender": "male",
+      "concern": "pigmentation",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_029"
+    ],
+    "reasoning": "pico laser treats pigmentation"
+  },
+  {
+    "id": "consult_067",
+    "user_profile": {
+      "age": 26,
+      "gender": "female",
+      "concern": "sagging cheeks",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_061"
+    ],
+    "reasoning": "thread lift improves sagging cheeks"
+  },
+  {
+    "id": "consult_068",
+    "user_profile": {
+      "age": 27,
+      "gender": "male",
+      "concern": "jawline contour",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_004"
+    ],
+    "reasoning": "jawline filler improves facial contour"
+  },
+  {
+    "id": "consult_069",
+    "user_profile": {
+      "age": 28,
+      "gender": "female",
+      "concern": "under eye hollow",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "tear trough filler restores volume"
+  },
+  {
+    "id": "consult_070",
+    "user_profile": {
+      "age": 29,
+      "gender": "male",
+      "concern": "enlarged pores",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_041"
+    ],
+    "reasoning": "hydrafacial cleans pores"
+  },
+  {
+    "id": "consult_071",
+    "user_profile": {
+      "age": 30,
+      "gender": "female",
+      "concern": "volume loss",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "dermal filler restores facial volume"
+  },
+  {
+    "id": "consult_072",
+    "user_profile": {
+      "age": 31,
+      "gender": "male",
+      "concern": "collagen loss",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_010"
+    ],
+    "reasoning": "sculptra stimulates collagen production"
+  },
+  {
+    "id": "consult_073",
+    "user_profile": {
+      "age": 32,
+      "gender": "female",
+      "concern": "freckles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_030"
+    ],
+    "reasoning": "q switched laser removes freckles"
+  },
+  {
+    "id": "consult_074",
+    "user_profile": {
+      "age": 33,
+      "gender": "male",
+      "concern": "hair loss",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_078"
+    ],
+    "reasoning": "hair transplant restores density"
+  },
+  {
+    "id": "consult_075",
+    "user_profile": {
+      "age": 34,
+      "gender": "female",
+      "concern": "fine lines",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic wrinkles"
+  },
+  {
+    "id": "consult_076",
+    "user_profile": {
+      "age": 35,
+      "gender": "male",
+      "concern": "dehydrated skin",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_008"
+    ],
+    "reasoning": "skin booster hydrates skin"
+  },
+  {
+    "id": "consult_077",
+    "user_profile": {
+      "age": 36,
+      "gender": "female",
+      "concern": "jaw slimming",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "masseter botox reduces jaw muscle"
+  },
+  {
+    "id": "consult_078",
+    "user_profile": {
+      "age": 37,
+      "gender": "male",
+      "concern": "double chin",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_069"
+    ],
+    "reasoning": "fat dissolving injections reduce chin fat"
+  },
+  {
+    "id": "consult_079",
+    "user_profile": {
+      "age": 38,
+      "gender": "female",
+      "concern": "neck laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_023"
+    ],
+    "reasoning": "thermage tightens neck skin"
+  },
+  {
+    "id": "consult_080",
+    "user_profile": {
+      "age": 39,
+      "gender": "male",
+      "concern": "severe sagging",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_093"
+    ],
+    "reasoning": "facelift surgery provides strongest lifting"
+  },
+  {
+    "id": "consult_081",
+    "user_profile": {
+      "age": 40,
+      "gender": "female",
+      "concern": "forehead wrinkles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic forehead wrinkles"
+  },
+  {
+    "id": "consult_082",
+    "user_profile": {
+      "age": 41,
+      "gender": "male",
+      "concern": "nasolabial folds",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "filler restores volume in smile lines"
+  },
+  {
+    "id": "consult_083",
+    "user_profile": {
+      "age": 42,
+      "gender": "female",
+      "concern": "skin laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_021"
+    ],
+    "reasoning": "hifu tightens deeper skin layers"
+  },
+  {
+    "id": "consult_084",
+    "user_profile": {
+      "age": 43,
+      "gender": "male",
+      "concern": "acne scars",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_028"
+    ],
+    "reasoning": "fractional laser improves acne scars"
+  },
+  {
+    "id": "consult_085",
+    "user_profile": {
+      "age": 44,
+      "gender": "female",
+      "concern": "dull skin",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_042"
+    ],
+    "reasoning": "oxygen facial improves skin glow"
+  },
+  {
+    "id": "consult_086",
+    "user_profile": {
+      "age": 45,
+      "gender": "male",
+      "concern": "pigmentation",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_029"
+    ],
+    "reasoning": "pico laser treats pigmentation"
+  },
+  {
+    "id": "consult_087",
+    "user_profile": {
+      "age": 46,
+      "gender": "female",
+      "concern": "sagging cheeks",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_061"
+    ],
+    "reasoning": "thread lift improves sagging cheeks"
+  },
+  {
+    "id": "consult_088",
+    "user_profile": {
+      "age": 47,
+      "gender": "male",
+      "concern": "jawline contour",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_004"
+    ],
+    "reasoning": "jawline filler improves facial contour"
+  },
+  {
+    "id": "consult_089",
+    "user_profile": {
+      "age": 48,
+      "gender": "female",
+      "concern": "under eye hollow",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "tear trough filler restores volume"
+  },
+  {
+    "id": "consult_090",
+    "user_profile": {
+      "age": 49,
+      "gender": "male",
+      "concern": "enlarged pores",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_041"
+    ],
+    "reasoning": "hydrafacial cleans pores"
+  },
+  {
+    "id": "consult_091",
+    "user_profile": {
+      "age": 50,
+      "gender": "female",
+      "concern": "volume loss",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "dermal filler restores facial volume"
+  },
+  {
+    "id": "consult_092",
+    "user_profile": {
+      "age": 51,
+      "gender": "male",
+      "concern": "collagen loss",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_010"
+    ],
+    "reasoning": "sculptra stimulates collagen production"
+  },
+  {
+    "id": "consult_093",
+    "user_profile": {
+      "age": 52,
+      "gender": "female",
+      "concern": "freckles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_030"
+    ],
+    "reasoning": "q switched laser removes freckles"
+  },
+  {
+    "id": "consult_094",
+    "user_profile": {
+      "age": 53,
+      "gender": "male",
+      "concern": "hair loss",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_078"
+    ],
+    "reasoning": "hair transplant restores density"
+  },
+  {
+    "id": "consult_095",
+    "user_profile": {
+      "age": 54,
+      "gender": "female",
+      "concern": "fine lines",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic wrinkles"
+  },
+  {
+    "id": "consult_096",
+    "user_profile": {
+      "age": 55,
+      "gender": "male",
+      "concern": "dehydrated skin",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_008"
+    ],
+    "reasoning": "skin booster hydrates skin"
+  },
+  {
+    "id": "consult_097",
+    "user_profile": {
+      "age": 24,
+      "gender": "female",
+      "concern": "jaw slimming",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "masseter botox reduces jaw muscle"
+  },
+  {
+    "id": "consult_098",
+    "user_profile": {
+      "age": 25,
+      "gender": "male",
+      "concern": "double chin",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_069"
+    ],
+    "reasoning": "fat dissolving injections reduce chin fat"
+  },
+  {
+    "id": "consult_099",
+    "user_profile": {
+      "age": 26,
+      "gender": "female",
+      "concern": "neck laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_023"
+    ],
+    "reasoning": "thermage tightens neck skin"
+  },
+  {
+    "id": "consult_100",
+    "user_profile": {
+      "age": 27,
+      "gender": "male",
+      "concern": "severe sagging",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_093"
+    ],
+    "reasoning": "facelift surgery provides strongest lifting"
+  },
+  {
+    "id": "consult_101",
+    "user_profile": {
+      "age": 28,
+      "gender": "female",
+      "concern": "forehead wrinkles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic forehead wrinkles"
+  },
+  {
+    "id": "consult_102",
+    "user_profile": {
+      "age": 29,
+      "gender": "male",
+      "concern": "nasolabial folds",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "filler restores volume in smile lines"
+  },
+  {
+    "id": "consult_103",
+    "user_profile": {
+      "age": 30,
+      "gender": "female",
+      "concern": "skin laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_021"
+    ],
+    "reasoning": "hifu tightens deeper skin layers"
+  },
+  {
+    "id": "consult_104",
+    "user_profile": {
+      "age": 31,
+      "gender": "male",
+      "concern": "acne scars",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_028"
+    ],
+    "reasoning": "fractional laser improves acne scars"
+  },
+  {
+    "id": "consult_105",
+    "user_profile": {
+      "age": 32,
+      "gender": "female",
+      "concern": "dull skin",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_042"
+    ],
+    "reasoning": "oxygen facial improves skin glow"
+  },
+  {
+    "id": "consult_106",
+    "user_profile": {
+      "age": 33,
+      "gender": "male",
+      "concern": "pigmentation",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_029"
+    ],
+    "reasoning": "pico laser treats pigmentation"
+  },
+  {
+    "id": "consult_107",
+    "user_profile": {
+      "age": 34,
+      "gender": "female",
+      "concern": "sagging cheeks",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_061"
+    ],
+    "reasoning": "thread lift improves sagging cheeks"
+  },
+  {
+    "id": "consult_108",
+    "user_profile": {
+      "age": 35,
+      "gender": "male",
+      "concern": "jawline contour",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_004"
+    ],
+    "reasoning": "jawline filler improves facial contour"
+  },
+  {
+    "id": "consult_109",
+    "user_profile": {
+      "age": 36,
+      "gender": "female",
+      "concern": "under eye hollow",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "tear trough filler restores volume"
+  },
+  {
+    "id": "consult_110",
+    "user_profile": {
+      "age": 37,
+      "gender": "male",
+      "concern": "enlarged pores",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_041"
+    ],
+    "reasoning": "hydrafacial cleans pores"
+  },
+  {
+    "id": "consult_111",
+    "user_profile": {
+      "age": 38,
+      "gender": "female",
+      "concern": "volume loss",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "dermal filler restores facial volume"
+  },
+  {
+    "id": "consult_112",
+    "user_profile": {
+      "age": 39,
+      "gender": "male",
+      "concern": "collagen loss",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_010"
+    ],
+    "reasoning": "sculptra stimulates collagen production"
+  },
+  {
+    "id": "consult_113",
+    "user_profile": {
+      "age": 40,
+      "gender": "female",
+      "concern": "freckles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_030"
+    ],
+    "reasoning": "q switched laser removes freckles"
+  },
+  {
+    "id": "consult_114",
+    "user_profile": {
+      "age": 41,
+      "gender": "male",
+      "concern": "hair loss",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_078"
+    ],
+    "reasoning": "hair transplant restores density"
+  },
+  {
+    "id": "consult_115",
+    "user_profile": {
+      "age": 42,
+      "gender": "female",
+      "concern": "fine lines",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic wrinkles"
+  },
+  {
+    "id": "consult_116",
+    "user_profile": {
+      "age": 43,
+      "gender": "male",
+      "concern": "dehydrated skin",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_008"
+    ],
+    "reasoning": "skin booster hydrates skin"
+  },
+  {
+    "id": "consult_117",
+    "user_profile": {
+      "age": 44,
+      "gender": "female",
+      "concern": "jaw slimming",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "masseter botox reduces jaw muscle"
+  },
+  {
+    "id": "consult_118",
+    "user_profile": {
+      "age": 45,
+      "gender": "male",
+      "concern": "double chin",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_069"
+    ],
+    "reasoning": "fat dissolving injections reduce chin fat"
+  },
+  {
+    "id": "consult_119",
+    "user_profile": {
+      "age": 46,
+      "gender": "female",
+      "concern": "neck laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_023"
+    ],
+    "reasoning": "thermage tightens neck skin"
+  },
+  {
+    "id": "consult_120",
+    "user_profile": {
+      "age": 47,
+      "gender": "male",
+      "concern": "severe sagging",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_093"
+    ],
+    "reasoning": "facelift surgery provides strongest lifting"
+  },
+  {
+    "id": "consult_121",
+    "user_profile": {
+      "age": 48,
+      "gender": "female",
+      "concern": "forehead wrinkles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic forehead wrinkles"
+  },
+  {
+    "id": "consult_122",
+    "user_profile": {
+      "age": 49,
+      "gender": "male",
+      "concern": "nasolabial folds",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "filler restores volume in smile lines"
+  },
+  {
+    "id": "consult_123",
+    "user_profile": {
+      "age": 50,
+      "gender": "female",
+      "concern": "skin laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_021"
+    ],
+    "reasoning": "hifu tightens deeper skin layers"
+  },
+  {
+    "id": "consult_124",
+    "user_profile": {
+      "age": 51,
+      "gender": "male",
+      "concern": "acne scars",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_028"
+    ],
+    "reasoning": "fractional laser improves acne scars"
+  },
+  {
+    "id": "consult_125",
+    "user_profile": {
+      "age": 52,
+      "gender": "female",
+      "concern": "dull skin",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_042"
+    ],
+    "reasoning": "oxygen facial improves skin glow"
+  },
+  {
+    "id": "consult_126",
+    "user_profile": {
+      "age": 53,
+      "gender": "male",
+      "concern": "pigmentation",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_029"
+    ],
+    "reasoning": "pico laser treats pigmentation"
+  },
+  {
+    "id": "consult_127",
+    "user_profile": {
+      "age": 54,
+      "gender": "female",
+      "concern": "sagging cheeks",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_061"
+    ],
+    "reasoning": "thread lift improves sagging cheeks"
+  },
+  {
+    "id": "consult_128",
+    "user_profile": {
+      "age": 55,
+      "gender": "male",
+      "concern": "jawline contour",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_004"
+    ],
+    "reasoning": "jawline filler improves facial contour"
+  },
+  {
+    "id": "consult_129",
+    "user_profile": {
+      "age": 24,
+      "gender": "female",
+      "concern": "under eye hollow",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "tear trough filler restores volume"
+  },
+  {
+    "id": "consult_130",
+    "user_profile": {
+      "age": 25,
+      "gender": "male",
+      "concern": "enlarged pores",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_041"
+    ],
+    "reasoning": "hydrafacial cleans pores"
+  },
+  {
+    "id": "consult_131",
+    "user_profile": {
+      "age": 26,
+      "gender": "female",
+      "concern": "volume loss",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "dermal filler restores facial volume"
+  },
+  {
+    "id": "consult_132",
+    "user_profile": {
+      "age": 27,
+      "gender": "male",
+      "concern": "collagen loss",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_010"
+    ],
+    "reasoning": "sculptra stimulates collagen production"
+  },
+  {
+    "id": "consult_133",
+    "user_profile": {
+      "age": 28,
+      "gender": "female",
+      "concern": "freckles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_030"
+    ],
+    "reasoning": "q switched laser removes freckles"
+  },
+  {
+    "id": "consult_134",
+    "user_profile": {
+      "age": 29,
+      "gender": "male",
+      "concern": "hair loss",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_078"
+    ],
+    "reasoning": "hair transplant restores density"
+  },
+  {
+    "id": "consult_135",
+    "user_profile": {
+      "age": 30,
+      "gender": "female",
+      "concern": "fine lines",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic wrinkles"
+  },
+  {
+    "id": "consult_136",
+    "user_profile": {
+      "age": 31,
+      "gender": "male",
+      "concern": "dehydrated skin",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_008"
+    ],
+    "reasoning": "skin booster hydrates skin"
+  },
+  {
+    "id": "consult_137",
+    "user_profile": {
+      "age": 32,
+      "gender": "female",
+      "concern": "jaw slimming",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "masseter botox reduces jaw muscle"
+  },
+  {
+    "id": "consult_138",
+    "user_profile": {
+      "age": 33,
+      "gender": "male",
+      "concern": "double chin",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_069"
+    ],
+    "reasoning": "fat dissolving injections reduce chin fat"
+  },
+  {
+    "id": "consult_139",
+    "user_profile": {
+      "age": 34,
+      "gender": "female",
+      "concern": "neck laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_023"
+    ],
+    "reasoning": "thermage tightens neck skin"
+  },
+  {
+    "id": "consult_140",
+    "user_profile": {
+      "age": 35,
+      "gender": "male",
+      "concern": "severe sagging",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_093"
+    ],
+    "reasoning": "facelift surgery provides strongest lifting"
+  },
+  {
+    "id": "consult_141",
+    "user_profile": {
+      "age": 36,
+      "gender": "female",
+      "concern": "forehead wrinkles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic forehead wrinkles"
+  },
+  {
+    "id": "consult_142",
+    "user_profile": {
+      "age": 37,
+      "gender": "male",
+      "concern": "nasolabial folds",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "filler restores volume in smile lines"
+  },
+  {
+    "id": "consult_143",
+    "user_profile": {
+      "age": 38,
+      "gender": "female",
+      "concern": "skin laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_021"
+    ],
+    "reasoning": "hifu tightens deeper skin layers"
+  },
+  {
+    "id": "consult_144",
+    "user_profile": {
+      "age": 39,
+      "gender": "male",
+      "concern": "acne scars",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_028"
+    ],
+    "reasoning": "fractional laser improves acne scars"
+  },
+  {
+    "id": "consult_145",
+    "user_profile": {
+      "age": 40,
+      "gender": "female",
+      "concern": "dull skin",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_042"
+    ],
+    "reasoning": "oxygen facial improves skin glow"
+  },
+  {
+    "id": "consult_146",
+    "user_profile": {
+      "age": 41,
+      "gender": "male",
+      "concern": "pigmentation",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_029"
+    ],
+    "reasoning": "pico laser treats pigmentation"
+  },
+  {
+    "id": "consult_147",
+    "user_profile": {
+      "age": 42,
+      "gender": "female",
+      "concern": "sagging cheeks",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_061"
+    ],
+    "reasoning": "thread lift improves sagging cheeks"
+  },
+  {
+    "id": "consult_148",
+    "user_profile": {
+      "age": 43,
+      "gender": "male",
+      "concern": "jawline contour",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_004"
+    ],
+    "reasoning": "jawline filler improves facial contour"
+  },
+  {
+    "id": "consult_149",
+    "user_profile": {
+      "age": 44,
+      "gender": "female",
+      "concern": "under eye hollow",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "tear trough filler restores volume"
+  },
+  {
+    "id": "consult_150",
+    "user_profile": {
+      "age": 45,
+      "gender": "male",
+      "concern": "enlarged pores",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_041"
+    ],
+    "reasoning": "hydrafacial cleans pores"
+  },
+  {
+    "id": "consult_151",
+    "user_profile": {
+      "age": 46,
+      "gender": "female",
+      "concern": "volume loss",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "dermal filler restores facial volume"
+  },
+  {
+    "id": "consult_152",
+    "user_profile": {
+      "age": 47,
+      "gender": "male",
+      "concern": "collagen loss",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_010"
+    ],
+    "reasoning": "sculptra stimulates collagen production"
+  },
+  {
+    "id": "consult_153",
+    "user_profile": {
+      "age": 48,
+      "gender": "female",
+      "concern": "freckles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_030"
+    ],
+    "reasoning": "q switched laser removes freckles"
+  },
+  {
+    "id": "consult_154",
+    "user_profile": {
+      "age": 49,
+      "gender": "male",
+      "concern": "hair loss",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_078"
+    ],
+    "reasoning": "hair transplant restores density"
+  },
+  {
+    "id": "consult_155",
+    "user_profile": {
+      "age": 50,
+      "gender": "female",
+      "concern": "fine lines",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic wrinkles"
+  },
+  {
+    "id": "consult_156",
+    "user_profile": {
+      "age": 51,
+      "gender": "male",
+      "concern": "dehydrated skin",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_008"
+    ],
+    "reasoning": "skin booster hydrates skin"
+  },
+  {
+    "id": "consult_157",
+    "user_profile": {
+      "age": 52,
+      "gender": "female",
+      "concern": "jaw slimming",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "masseter botox reduces jaw muscle"
+  },
+  {
+    "id": "consult_158",
+    "user_profile": {
+      "age": 53,
+      "gender": "male",
+      "concern": "double chin",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_069"
+    ],
+    "reasoning": "fat dissolving injections reduce chin fat"
+  },
+  {
+    "id": "consult_159",
+    "user_profile": {
+      "age": 54,
+      "gender": "female",
+      "concern": "neck laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_023"
+    ],
+    "reasoning": "thermage tightens neck skin"
+  },
+  {
+    "id": "consult_160",
+    "user_profile": {
+      "age": 55,
+      "gender": "male",
+      "concern": "severe sagging",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_093"
+    ],
+    "reasoning": "facelift surgery provides strongest lifting"
+  },
+  {
+    "id": "consult_161",
+    "user_profile": {
+      "age": 24,
+      "gender": "female",
+      "concern": "forehead wrinkles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic forehead wrinkles"
+  },
+  {
+    "id": "consult_162",
+    "user_profile": {
+      "age": 25,
+      "gender": "male",
+      "concern": "nasolabial folds",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "filler restores volume in smile lines"
+  },
+  {
+    "id": "consult_163",
+    "user_profile": {
+      "age": 26,
+      "gender": "female",
+      "concern": "skin laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_021"
+    ],
+    "reasoning": "hifu tightens deeper skin layers"
+  },
+  {
+    "id": "consult_164",
+    "user_profile": {
+      "age": 27,
+      "gender": "male",
+      "concern": "acne scars",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_028"
+    ],
+    "reasoning": "fractional laser improves acne scars"
+  },
+  {
+    "id": "consult_165",
+    "user_profile": {
+      "age": 28,
+      "gender": "female",
+      "concern": "dull skin",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_042"
+    ],
+    "reasoning": "oxygen facial improves skin glow"
+  },
+  {
+    "id": "consult_166",
+    "user_profile": {
+      "age": 29,
+      "gender": "male",
+      "concern": "pigmentation",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_029"
+    ],
+    "reasoning": "pico laser treats pigmentation"
+  },
+  {
+    "id": "consult_167",
+    "user_profile": {
+      "age": 30,
+      "gender": "female",
+      "concern": "sagging cheeks",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_061"
+    ],
+    "reasoning": "thread lift improves sagging cheeks"
+  },
+  {
+    "id": "consult_168",
+    "user_profile": {
+      "age": 31,
+      "gender": "male",
+      "concern": "jawline contour",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_004"
+    ],
+    "reasoning": "jawline filler improves facial contour"
+  },
+  {
+    "id": "consult_169",
+    "user_profile": {
+      "age": 32,
+      "gender": "female",
+      "concern": "under eye hollow",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "tear trough filler restores volume"
+  },
+  {
+    "id": "consult_170",
+    "user_profile": {
+      "age": 33,
+      "gender": "male",
+      "concern": "enlarged pores",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_041"
+    ],
+    "reasoning": "hydrafacial cleans pores"
+  },
+  {
+    "id": "consult_171",
+    "user_profile": {
+      "age": 34,
+      "gender": "female",
+      "concern": "volume loss",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "dermal filler restores facial volume"
+  },
+  {
+    "id": "consult_172",
+    "user_profile": {
+      "age": 35,
+      "gender": "male",
+      "concern": "collagen loss",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_010"
+    ],
+    "reasoning": "sculptra stimulates collagen production"
+  },
+  {
+    "id": "consult_173",
+    "user_profile": {
+      "age": 36,
+      "gender": "female",
+      "concern": "freckles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_030"
+    ],
+    "reasoning": "q switched laser removes freckles"
+  },
+  {
+    "id": "consult_174",
+    "user_profile": {
+      "age": 37,
+      "gender": "male",
+      "concern": "hair loss",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_078"
+    ],
+    "reasoning": "hair transplant restores density"
+  },
+  {
+    "id": "consult_175",
+    "user_profile": {
+      "age": 38,
+      "gender": "female",
+      "concern": "fine lines",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic wrinkles"
+  },
+  {
+    "id": "consult_176",
+    "user_profile": {
+      "age": 39,
+      "gender": "male",
+      "concern": "dehydrated skin",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_008"
+    ],
+    "reasoning": "skin booster hydrates skin"
+  },
+  {
+    "id": "consult_177",
+    "user_profile": {
+      "age": 40,
+      "gender": "female",
+      "concern": "jaw slimming",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "masseter botox reduces jaw muscle"
+  },
+  {
+    "id": "consult_178",
+    "user_profile": {
+      "age": 41,
+      "gender": "male",
+      "concern": "double chin",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_069"
+    ],
+    "reasoning": "fat dissolving injections reduce chin fat"
+  },
+  {
+    "id": "consult_179",
+    "user_profile": {
+      "age": 42,
+      "gender": "female",
+      "concern": "neck laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_023"
+    ],
+    "reasoning": "thermage tightens neck skin"
+  },
+  {
+    "id": "consult_180",
+    "user_profile": {
+      "age": 43,
+      "gender": "male",
+      "concern": "severe sagging",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_093"
+    ],
+    "reasoning": "facelift surgery provides strongest lifting"
+  },
+  {
+    "id": "consult_181",
+    "user_profile": {
+      "age": 44,
+      "gender": "female",
+      "concern": "forehead wrinkles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic forehead wrinkles"
+  },
+  {
+    "id": "consult_182",
+    "user_profile": {
+      "age": 45,
+      "gender": "male",
+      "concern": "nasolabial folds",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "filler restores volume in smile lines"
+  },
+  {
+    "id": "consult_183",
+    "user_profile": {
+      "age": 46,
+      "gender": "female",
+      "concern": "skin laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_021"
+    ],
+    "reasoning": "hifu tightens deeper skin layers"
+  },
+  {
+    "id": "consult_184",
+    "user_profile": {
+      "age": 47,
+      "gender": "male",
+      "concern": "acne scars",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_028"
+    ],
+    "reasoning": "fractional laser improves acne scars"
+  },
+  {
+    "id": "consult_185",
+    "user_profile": {
+      "age": 48,
+      "gender": "female",
+      "concern": "dull skin",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_042"
+    ],
+    "reasoning": "oxygen facial improves skin glow"
+  },
+  {
+    "id": "consult_186",
+    "user_profile": {
+      "age": 49,
+      "gender": "male",
+      "concern": "pigmentation",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_029"
+    ],
+    "reasoning": "pico laser treats pigmentation"
+  },
+  {
+    "id": "consult_187",
+    "user_profile": {
+      "age": 50,
+      "gender": "female",
+      "concern": "sagging cheeks",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_061"
+    ],
+    "reasoning": "thread lift improves sagging cheeks"
+  },
+  {
+    "id": "consult_188",
+    "user_profile": {
+      "age": 51,
+      "gender": "male",
+      "concern": "jawline contour",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_004"
+    ],
+    "reasoning": "jawline filler improves facial contour"
+  },
+  {
+    "id": "consult_189",
+    "user_profile": {
+      "age": 52,
+      "gender": "female",
+      "concern": "under eye hollow",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "tear trough filler restores volume"
+  },
+  {
+    "id": "consult_190",
+    "user_profile": {
+      "age": 53,
+      "gender": "male",
+      "concern": "enlarged pores",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_041"
+    ],
+    "reasoning": "hydrafacial cleans pores"
+  },
+  {
+    "id": "consult_191",
+    "user_profile": {
+      "age": 54,
+      "gender": "female",
+      "concern": "volume loss",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "dermal filler restores facial volume"
+  },
+  {
+    "id": "consult_192",
+    "user_profile": {
+      "age": 55,
+      "gender": "male",
+      "concern": "collagen loss",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_010"
+    ],
+    "reasoning": "sculptra stimulates collagen production"
+  },
+  {
+    "id": "consult_193",
+    "user_profile": {
+      "age": 24,
+      "gender": "female",
+      "concern": "freckles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_030"
+    ],
+    "reasoning": "q switched laser removes freckles"
+  },
+  {
+    "id": "consult_194",
+    "user_profile": {
+      "age": 25,
+      "gender": "male",
+      "concern": "hair loss",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_078"
+    ],
+    "reasoning": "hair transplant restores density"
+  },
+  {
+    "id": "consult_195",
+    "user_profile": {
+      "age": 26,
+      "gender": "female",
+      "concern": "fine lines",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic wrinkles"
+  },
+  {
+    "id": "consult_196",
+    "user_profile": {
+      "age": 27,
+      "gender": "male",
+      "concern": "dehydrated skin",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_008"
+    ],
+    "reasoning": "skin booster hydrates skin"
+  },
+  {
+    "id": "consult_197",
+    "user_profile": {
+      "age": 28,
+      "gender": "female",
+      "concern": "jaw slimming",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "masseter botox reduces jaw muscle"
+  },
+  {
+    "id": "consult_198",
+    "user_profile": {
+      "age": 29,
+      "gender": "male",
+      "concern": "double chin",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_069"
+    ],
+    "reasoning": "fat dissolving injections reduce chin fat"
+  },
+  {
+    "id": "consult_199",
+    "user_profile": {
+      "age": 30,
+      "gender": "female",
+      "concern": "neck laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_023"
+    ],
+    "reasoning": "thermage tightens neck skin"
+  },
+  {
+    "id": "consult_200",
+    "user_profile": {
+      "age": 31,
+      "gender": "male",
+      "concern": "severe sagging",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_093"
+    ],
+    "reasoning": "facelift surgery provides strongest lifting"
+  },
+  {
+    "id": "consult_201",
+    "user_profile": {
+      "age": 32,
+      "gender": "female",
+      "concern": "forehead wrinkles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic forehead wrinkles"
+  },
+  {
+    "id": "consult_202",
+    "user_profile": {
+      "age": 33,
+      "gender": "male",
+      "concern": "nasolabial folds",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "filler restores volume in smile lines"
+  },
+  {
+    "id": "consult_203",
+    "user_profile": {
+      "age": 34,
+      "gender": "female",
+      "concern": "skin laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_021"
+    ],
+    "reasoning": "hifu tightens deeper skin layers"
+  },
+  {
+    "id": "consult_204",
+    "user_profile": {
+      "age": 35,
+      "gender": "male",
+      "concern": "acne scars",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_028"
+    ],
+    "reasoning": "fractional laser improves acne scars"
+  },
+  {
+    "id": "consult_205",
+    "user_profile": {
+      "age": 36,
+      "gender": "female",
+      "concern": "dull skin",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_042"
+    ],
+    "reasoning": "oxygen facial improves skin glow"
+  },
+  {
+    "id": "consult_206",
+    "user_profile": {
+      "age": 37,
+      "gender": "male",
+      "concern": "pigmentation",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_029"
+    ],
+    "reasoning": "pico laser treats pigmentation"
+  },
+  {
+    "id": "consult_207",
+    "user_profile": {
+      "age": 38,
+      "gender": "female",
+      "concern": "sagging cheeks",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_061"
+    ],
+    "reasoning": "thread lift improves sagging cheeks"
+  },
+  {
+    "id": "consult_208",
+    "user_profile": {
+      "age": 39,
+      "gender": "male",
+      "concern": "jawline contour",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_004"
+    ],
+    "reasoning": "jawline filler improves facial contour"
+  },
+  {
+    "id": "consult_209",
+    "user_profile": {
+      "age": 40,
+      "gender": "female",
+      "concern": "under eye hollow",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "tear trough filler restores volume"
+  },
+  {
+    "id": "consult_210",
+    "user_profile": {
+      "age": 41,
+      "gender": "male",
+      "concern": "enlarged pores",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_041"
+    ],
+    "reasoning": "hydrafacial cleans pores"
+  },
+  {
+    "id": "consult_211",
+    "user_profile": {
+      "age": 42,
+      "gender": "female",
+      "concern": "volume loss",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "dermal filler restores facial volume"
+  },
+  {
+    "id": "consult_212",
+    "user_profile": {
+      "age": 43,
+      "gender": "male",
+      "concern": "collagen loss",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_010"
+    ],
+    "reasoning": "sculptra stimulates collagen production"
+  },
+  {
+    "id": "consult_213",
+    "user_profile": {
+      "age": 44,
+      "gender": "female",
+      "concern": "freckles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_030"
+    ],
+    "reasoning": "q switched laser removes freckles"
+  },
+  {
+    "id": "consult_214",
+    "user_profile": {
+      "age": 45,
+      "gender": "male",
+      "concern": "hair loss",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_078"
+    ],
+    "reasoning": "hair transplant restores density"
+  },
+  {
+    "id": "consult_215",
+    "user_profile": {
+      "age": 46,
+      "gender": "female",
+      "concern": "fine lines",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic wrinkles"
+  },
+  {
+    "id": "consult_216",
+    "user_profile": {
+      "age": 47,
+      "gender": "male",
+      "concern": "dehydrated skin",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_008"
+    ],
+    "reasoning": "skin booster hydrates skin"
+  },
+  {
+    "id": "consult_217",
+    "user_profile": {
+      "age": 48,
+      "gender": "female",
+      "concern": "jaw slimming",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "masseter botox reduces jaw muscle"
+  },
+  {
+    "id": "consult_218",
+    "user_profile": {
+      "age": 49,
+      "gender": "male",
+      "concern": "double chin",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_069"
+    ],
+    "reasoning": "fat dissolving injections reduce chin fat"
+  },
+  {
+    "id": "consult_219",
+    "user_profile": {
+      "age": 50,
+      "gender": "female",
+      "concern": "neck laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_023"
+    ],
+    "reasoning": "thermage tightens neck skin"
+  },
+  {
+    "id": "consult_220",
+    "user_profile": {
+      "age": 51,
+      "gender": "male",
+      "concern": "severe sagging",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_093"
+    ],
+    "reasoning": "facelift surgery provides strongest lifting"
+  },
+  {
+    "id": "consult_221",
+    "user_profile": {
+      "age": 52,
+      "gender": "female",
+      "concern": "forehead wrinkles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic forehead wrinkles"
+  },
+  {
+    "id": "consult_222",
+    "user_profile": {
+      "age": 53,
+      "gender": "male",
+      "concern": "nasolabial folds",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "filler restores volume in smile lines"
+  },
+  {
+    "id": "consult_223",
+    "user_profile": {
+      "age": 54,
+      "gender": "female",
+      "concern": "skin laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_021"
+    ],
+    "reasoning": "hifu tightens deeper skin layers"
+  },
+  {
+    "id": "consult_224",
+    "user_profile": {
+      "age": 55,
+      "gender": "male",
+      "concern": "acne scars",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_028"
+    ],
+    "reasoning": "fractional laser improves acne scars"
+  },
+  {
+    "id": "consult_225",
+    "user_profile": {
+      "age": 24,
+      "gender": "female",
+      "concern": "dull skin",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_042"
+    ],
+    "reasoning": "oxygen facial improves skin glow"
+  },
+  {
+    "id": "consult_226",
+    "user_profile": {
+      "age": 25,
+      "gender": "male",
+      "concern": "pigmentation",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_029"
+    ],
+    "reasoning": "pico laser treats pigmentation"
+  },
+  {
+    "id": "consult_227",
+    "user_profile": {
+      "age": 26,
+      "gender": "female",
+      "concern": "sagging cheeks",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_061"
+    ],
+    "reasoning": "thread lift improves sagging cheeks"
+  },
+  {
+    "id": "consult_228",
+    "user_profile": {
+      "age": 27,
+      "gender": "male",
+      "concern": "jawline contour",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_004"
+    ],
+    "reasoning": "jawline filler improves facial contour"
+  },
+  {
+    "id": "consult_229",
+    "user_profile": {
+      "age": 28,
+      "gender": "female",
+      "concern": "under eye hollow",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "tear trough filler restores volume"
+  },
+  {
+    "id": "consult_230",
+    "user_profile": {
+      "age": 29,
+      "gender": "male",
+      "concern": "enlarged pores",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_041"
+    ],
+    "reasoning": "hydrafacial cleans pores"
+  },
+  {
+    "id": "consult_231",
+    "user_profile": {
+      "age": 30,
+      "gender": "female",
+      "concern": "volume loss",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "dermal filler restores facial volume"
+  },
+  {
+    "id": "consult_232",
+    "user_profile": {
+      "age": 31,
+      "gender": "male",
+      "concern": "collagen loss",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_010"
+    ],
+    "reasoning": "sculptra stimulates collagen production"
+  },
+  {
+    "id": "consult_233",
+    "user_profile": {
+      "age": 32,
+      "gender": "female",
+      "concern": "freckles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_030"
+    ],
+    "reasoning": "q switched laser removes freckles"
+  },
+  {
+    "id": "consult_234",
+    "user_profile": {
+      "age": 33,
+      "gender": "male",
+      "concern": "hair loss",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_078"
+    ],
+    "reasoning": "hair transplant restores density"
+  },
+  {
+    "id": "consult_235",
+    "user_profile": {
+      "age": 34,
+      "gender": "female",
+      "concern": "fine lines",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic wrinkles"
+  },
+  {
+    "id": "consult_236",
+    "user_profile": {
+      "age": 35,
+      "gender": "male",
+      "concern": "dehydrated skin",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_008"
+    ],
+    "reasoning": "skin booster hydrates skin"
+  },
+  {
+    "id": "consult_237",
+    "user_profile": {
+      "age": 36,
+      "gender": "female",
+      "concern": "jaw slimming",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "masseter botox reduces jaw muscle"
+  },
+  {
+    "id": "consult_238",
+    "user_profile": {
+      "age": 37,
+      "gender": "male",
+      "concern": "double chin",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_069"
+    ],
+    "reasoning": "fat dissolving injections reduce chin fat"
+  },
+  {
+    "id": "consult_239",
+    "user_profile": {
+      "age": 38,
+      "gender": "female",
+      "concern": "neck laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_023"
+    ],
+    "reasoning": "thermage tightens neck skin"
+  },
+  {
+    "id": "consult_240",
+    "user_profile": {
+      "age": 39,
+      "gender": "male",
+      "concern": "severe sagging",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_093"
+    ],
+    "reasoning": "facelift surgery provides strongest lifting"
+  },
+  {
+    "id": "consult_241",
+    "user_profile": {
+      "age": 40,
+      "gender": "female",
+      "concern": "forehead wrinkles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic forehead wrinkles"
+  },
+  {
+    "id": "consult_242",
+    "user_profile": {
+      "age": 41,
+      "gender": "male",
+      "concern": "nasolabial folds",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "filler restores volume in smile lines"
+  },
+  {
+    "id": "consult_243",
+    "user_profile": {
+      "age": 42,
+      "gender": "female",
+      "concern": "skin laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_021"
+    ],
+    "reasoning": "hifu tightens deeper skin layers"
+  },
+  {
+    "id": "consult_244",
+    "user_profile": {
+      "age": 43,
+      "gender": "male",
+      "concern": "acne scars",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_028"
+    ],
+    "reasoning": "fractional laser improves acne scars"
+  },
+  {
+    "id": "consult_245",
+    "user_profile": {
+      "age": 44,
+      "gender": "female",
+      "concern": "dull skin",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_042"
+    ],
+    "reasoning": "oxygen facial improves skin glow"
+  },
+  {
+    "id": "consult_246",
+    "user_profile": {
+      "age": 45,
+      "gender": "male",
+      "concern": "pigmentation",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_029"
+    ],
+    "reasoning": "pico laser treats pigmentation"
+  },
+  {
+    "id": "consult_247",
+    "user_profile": {
+      "age": 46,
+      "gender": "female",
+      "concern": "sagging cheeks",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_061"
+    ],
+    "reasoning": "thread lift improves sagging cheeks"
+  },
+  {
+    "id": "consult_248",
+    "user_profile": {
+      "age": 47,
+      "gender": "male",
+      "concern": "jawline contour",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_004"
+    ],
+    "reasoning": "jawline filler improves facial contour"
+  },
+  {
+    "id": "consult_249",
+    "user_profile": {
+      "age": 48,
+      "gender": "female",
+      "concern": "under eye hollow",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "tear trough filler restores volume"
+  },
+  {
+    "id": "consult_250",
+    "user_profile": {
+      "age": 49,
+      "gender": "male",
+      "concern": "enlarged pores",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_041"
+    ],
+    "reasoning": "hydrafacial cleans pores"
+  },
+  {
+    "id": "consult_251",
+    "user_profile": {
+      "age": 50,
+      "gender": "female",
+      "concern": "volume loss",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "dermal filler restores facial volume"
+  },
+  {
+    "id": "consult_252",
+    "user_profile": {
+      "age": 51,
+      "gender": "male",
+      "concern": "collagen loss",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_010"
+    ],
+    "reasoning": "sculptra stimulates collagen production"
+  },
+  {
+    "id": "consult_253",
+    "user_profile": {
+      "age": 52,
+      "gender": "female",
+      "concern": "freckles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_030"
+    ],
+    "reasoning": "q switched laser removes freckles"
+  },
+  {
+    "id": "consult_254",
+    "user_profile": {
+      "age": 53,
+      "gender": "male",
+      "concern": "hair loss",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_078"
+    ],
+    "reasoning": "hair transplant restores density"
+  },
+  {
+    "id": "consult_255",
+    "user_profile": {
+      "age": 54,
+      "gender": "female",
+      "concern": "fine lines",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic wrinkles"
+  },
+  {
+    "id": "consult_256",
+    "user_profile": {
+      "age": 55,
+      "gender": "male",
+      "concern": "dehydrated skin",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_008"
+    ],
+    "reasoning": "skin booster hydrates skin"
+  },
+  {
+    "id": "consult_257",
+    "user_profile": {
+      "age": 24,
+      "gender": "female",
+      "concern": "jaw slimming",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "masseter botox reduces jaw muscle"
+  },
+  {
+    "id": "consult_258",
+    "user_profile": {
+      "age": 25,
+      "gender": "male",
+      "concern": "double chin",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_069"
+    ],
+    "reasoning": "fat dissolving injections reduce chin fat"
+  },
+  {
+    "id": "consult_259",
+    "user_profile": {
+      "age": 26,
+      "gender": "female",
+      "concern": "neck laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_023"
+    ],
+    "reasoning": "thermage tightens neck skin"
+  },
+  {
+    "id": "consult_260",
+    "user_profile": {
+      "age": 27,
+      "gender": "male",
+      "concern": "severe sagging",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_093"
+    ],
+    "reasoning": "facelift surgery provides strongest lifting"
+  },
+  {
+    "id": "consult_261",
+    "user_profile": {
+      "age": 28,
+      "gender": "female",
+      "concern": "forehead wrinkles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic forehead wrinkles"
+  },
+  {
+    "id": "consult_262",
+    "user_profile": {
+      "age": 29,
+      "gender": "male",
+      "concern": "nasolabial folds",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "filler restores volume in smile lines"
+  },
+  {
+    "id": "consult_263",
+    "user_profile": {
+      "age": 30,
+      "gender": "female",
+      "concern": "skin laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_021"
+    ],
+    "reasoning": "hifu tightens deeper skin layers"
+  },
+  {
+    "id": "consult_264",
+    "user_profile": {
+      "age": 31,
+      "gender": "male",
+      "concern": "acne scars",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_028"
+    ],
+    "reasoning": "fractional laser improves acne scars"
+  },
+  {
+    "id": "consult_265",
+    "user_profile": {
+      "age": 32,
+      "gender": "female",
+      "concern": "dull skin",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_042"
+    ],
+    "reasoning": "oxygen facial improves skin glow"
+  },
+  {
+    "id": "consult_266",
+    "user_profile": {
+      "age": 33,
+      "gender": "male",
+      "concern": "pigmentation",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_029"
+    ],
+    "reasoning": "pico laser treats pigmentation"
+  },
+  {
+    "id": "consult_267",
+    "user_profile": {
+      "age": 34,
+      "gender": "female",
+      "concern": "sagging cheeks",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_061"
+    ],
+    "reasoning": "thread lift improves sagging cheeks"
+  },
+  {
+    "id": "consult_268",
+    "user_profile": {
+      "age": 35,
+      "gender": "male",
+      "concern": "jawline contour",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_004"
+    ],
+    "reasoning": "jawline filler improves facial contour"
+  },
+  {
+    "id": "consult_269",
+    "user_profile": {
+      "age": 36,
+      "gender": "female",
+      "concern": "under eye hollow",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "tear trough filler restores volume"
+  },
+  {
+    "id": "consult_270",
+    "user_profile": {
+      "age": 37,
+      "gender": "male",
+      "concern": "enlarged pores",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_041"
+    ],
+    "reasoning": "hydrafacial cleans pores"
+  },
+  {
+    "id": "consult_271",
+    "user_profile": {
+      "age": 38,
+      "gender": "female",
+      "concern": "volume loss",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "dermal filler restores facial volume"
+  },
+  {
+    "id": "consult_272",
+    "user_profile": {
+      "age": 39,
+      "gender": "male",
+      "concern": "collagen loss",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_010"
+    ],
+    "reasoning": "sculptra stimulates collagen production"
+  },
+  {
+    "id": "consult_273",
+    "user_profile": {
+      "age": 40,
+      "gender": "female",
+      "concern": "freckles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_030"
+    ],
+    "reasoning": "q switched laser removes freckles"
+  },
+  {
+    "id": "consult_274",
+    "user_profile": {
+      "age": 41,
+      "gender": "male",
+      "concern": "hair loss",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_078"
+    ],
+    "reasoning": "hair transplant restores density"
+  },
+  {
+    "id": "consult_275",
+    "user_profile": {
+      "age": 42,
+      "gender": "female",
+      "concern": "fine lines",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic wrinkles"
+  },
+  {
+    "id": "consult_276",
+    "user_profile": {
+      "age": 43,
+      "gender": "male",
+      "concern": "dehydrated skin",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_008"
+    ],
+    "reasoning": "skin booster hydrates skin"
+  },
+  {
+    "id": "consult_277",
+    "user_profile": {
+      "age": 44,
+      "gender": "female",
+      "concern": "jaw slimming",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "masseter botox reduces jaw muscle"
+  },
+  {
+    "id": "consult_278",
+    "user_profile": {
+      "age": 45,
+      "gender": "male",
+      "concern": "double chin",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_069"
+    ],
+    "reasoning": "fat dissolving injections reduce chin fat"
+  },
+  {
+    "id": "consult_279",
+    "user_profile": {
+      "age": 46,
+      "gender": "female",
+      "concern": "neck laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_023"
+    ],
+    "reasoning": "thermage tightens neck skin"
+  },
+  {
+    "id": "consult_280",
+    "user_profile": {
+      "age": 47,
+      "gender": "male",
+      "concern": "severe sagging",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_093"
+    ],
+    "reasoning": "facelift surgery provides strongest lifting"
+  },
+  {
+    "id": "consult_281",
+    "user_profile": {
+      "age": 48,
+      "gender": "female",
+      "concern": "forehead wrinkles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic forehead wrinkles"
+  },
+  {
+    "id": "consult_282",
+    "user_profile": {
+      "age": 49,
+      "gender": "male",
+      "concern": "nasolabial folds",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "filler restores volume in smile lines"
+  },
+  {
+    "id": "consult_283",
+    "user_profile": {
+      "age": 50,
+      "gender": "female",
+      "concern": "skin laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_021"
+    ],
+    "reasoning": "hifu tightens deeper skin layers"
+  },
+  {
+    "id": "consult_284",
+    "user_profile": {
+      "age": 51,
+      "gender": "male",
+      "concern": "acne scars",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_028"
+    ],
+    "reasoning": "fractional laser improves acne scars"
+  },
+  {
+    "id": "consult_285",
+    "user_profile": {
+      "age": 52,
+      "gender": "female",
+      "concern": "dull skin",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_042"
+    ],
+    "reasoning": "oxygen facial improves skin glow"
+  },
+  {
+    "id": "consult_286",
+    "user_profile": {
+      "age": 53,
+      "gender": "male",
+      "concern": "pigmentation",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_029"
+    ],
+    "reasoning": "pico laser treats pigmentation"
+  },
+  {
+    "id": "consult_287",
+    "user_profile": {
+      "age": 54,
+      "gender": "female",
+      "concern": "sagging cheeks",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_061"
+    ],
+    "reasoning": "thread lift improves sagging cheeks"
+  },
+  {
+    "id": "consult_288",
+    "user_profile": {
+      "age": 55,
+      "gender": "male",
+      "concern": "jawline contour",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_004"
+    ],
+    "reasoning": "jawline filler improves facial contour"
+  },
+  {
+    "id": "consult_289",
+    "user_profile": {
+      "age": 24,
+      "gender": "female",
+      "concern": "under eye hollow",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "tear trough filler restores volume"
+  },
+  {
+    "id": "consult_290",
+    "user_profile": {
+      "age": 25,
+      "gender": "male",
+      "concern": "enlarged pores",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_041"
+    ],
+    "reasoning": "hydrafacial cleans pores"
+  },
+  {
+    "id": "consult_291",
+    "user_profile": {
+      "age": 26,
+      "gender": "female",
+      "concern": "volume loss",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "dermal filler restores facial volume"
+  },
+  {
+    "id": "consult_292",
+    "user_profile": {
+      "age": 27,
+      "gender": "male",
+      "concern": "collagen loss",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_010"
+    ],
+    "reasoning": "sculptra stimulates collagen production"
+  },
+  {
+    "id": "consult_293",
+    "user_profile": {
+      "age": 28,
+      "gender": "female",
+      "concern": "freckles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_030"
+    ],
+    "reasoning": "q switched laser removes freckles"
+  },
+  {
+    "id": "consult_294",
+    "user_profile": {
+      "age": 29,
+      "gender": "male",
+      "concern": "hair loss",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_078"
+    ],
+    "reasoning": "hair transplant restores density"
+  },
+  {
+    "id": "consult_295",
+    "user_profile": {
+      "age": 30,
+      "gender": "female",
+      "concern": "fine lines",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic wrinkles"
+  },
+  {
+    "id": "consult_296",
+    "user_profile": {
+      "age": 31,
+      "gender": "male",
+      "concern": "dehydrated skin",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_008"
+    ],
+    "reasoning": "skin booster hydrates skin"
+  },
+  {
+    "id": "consult_297",
+    "user_profile": {
+      "age": 32,
+      "gender": "female",
+      "concern": "jaw slimming",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "masseter botox reduces jaw muscle"
+  },
+  {
+    "id": "consult_298",
+    "user_profile": {
+      "age": 33,
+      "gender": "male",
+      "concern": "double chin",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_069"
+    ],
+    "reasoning": "fat dissolving injections reduce chin fat"
+  },
+  {
+    "id": "consult_299",
+    "user_profile": {
+      "age": 34,
+      "gender": "female",
+      "concern": "neck laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_023"
+    ],
+    "reasoning": "thermage tightens neck skin"
+  },
+  {
+    "id": "consult_300",
+    "user_profile": {
+      "age": 35,
+      "gender": "male",
+      "concern": "severe sagging",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_093"
+    ],
+    "reasoning": "facelift surgery provides strongest lifting"
+  },
+  {
+    "id": "consult_301",
+    "user_profile": {
+      "age": 36,
+      "gender": "female",
+      "concern": "forehead wrinkles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic forehead wrinkles"
+  },
+  {
+    "id": "consult_302",
+    "user_profile": {
+      "age": 37,
+      "gender": "male",
+      "concern": "nasolabial folds",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "filler restores volume in smile lines"
+  },
+  {
+    "id": "consult_303",
+    "user_profile": {
+      "age": 38,
+      "gender": "female",
+      "concern": "skin laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_021"
+    ],
+    "reasoning": "hifu tightens deeper skin layers"
+  },
+  {
+    "id": "consult_304",
+    "user_profile": {
+      "age": 39,
+      "gender": "male",
+      "concern": "acne scars",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_028"
+    ],
+    "reasoning": "fractional laser improves acne scars"
+  },
+  {
+    "id": "consult_305",
+    "user_profile": {
+      "age": 40,
+      "gender": "female",
+      "concern": "dull skin",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_042"
+    ],
+    "reasoning": "oxygen facial improves skin glow"
+  },
+  {
+    "id": "consult_306",
+    "user_profile": {
+      "age": 41,
+      "gender": "male",
+      "concern": "pigmentation",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_029"
+    ],
+    "reasoning": "pico laser treats pigmentation"
+  },
+  {
+    "id": "consult_307",
+    "user_profile": {
+      "age": 42,
+      "gender": "female",
+      "concern": "sagging cheeks",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_061"
+    ],
+    "reasoning": "thread lift improves sagging cheeks"
+  },
+  {
+    "id": "consult_308",
+    "user_profile": {
+      "age": 43,
+      "gender": "male",
+      "concern": "jawline contour",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_004"
+    ],
+    "reasoning": "jawline filler improves facial contour"
+  },
+  {
+    "id": "consult_309",
+    "user_profile": {
+      "age": 44,
+      "gender": "female",
+      "concern": "under eye hollow",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "tear trough filler restores volume"
+  },
+  {
+    "id": "consult_310",
+    "user_profile": {
+      "age": 45,
+      "gender": "male",
+      "concern": "enlarged pores",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_041"
+    ],
+    "reasoning": "hydrafacial cleans pores"
+  },
+  {
+    "id": "consult_311",
+    "user_profile": {
+      "age": 46,
+      "gender": "female",
+      "concern": "volume loss",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "dermal filler restores facial volume"
+  },
+  {
+    "id": "consult_312",
+    "user_profile": {
+      "age": 47,
+      "gender": "male",
+      "concern": "collagen loss",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_010"
+    ],
+    "reasoning": "sculptra stimulates collagen production"
+  },
+  {
+    "id": "consult_313",
+    "user_profile": {
+      "age": 48,
+      "gender": "female",
+      "concern": "freckles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_030"
+    ],
+    "reasoning": "q switched laser removes freckles"
+  },
+  {
+    "id": "consult_314",
+    "user_profile": {
+      "age": 49,
+      "gender": "male",
+      "concern": "hair loss",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_078"
+    ],
+    "reasoning": "hair transplant restores density"
+  },
+  {
+    "id": "consult_315",
+    "user_profile": {
+      "age": 50,
+      "gender": "female",
+      "concern": "fine lines",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic wrinkles"
+  },
+  {
+    "id": "consult_316",
+    "user_profile": {
+      "age": 51,
+      "gender": "male",
+      "concern": "dehydrated skin",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_008"
+    ],
+    "reasoning": "skin booster hydrates skin"
+  },
+  {
+    "id": "consult_317",
+    "user_profile": {
+      "age": 52,
+      "gender": "female",
+      "concern": "jaw slimming",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "masseter botox reduces jaw muscle"
+  },
+  {
+    "id": "consult_318",
+    "user_profile": {
+      "age": 53,
+      "gender": "male",
+      "concern": "double chin",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_069"
+    ],
+    "reasoning": "fat dissolving injections reduce chin fat"
+  },
+  {
+    "id": "consult_319",
+    "user_profile": {
+      "age": 54,
+      "gender": "female",
+      "concern": "neck laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_023"
+    ],
+    "reasoning": "thermage tightens neck skin"
+  },
+  {
+    "id": "consult_320",
+    "user_profile": {
+      "age": 55,
+      "gender": "male",
+      "concern": "severe sagging",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_093"
+    ],
+    "reasoning": "facelift surgery provides strongest lifting"
+  },
+  {
+    "id": "consult_321",
+    "user_profile": {
+      "age": 24,
+      "gender": "female",
+      "concern": "forehead wrinkles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic forehead wrinkles"
+  },
+  {
+    "id": "consult_322",
+    "user_profile": {
+      "age": 25,
+      "gender": "male",
+      "concern": "nasolabial folds",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "filler restores volume in smile lines"
+  },
+  {
+    "id": "consult_323",
+    "user_profile": {
+      "age": 26,
+      "gender": "female",
+      "concern": "skin laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_021"
+    ],
+    "reasoning": "hifu tightens deeper skin layers"
+  },
+  {
+    "id": "consult_324",
+    "user_profile": {
+      "age": 27,
+      "gender": "male",
+      "concern": "acne scars",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_028"
+    ],
+    "reasoning": "fractional laser improves acne scars"
+  },
+  {
+    "id": "consult_325",
+    "user_profile": {
+      "age": 28,
+      "gender": "female",
+      "concern": "dull skin",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_042"
+    ],
+    "reasoning": "oxygen facial improves skin glow"
+  },
+  {
+    "id": "consult_326",
+    "user_profile": {
+      "age": 29,
+      "gender": "male",
+      "concern": "pigmentation",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_029"
+    ],
+    "reasoning": "pico laser treats pigmentation"
+  },
+  {
+    "id": "consult_327",
+    "user_profile": {
+      "age": 30,
+      "gender": "female",
+      "concern": "sagging cheeks",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_061"
+    ],
+    "reasoning": "thread lift improves sagging cheeks"
+  },
+  {
+    "id": "consult_328",
+    "user_profile": {
+      "age": 31,
+      "gender": "male",
+      "concern": "jawline contour",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_004"
+    ],
+    "reasoning": "jawline filler improves facial contour"
+  },
+  {
+    "id": "consult_329",
+    "user_profile": {
+      "age": 32,
+      "gender": "female",
+      "concern": "under eye hollow",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "tear trough filler restores volume"
+  },
+  {
+    "id": "consult_330",
+    "user_profile": {
+      "age": 33,
+      "gender": "male",
+      "concern": "enlarged pores",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_041"
+    ],
+    "reasoning": "hydrafacial cleans pores"
+  },
+  {
+    "id": "consult_331",
+    "user_profile": {
+      "age": 34,
+      "gender": "female",
+      "concern": "volume loss",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "dermal filler restores facial volume"
+  },
+  {
+    "id": "consult_332",
+    "user_profile": {
+      "age": 35,
+      "gender": "male",
+      "concern": "collagen loss",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_010"
+    ],
+    "reasoning": "sculptra stimulates collagen production"
+  },
+  {
+    "id": "consult_333",
+    "user_profile": {
+      "age": 36,
+      "gender": "female",
+      "concern": "freckles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_030"
+    ],
+    "reasoning": "q switched laser removes freckles"
+  },
+  {
+    "id": "consult_334",
+    "user_profile": {
+      "age": 37,
+      "gender": "male",
+      "concern": "hair loss",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_078"
+    ],
+    "reasoning": "hair transplant restores density"
+  },
+  {
+    "id": "consult_335",
+    "user_profile": {
+      "age": 38,
+      "gender": "female",
+      "concern": "fine lines",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic wrinkles"
+  },
+  {
+    "id": "consult_336",
+    "user_profile": {
+      "age": 39,
+      "gender": "male",
+      "concern": "dehydrated skin",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_008"
+    ],
+    "reasoning": "skin booster hydrates skin"
+  },
+  {
+    "id": "consult_337",
+    "user_profile": {
+      "age": 40,
+      "gender": "female",
+      "concern": "jaw slimming",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "masseter botox reduces jaw muscle"
+  },
+  {
+    "id": "consult_338",
+    "user_profile": {
+      "age": 41,
+      "gender": "male",
+      "concern": "double chin",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_069"
+    ],
+    "reasoning": "fat dissolving injections reduce chin fat"
+  },
+  {
+    "id": "consult_339",
+    "user_profile": {
+      "age": 42,
+      "gender": "female",
+      "concern": "neck laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_023"
+    ],
+    "reasoning": "thermage tightens neck skin"
+  },
+  {
+    "id": "consult_340",
+    "user_profile": {
+      "age": 43,
+      "gender": "male",
+      "concern": "severe sagging",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_093"
+    ],
+    "reasoning": "facelift surgery provides strongest lifting"
+  },
+  {
+    "id": "consult_341",
+    "user_profile": {
+      "age": 44,
+      "gender": "female",
+      "concern": "forehead wrinkles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic forehead wrinkles"
+  },
+  {
+    "id": "consult_342",
+    "user_profile": {
+      "age": 45,
+      "gender": "male",
+      "concern": "nasolabial folds",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "filler restores volume in smile lines"
+  },
+  {
+    "id": "consult_343",
+    "user_profile": {
+      "age": 46,
+      "gender": "female",
+      "concern": "skin laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_021"
+    ],
+    "reasoning": "hifu tightens deeper skin layers"
+  },
+  {
+    "id": "consult_344",
+    "user_profile": {
+      "age": 47,
+      "gender": "male",
+      "concern": "acne scars",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_028"
+    ],
+    "reasoning": "fractional laser improves acne scars"
+  },
+  {
+    "id": "consult_345",
+    "user_profile": {
+      "age": 48,
+      "gender": "female",
+      "concern": "dull skin",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_042"
+    ],
+    "reasoning": "oxygen facial improves skin glow"
+  },
+  {
+    "id": "consult_346",
+    "user_profile": {
+      "age": 49,
+      "gender": "male",
+      "concern": "pigmentation",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_029"
+    ],
+    "reasoning": "pico laser treats pigmentation"
+  },
+  {
+    "id": "consult_347",
+    "user_profile": {
+      "age": 50,
+      "gender": "female",
+      "concern": "sagging cheeks",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_061"
+    ],
+    "reasoning": "thread lift improves sagging cheeks"
+  },
+  {
+    "id": "consult_348",
+    "user_profile": {
+      "age": 51,
+      "gender": "male",
+      "concern": "jawline contour",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_004"
+    ],
+    "reasoning": "jawline filler improves facial contour"
+  },
+  {
+    "id": "consult_349",
+    "user_profile": {
+      "age": 52,
+      "gender": "female",
+      "concern": "under eye hollow",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "tear trough filler restores volume"
+  },
+  {
+    "id": "consult_350",
+    "user_profile": {
+      "age": 53,
+      "gender": "male",
+      "concern": "enlarged pores",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_041"
+    ],
+    "reasoning": "hydrafacial cleans pores"
+  },
+  {
+    "id": "consult_351",
+    "user_profile": {
+      "age": 54,
+      "gender": "female",
+      "concern": "volume loss",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "dermal filler restores facial volume"
+  },
+  {
+    "id": "consult_352",
+    "user_profile": {
+      "age": 55,
+      "gender": "male",
+      "concern": "collagen loss",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_010"
+    ],
+    "reasoning": "sculptra stimulates collagen production"
+  },
+  {
+    "id": "consult_353",
+    "user_profile": {
+      "age": 24,
+      "gender": "female",
+      "concern": "freckles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_030"
+    ],
+    "reasoning": "q switched laser removes freckles"
+  },
+  {
+    "id": "consult_354",
+    "user_profile": {
+      "age": 25,
+      "gender": "male",
+      "concern": "hair loss",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_078"
+    ],
+    "reasoning": "hair transplant restores density"
+  },
+  {
+    "id": "consult_355",
+    "user_profile": {
+      "age": 26,
+      "gender": "female",
+      "concern": "fine lines",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic wrinkles"
+  },
+  {
+    "id": "consult_356",
+    "user_profile": {
+      "age": 27,
+      "gender": "male",
+      "concern": "dehydrated skin",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_008"
+    ],
+    "reasoning": "skin booster hydrates skin"
+  },
+  {
+    "id": "consult_357",
+    "user_profile": {
+      "age": 28,
+      "gender": "female",
+      "concern": "jaw slimming",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "masseter botox reduces jaw muscle"
+  },
+  {
+    "id": "consult_358",
+    "user_profile": {
+      "age": 29,
+      "gender": "male",
+      "concern": "double chin",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_069"
+    ],
+    "reasoning": "fat dissolving injections reduce chin fat"
+  },
+  {
+    "id": "consult_359",
+    "user_profile": {
+      "age": 30,
+      "gender": "female",
+      "concern": "neck laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_023"
+    ],
+    "reasoning": "thermage tightens neck skin"
+  },
+  {
+    "id": "consult_360",
+    "user_profile": {
+      "age": 31,
+      "gender": "male",
+      "concern": "severe sagging",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_093"
+    ],
+    "reasoning": "facelift surgery provides strongest lifting"
+  },
+  {
+    "id": "consult_361",
+    "user_profile": {
+      "age": 32,
+      "gender": "female",
+      "concern": "forehead wrinkles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic forehead wrinkles"
+  },
+  {
+    "id": "consult_362",
+    "user_profile": {
+      "age": 33,
+      "gender": "male",
+      "concern": "nasolabial folds",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "filler restores volume in smile lines"
+  },
+  {
+    "id": "consult_363",
+    "user_profile": {
+      "age": 34,
+      "gender": "female",
+      "concern": "skin laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_021"
+    ],
+    "reasoning": "hifu tightens deeper skin layers"
+  },
+  {
+    "id": "consult_364",
+    "user_profile": {
+      "age": 35,
+      "gender": "male",
+      "concern": "acne scars",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_028"
+    ],
+    "reasoning": "fractional laser improves acne scars"
+  },
+  {
+    "id": "consult_365",
+    "user_profile": {
+      "age": 36,
+      "gender": "female",
+      "concern": "dull skin",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_042"
+    ],
+    "reasoning": "oxygen facial improves skin glow"
+  },
+  {
+    "id": "consult_366",
+    "user_profile": {
+      "age": 37,
+      "gender": "male",
+      "concern": "pigmentation",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_029"
+    ],
+    "reasoning": "pico laser treats pigmentation"
+  },
+  {
+    "id": "consult_367",
+    "user_profile": {
+      "age": 38,
+      "gender": "female",
+      "concern": "sagging cheeks",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_061"
+    ],
+    "reasoning": "thread lift improves sagging cheeks"
+  },
+  {
+    "id": "consult_368",
+    "user_profile": {
+      "age": 39,
+      "gender": "male",
+      "concern": "jawline contour",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_004"
+    ],
+    "reasoning": "jawline filler improves facial contour"
+  },
+  {
+    "id": "consult_369",
+    "user_profile": {
+      "age": 40,
+      "gender": "female",
+      "concern": "under eye hollow",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "tear trough filler restores volume"
+  },
+  {
+    "id": "consult_370",
+    "user_profile": {
+      "age": 41,
+      "gender": "male",
+      "concern": "enlarged pores",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_041"
+    ],
+    "reasoning": "hydrafacial cleans pores"
+  },
+  {
+    "id": "consult_371",
+    "user_profile": {
+      "age": 42,
+      "gender": "female",
+      "concern": "volume loss",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "dermal filler restores facial volume"
+  },
+  {
+    "id": "consult_372",
+    "user_profile": {
+      "age": 43,
+      "gender": "male",
+      "concern": "collagen loss",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_010"
+    ],
+    "reasoning": "sculptra stimulates collagen production"
+  },
+  {
+    "id": "consult_373",
+    "user_profile": {
+      "age": 44,
+      "gender": "female",
+      "concern": "freckles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_030"
+    ],
+    "reasoning": "q switched laser removes freckles"
+  },
+  {
+    "id": "consult_374",
+    "user_profile": {
+      "age": 45,
+      "gender": "male",
+      "concern": "hair loss",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_078"
+    ],
+    "reasoning": "hair transplant restores density"
+  },
+  {
+    "id": "consult_375",
+    "user_profile": {
+      "age": 46,
+      "gender": "female",
+      "concern": "fine lines",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic wrinkles"
+  },
+  {
+    "id": "consult_376",
+    "user_profile": {
+      "age": 47,
+      "gender": "male",
+      "concern": "dehydrated skin",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_008"
+    ],
+    "reasoning": "skin booster hydrates skin"
+  },
+  {
+    "id": "consult_377",
+    "user_profile": {
+      "age": 48,
+      "gender": "female",
+      "concern": "jaw slimming",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "masseter botox reduces jaw muscle"
+  },
+  {
+    "id": "consult_378",
+    "user_profile": {
+      "age": 49,
+      "gender": "male",
+      "concern": "double chin",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_069"
+    ],
+    "reasoning": "fat dissolving injections reduce chin fat"
+  },
+  {
+    "id": "consult_379",
+    "user_profile": {
+      "age": 50,
+      "gender": "female",
+      "concern": "neck laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_023"
+    ],
+    "reasoning": "thermage tightens neck skin"
+  },
+  {
+    "id": "consult_380",
+    "user_profile": {
+      "age": 51,
+      "gender": "male",
+      "concern": "severe sagging",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_093"
+    ],
+    "reasoning": "facelift surgery provides strongest lifting"
+  },
+  {
+    "id": "consult_381",
+    "user_profile": {
+      "age": 52,
+      "gender": "female",
+      "concern": "forehead wrinkles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic forehead wrinkles"
+  },
+  {
+    "id": "consult_382",
+    "user_profile": {
+      "age": 53,
+      "gender": "male",
+      "concern": "nasolabial folds",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "filler restores volume in smile lines"
+  },
+  {
+    "id": "consult_383",
+    "user_profile": {
+      "age": 54,
+      "gender": "female",
+      "concern": "skin laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_021"
+    ],
+    "reasoning": "hifu tightens deeper skin layers"
+  },
+  {
+    "id": "consult_384",
+    "user_profile": {
+      "age": 55,
+      "gender": "male",
+      "concern": "acne scars",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_028"
+    ],
+    "reasoning": "fractional laser improves acne scars"
+  },
+  {
+    "id": "consult_385",
+    "user_profile": {
+      "age": 24,
+      "gender": "female",
+      "concern": "dull skin",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_042"
+    ],
+    "reasoning": "oxygen facial improves skin glow"
+  },
+  {
+    "id": "consult_386",
+    "user_profile": {
+      "age": 25,
+      "gender": "male",
+      "concern": "pigmentation",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_029"
+    ],
+    "reasoning": "pico laser treats pigmentation"
+  },
+  {
+    "id": "consult_387",
+    "user_profile": {
+      "age": 26,
+      "gender": "female",
+      "concern": "sagging cheeks",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_061"
+    ],
+    "reasoning": "thread lift improves sagging cheeks"
+  },
+  {
+    "id": "consult_388",
+    "user_profile": {
+      "age": 27,
+      "gender": "male",
+      "concern": "jawline contour",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_004"
+    ],
+    "reasoning": "jawline filler improves facial contour"
+  },
+  {
+    "id": "consult_389",
+    "user_profile": {
+      "age": 28,
+      "gender": "female",
+      "concern": "under eye hollow",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "tear trough filler restores volume"
+  },
+  {
+    "id": "consult_390",
+    "user_profile": {
+      "age": 29,
+      "gender": "male",
+      "concern": "enlarged pores",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_041"
+    ],
+    "reasoning": "hydrafacial cleans pores"
+  },
+  {
+    "id": "consult_391",
+    "user_profile": {
+      "age": 30,
+      "gender": "female",
+      "concern": "volume loss",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "dermal filler restores facial volume"
+  },
+  {
+    "id": "consult_392",
+    "user_profile": {
+      "age": 31,
+      "gender": "male",
+      "concern": "collagen loss",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_010"
+    ],
+    "reasoning": "sculptra stimulates collagen production"
+  },
+  {
+    "id": "consult_393",
+    "user_profile": {
+      "age": 32,
+      "gender": "female",
+      "concern": "freckles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_030"
+    ],
+    "reasoning": "q switched laser removes freckles"
+  },
+  {
+    "id": "consult_394",
+    "user_profile": {
+      "age": 33,
+      "gender": "male",
+      "concern": "hair loss",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_078"
+    ],
+    "reasoning": "hair transplant restores density"
+  },
+  {
+    "id": "consult_395",
+    "user_profile": {
+      "age": 34,
+      "gender": "female",
+      "concern": "fine lines",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic wrinkles"
+  },
+  {
+    "id": "consult_396",
+    "user_profile": {
+      "age": 35,
+      "gender": "male",
+      "concern": "dehydrated skin",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_008"
+    ],
+    "reasoning": "skin booster hydrates skin"
+  },
+  {
+    "id": "consult_397",
+    "user_profile": {
+      "age": 36,
+      "gender": "female",
+      "concern": "jaw slimming",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "masseter botox reduces jaw muscle"
+  },
+  {
+    "id": "consult_398",
+    "user_profile": {
+      "age": 37,
+      "gender": "male",
+      "concern": "double chin",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_069"
+    ],
+    "reasoning": "fat dissolving injections reduce chin fat"
+  },
+  {
+    "id": "consult_399",
+    "user_profile": {
+      "age": 38,
+      "gender": "female",
+      "concern": "neck laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_023"
+    ],
+    "reasoning": "thermage tightens neck skin"
+  },
+  {
+    "id": "consult_400",
+    "user_profile": {
+      "age": 39,
+      "gender": "male",
+      "concern": "severe sagging",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_093"
+    ],
+    "reasoning": "facelift surgery provides strongest lifting"
+  },
+  {
+    "id": "consult_401",
+    "user_profile": {
+      "age": 40,
+      "gender": "female",
+      "concern": "forehead wrinkles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic forehead wrinkles"
+  },
+  {
+    "id": "consult_402",
+    "user_profile": {
+      "age": 41,
+      "gender": "male",
+      "concern": "nasolabial folds",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "filler restores volume in smile lines"
+  },
+  {
+    "id": "consult_403",
+    "user_profile": {
+      "age": 42,
+      "gender": "female",
+      "concern": "skin laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_021"
+    ],
+    "reasoning": "hifu tightens deeper skin layers"
+  },
+  {
+    "id": "consult_404",
+    "user_profile": {
+      "age": 43,
+      "gender": "male",
+      "concern": "acne scars",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_028"
+    ],
+    "reasoning": "fractional laser improves acne scars"
+  },
+  {
+    "id": "consult_405",
+    "user_profile": {
+      "age": 44,
+      "gender": "female",
+      "concern": "dull skin",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_042"
+    ],
+    "reasoning": "oxygen facial improves skin glow"
+  },
+  {
+    "id": "consult_406",
+    "user_profile": {
+      "age": 45,
+      "gender": "male",
+      "concern": "pigmentation",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_029"
+    ],
+    "reasoning": "pico laser treats pigmentation"
+  },
+  {
+    "id": "consult_407",
+    "user_profile": {
+      "age": 46,
+      "gender": "female",
+      "concern": "sagging cheeks",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_061"
+    ],
+    "reasoning": "thread lift improves sagging cheeks"
+  },
+  {
+    "id": "consult_408",
+    "user_profile": {
+      "age": 47,
+      "gender": "male",
+      "concern": "jawline contour",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_004"
+    ],
+    "reasoning": "jawline filler improves facial contour"
+  },
+  {
+    "id": "consult_409",
+    "user_profile": {
+      "age": 48,
+      "gender": "female",
+      "concern": "under eye hollow",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "tear trough filler restores volume"
+  },
+  {
+    "id": "consult_410",
+    "user_profile": {
+      "age": 49,
+      "gender": "male",
+      "concern": "enlarged pores",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_041"
+    ],
+    "reasoning": "hydrafacial cleans pores"
+  },
+  {
+    "id": "consult_411",
+    "user_profile": {
+      "age": 50,
+      "gender": "female",
+      "concern": "volume loss",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "dermal filler restores facial volume"
+  },
+  {
+    "id": "consult_412",
+    "user_profile": {
+      "age": 51,
+      "gender": "male",
+      "concern": "collagen loss",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_010"
+    ],
+    "reasoning": "sculptra stimulates collagen production"
+  },
+  {
+    "id": "consult_413",
+    "user_profile": {
+      "age": 52,
+      "gender": "female",
+      "concern": "freckles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_030"
+    ],
+    "reasoning": "q switched laser removes freckles"
+  },
+  {
+    "id": "consult_414",
+    "user_profile": {
+      "age": 53,
+      "gender": "male",
+      "concern": "hair loss",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_078"
+    ],
+    "reasoning": "hair transplant restores density"
+  },
+  {
+    "id": "consult_415",
+    "user_profile": {
+      "age": 54,
+      "gender": "female",
+      "concern": "fine lines",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic wrinkles"
+  },
+  {
+    "id": "consult_416",
+    "user_profile": {
+      "age": 55,
+      "gender": "male",
+      "concern": "dehydrated skin",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_008"
+    ],
+    "reasoning": "skin booster hydrates skin"
+  },
+  {
+    "id": "consult_417",
+    "user_profile": {
+      "age": 24,
+      "gender": "female",
+      "concern": "jaw slimming",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "masseter botox reduces jaw muscle"
+  },
+  {
+    "id": "consult_418",
+    "user_profile": {
+      "age": 25,
+      "gender": "male",
+      "concern": "double chin",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_069"
+    ],
+    "reasoning": "fat dissolving injections reduce chin fat"
+  },
+  {
+    "id": "consult_419",
+    "user_profile": {
+      "age": 26,
+      "gender": "female",
+      "concern": "neck laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_023"
+    ],
+    "reasoning": "thermage tightens neck skin"
+  },
+  {
+    "id": "consult_420",
+    "user_profile": {
+      "age": 27,
+      "gender": "male",
+      "concern": "severe sagging",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_093"
+    ],
+    "reasoning": "facelift surgery provides strongest lifting"
+  },
+  {
+    "id": "consult_421",
+    "user_profile": {
+      "age": 28,
+      "gender": "female",
+      "concern": "forehead wrinkles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic forehead wrinkles"
+  },
+  {
+    "id": "consult_422",
+    "user_profile": {
+      "age": 29,
+      "gender": "male",
+      "concern": "nasolabial folds",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "filler restores volume in smile lines"
+  },
+  {
+    "id": "consult_423",
+    "user_profile": {
+      "age": 30,
+      "gender": "female",
+      "concern": "skin laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_021"
+    ],
+    "reasoning": "hifu tightens deeper skin layers"
+  },
+  {
+    "id": "consult_424",
+    "user_profile": {
+      "age": 31,
+      "gender": "male",
+      "concern": "acne scars",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_028"
+    ],
+    "reasoning": "fractional laser improves acne scars"
+  },
+  {
+    "id": "consult_425",
+    "user_profile": {
+      "age": 32,
+      "gender": "female",
+      "concern": "dull skin",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_042"
+    ],
+    "reasoning": "oxygen facial improves skin glow"
+  },
+  {
+    "id": "consult_426",
+    "user_profile": {
+      "age": 33,
+      "gender": "male",
+      "concern": "pigmentation",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_029"
+    ],
+    "reasoning": "pico laser treats pigmentation"
+  },
+  {
+    "id": "consult_427",
+    "user_profile": {
+      "age": 34,
+      "gender": "female",
+      "concern": "sagging cheeks",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_061"
+    ],
+    "reasoning": "thread lift improves sagging cheeks"
+  },
+  {
+    "id": "consult_428",
+    "user_profile": {
+      "age": 35,
+      "gender": "male",
+      "concern": "jawline contour",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_004"
+    ],
+    "reasoning": "jawline filler improves facial contour"
+  },
+  {
+    "id": "consult_429",
+    "user_profile": {
+      "age": 36,
+      "gender": "female",
+      "concern": "under eye hollow",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "tear trough filler restores volume"
+  },
+  {
+    "id": "consult_430",
+    "user_profile": {
+      "age": 37,
+      "gender": "male",
+      "concern": "enlarged pores",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_041"
+    ],
+    "reasoning": "hydrafacial cleans pores"
+  },
+  {
+    "id": "consult_431",
+    "user_profile": {
+      "age": 38,
+      "gender": "female",
+      "concern": "volume loss",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "dermal filler restores facial volume"
+  },
+  {
+    "id": "consult_432",
+    "user_profile": {
+      "age": 39,
+      "gender": "male",
+      "concern": "collagen loss",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_010"
+    ],
+    "reasoning": "sculptra stimulates collagen production"
+  },
+  {
+    "id": "consult_433",
+    "user_profile": {
+      "age": 40,
+      "gender": "female",
+      "concern": "freckles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_030"
+    ],
+    "reasoning": "q switched laser removes freckles"
+  },
+  {
+    "id": "consult_434",
+    "user_profile": {
+      "age": 41,
+      "gender": "male",
+      "concern": "hair loss",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_078"
+    ],
+    "reasoning": "hair transplant restores density"
+  },
+  {
+    "id": "consult_435",
+    "user_profile": {
+      "age": 42,
+      "gender": "female",
+      "concern": "fine lines",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic wrinkles"
+  },
+  {
+    "id": "consult_436",
+    "user_profile": {
+      "age": 43,
+      "gender": "male",
+      "concern": "dehydrated skin",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_008"
+    ],
+    "reasoning": "skin booster hydrates skin"
+  },
+  {
+    "id": "consult_437",
+    "user_profile": {
+      "age": 44,
+      "gender": "female",
+      "concern": "jaw slimming",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "masseter botox reduces jaw muscle"
+  },
+  {
+    "id": "consult_438",
+    "user_profile": {
+      "age": 45,
+      "gender": "male",
+      "concern": "double chin",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_069"
+    ],
+    "reasoning": "fat dissolving injections reduce chin fat"
+  },
+  {
+    "id": "consult_439",
+    "user_profile": {
+      "age": 46,
+      "gender": "female",
+      "concern": "neck laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_023"
+    ],
+    "reasoning": "thermage tightens neck skin"
+  },
+  {
+    "id": "consult_440",
+    "user_profile": {
+      "age": 47,
+      "gender": "male",
+      "concern": "severe sagging",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_093"
+    ],
+    "reasoning": "facelift surgery provides strongest lifting"
+  },
+  {
+    "id": "consult_441",
+    "user_profile": {
+      "age": 48,
+      "gender": "female",
+      "concern": "forehead wrinkles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic forehead wrinkles"
+  },
+  {
+    "id": "consult_442",
+    "user_profile": {
+      "age": 49,
+      "gender": "male",
+      "concern": "nasolabial folds",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "filler restores volume in smile lines"
+  },
+  {
+    "id": "consult_443",
+    "user_profile": {
+      "age": 50,
+      "gender": "female",
+      "concern": "skin laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_021"
+    ],
+    "reasoning": "hifu tightens deeper skin layers"
+  },
+  {
+    "id": "consult_444",
+    "user_profile": {
+      "age": 51,
+      "gender": "male",
+      "concern": "acne scars",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_028"
+    ],
+    "reasoning": "fractional laser improves acne scars"
+  },
+  {
+    "id": "consult_445",
+    "user_profile": {
+      "age": 52,
+      "gender": "female",
+      "concern": "dull skin",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_042"
+    ],
+    "reasoning": "oxygen facial improves skin glow"
+  },
+  {
+    "id": "consult_446",
+    "user_profile": {
+      "age": 53,
+      "gender": "male",
+      "concern": "pigmentation",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_029"
+    ],
+    "reasoning": "pico laser treats pigmentation"
+  },
+  {
+    "id": "consult_447",
+    "user_profile": {
+      "age": 54,
+      "gender": "female",
+      "concern": "sagging cheeks",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_061"
+    ],
+    "reasoning": "thread lift improves sagging cheeks"
+  },
+  {
+    "id": "consult_448",
+    "user_profile": {
+      "age": 55,
+      "gender": "male",
+      "concern": "jawline contour",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_004"
+    ],
+    "reasoning": "jawline filler improves facial contour"
+  },
+  {
+    "id": "consult_449",
+    "user_profile": {
+      "age": 24,
+      "gender": "female",
+      "concern": "under eye hollow",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "tear trough filler restores volume"
+  },
+  {
+    "id": "consult_450",
+    "user_profile": {
+      "age": 25,
+      "gender": "male",
+      "concern": "enlarged pores",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_041"
+    ],
+    "reasoning": "hydrafacial cleans pores"
+  },
+  {
+    "id": "consult_451",
+    "user_profile": {
+      "age": 26,
+      "gender": "female",
+      "concern": "volume loss",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "dermal filler restores facial volume"
+  },
+  {
+    "id": "consult_452",
+    "user_profile": {
+      "age": 27,
+      "gender": "male",
+      "concern": "collagen loss",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_010"
+    ],
+    "reasoning": "sculptra stimulates collagen production"
+  },
+  {
+    "id": "consult_453",
+    "user_profile": {
+      "age": 28,
+      "gender": "female",
+      "concern": "freckles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_030"
+    ],
+    "reasoning": "q switched laser removes freckles"
+  },
+  {
+    "id": "consult_454",
+    "user_profile": {
+      "age": 29,
+      "gender": "male",
+      "concern": "hair loss",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_078"
+    ],
+    "reasoning": "hair transplant restores density"
+  },
+  {
+    "id": "consult_455",
+    "user_profile": {
+      "age": 30,
+      "gender": "female",
+      "concern": "fine lines",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic wrinkles"
+  },
+  {
+    "id": "consult_456",
+    "user_profile": {
+      "age": 31,
+      "gender": "male",
+      "concern": "dehydrated skin",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_008"
+    ],
+    "reasoning": "skin booster hydrates skin"
+  },
+  {
+    "id": "consult_457",
+    "user_profile": {
+      "age": 32,
+      "gender": "female",
+      "concern": "jaw slimming",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "masseter botox reduces jaw muscle"
+  },
+  {
+    "id": "consult_458",
+    "user_profile": {
+      "age": 33,
+      "gender": "male",
+      "concern": "double chin",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_069"
+    ],
+    "reasoning": "fat dissolving injections reduce chin fat"
+  },
+  {
+    "id": "consult_459",
+    "user_profile": {
+      "age": 34,
+      "gender": "female",
+      "concern": "neck laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_023"
+    ],
+    "reasoning": "thermage tightens neck skin"
+  },
+  {
+    "id": "consult_460",
+    "user_profile": {
+      "age": 35,
+      "gender": "male",
+      "concern": "severe sagging",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_093"
+    ],
+    "reasoning": "facelift surgery provides strongest lifting"
+  },
+  {
+    "id": "consult_461",
+    "user_profile": {
+      "age": 36,
+      "gender": "female",
+      "concern": "forehead wrinkles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic forehead wrinkles"
+  },
+  {
+    "id": "consult_462",
+    "user_profile": {
+      "age": 37,
+      "gender": "male",
+      "concern": "nasolabial folds",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "filler restores volume in smile lines"
+  },
+  {
+    "id": "consult_463",
+    "user_profile": {
+      "age": 38,
+      "gender": "female",
+      "concern": "skin laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_021"
+    ],
+    "reasoning": "hifu tightens deeper skin layers"
+  },
+  {
+    "id": "consult_464",
+    "user_profile": {
+      "age": 39,
+      "gender": "male",
+      "concern": "acne scars",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_028"
+    ],
+    "reasoning": "fractional laser improves acne scars"
+  },
+  {
+    "id": "consult_465",
+    "user_profile": {
+      "age": 40,
+      "gender": "female",
+      "concern": "dull skin",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_042"
+    ],
+    "reasoning": "oxygen facial improves skin glow"
+  },
+  {
+    "id": "consult_466",
+    "user_profile": {
+      "age": 41,
+      "gender": "male",
+      "concern": "pigmentation",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_029"
+    ],
+    "reasoning": "pico laser treats pigmentation"
+  },
+  {
+    "id": "consult_467",
+    "user_profile": {
+      "age": 42,
+      "gender": "female",
+      "concern": "sagging cheeks",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_061"
+    ],
+    "reasoning": "thread lift improves sagging cheeks"
+  },
+  {
+    "id": "consult_468",
+    "user_profile": {
+      "age": 43,
+      "gender": "male",
+      "concern": "jawline contour",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_004"
+    ],
+    "reasoning": "jawline filler improves facial contour"
+  },
+  {
+    "id": "consult_469",
+    "user_profile": {
+      "age": 44,
+      "gender": "female",
+      "concern": "under eye hollow",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "tear trough filler restores volume"
+  },
+  {
+    "id": "consult_470",
+    "user_profile": {
+      "age": 45,
+      "gender": "male",
+      "concern": "enlarged pores",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_041"
+    ],
+    "reasoning": "hydrafacial cleans pores"
+  },
+  {
+    "id": "consult_471",
+    "user_profile": {
+      "age": 46,
+      "gender": "female",
+      "concern": "volume loss",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "dermal filler restores facial volume"
+  },
+  {
+    "id": "consult_472",
+    "user_profile": {
+      "age": 47,
+      "gender": "male",
+      "concern": "collagen loss",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_010"
+    ],
+    "reasoning": "sculptra stimulates collagen production"
+  },
+  {
+    "id": "consult_473",
+    "user_profile": {
+      "age": 48,
+      "gender": "female",
+      "concern": "freckles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_030"
+    ],
+    "reasoning": "q switched laser removes freckles"
+  },
+  {
+    "id": "consult_474",
+    "user_profile": {
+      "age": 49,
+      "gender": "male",
+      "concern": "hair loss",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_078"
+    ],
+    "reasoning": "hair transplant restores density"
+  },
+  {
+    "id": "consult_475",
+    "user_profile": {
+      "age": 50,
+      "gender": "female",
+      "concern": "fine lines",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic wrinkles"
+  },
+  {
+    "id": "consult_476",
+    "user_profile": {
+      "age": 51,
+      "gender": "male",
+      "concern": "dehydrated skin",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_008"
+    ],
+    "reasoning": "skin booster hydrates skin"
+  },
+  {
+    "id": "consult_477",
+    "user_profile": {
+      "age": 52,
+      "gender": "female",
+      "concern": "jaw slimming",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "masseter botox reduces jaw muscle"
+  },
+  {
+    "id": "consult_478",
+    "user_profile": {
+      "age": 53,
+      "gender": "male",
+      "concern": "double chin",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_069"
+    ],
+    "reasoning": "fat dissolving injections reduce chin fat"
+  },
+  {
+    "id": "consult_479",
+    "user_profile": {
+      "age": 54,
+      "gender": "female",
+      "concern": "neck laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_023"
+    ],
+    "reasoning": "thermage tightens neck skin"
+  },
+  {
+    "id": "consult_480",
+    "user_profile": {
+      "age": 55,
+      "gender": "male",
+      "concern": "severe sagging",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_093"
+    ],
+    "reasoning": "facelift surgery provides strongest lifting"
+  },
+  {
+    "id": "consult_481",
+    "user_profile": {
+      "age": 24,
+      "gender": "female",
+      "concern": "forehead wrinkles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic forehead wrinkles"
+  },
+  {
+    "id": "consult_482",
+    "user_profile": {
+      "age": 25,
+      "gender": "male",
+      "concern": "nasolabial folds",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "filler restores volume in smile lines"
+  },
+  {
+    "id": "consult_483",
+    "user_profile": {
+      "age": 26,
+      "gender": "female",
+      "concern": "skin laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_021"
+    ],
+    "reasoning": "hifu tightens deeper skin layers"
+  },
+  {
+    "id": "consult_484",
+    "user_profile": {
+      "age": 27,
+      "gender": "male",
+      "concern": "acne scars",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_028"
+    ],
+    "reasoning": "fractional laser improves acne scars"
+  },
+  {
+    "id": "consult_485",
+    "user_profile": {
+      "age": 28,
+      "gender": "female",
+      "concern": "dull skin",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_042"
+    ],
+    "reasoning": "oxygen facial improves skin glow"
+  },
+  {
+    "id": "consult_486",
+    "user_profile": {
+      "age": 29,
+      "gender": "male",
+      "concern": "pigmentation",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_029"
+    ],
+    "reasoning": "pico laser treats pigmentation"
+  },
+  {
+    "id": "consult_487",
+    "user_profile": {
+      "age": 30,
+      "gender": "female",
+      "concern": "sagging cheeks",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_061"
+    ],
+    "reasoning": "thread lift improves sagging cheeks"
+  },
+  {
+    "id": "consult_488",
+    "user_profile": {
+      "age": 31,
+      "gender": "male",
+      "concern": "jawline contour",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_004"
+    ],
+    "reasoning": "jawline filler improves facial contour"
+  },
+  {
+    "id": "consult_489",
+    "user_profile": {
+      "age": 32,
+      "gender": "female",
+      "concern": "under eye hollow",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "tear trough filler restores volume"
+  },
+  {
+    "id": "consult_490",
+    "user_profile": {
+      "age": 33,
+      "gender": "male",
+      "concern": "enlarged pores",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_041"
+    ],
+    "reasoning": "hydrafacial cleans pores"
+  },
+  {
+    "id": "consult_491",
+    "user_profile": {
+      "age": 34,
+      "gender": "female",
+      "concern": "volume loss",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_006"
+    ],
+    "reasoning": "dermal filler restores facial volume"
+  },
+  {
+    "id": "consult_492",
+    "user_profile": {
+      "age": 35,
+      "gender": "male",
+      "concern": "collagen loss",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_010"
+    ],
+    "reasoning": "sculptra stimulates collagen production"
+  },
+  {
+    "id": "consult_493",
+    "user_profile": {
+      "age": 36,
+      "gender": "female",
+      "concern": "freckles",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_030"
+    ],
+    "reasoning": "q switched laser removes freckles"
+  },
+  {
+    "id": "consult_494",
+    "user_profile": {
+      "age": 37,
+      "gender": "male",
+      "concern": "hair loss",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_078"
+    ],
+    "reasoning": "hair transplant restores density"
+  },
+  {
+    "id": "consult_495",
+    "user_profile": {
+      "age": 38,
+      "gender": "female",
+      "concern": "fine lines",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "botox reduces dynamic wrinkles"
+  },
+  {
+    "id": "consult_496",
+    "user_profile": {
+      "age": 39,
+      "gender": "male",
+      "concern": "dehydrated skin",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_008"
+    ],
+    "reasoning": "skin booster hydrates skin"
+  },
+  {
+    "id": "consult_497",
+    "user_profile": {
+      "age": 40,
+      "gender": "female",
+      "concern": "jaw slimming",
+      "budget": "low",
+      "downtime_tolerance": "none"
+    },
+    "recommended_procedures": [
+      "proc_001"
+    ],
+    "reasoning": "masseter botox reduces jaw muscle"
+  },
+  {
+    "id": "consult_498",
+    "user_profile": {
+      "age": 41,
+      "gender": "male",
+      "concern": "double chin",
+      "budget": "medium",
+      "downtime_tolerance": "low"
+    },
+    "recommended_procedures": [
+      "proc_069"
+    ],
+    "reasoning": "fat dissolving injections reduce chin fat"
+  },
+  {
+    "id": "consult_499",
+    "user_profile": {
+      "age": 42,
+      "gender": "female",
+      "concern": "neck laxity",
+      "budget": "high",
+      "downtime_tolerance": "medium"
+    },
+    "recommended_procedures": [
+      "proc_023"
+    ],
+    "reasoning": "thermage tightens neck skin"
+  },
+  {
+    "id": "consult_500",
+    "user_profile": {
+      "age": 43,
+      "gender": "male",
+      "concern": "severe sagging",
+      "budget": "very_high",
+      "downtime_tolerance": "high"
+    },
+    "recommended_procedures": [
+      "proc_093"
+    ],
+    "reasoning": "facelift surgery provides strongest lifting"
+  }
+]

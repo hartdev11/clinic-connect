@@ -64,6 +64,8 @@ export interface User {
   default_branch_id?: string | null;
   /** Phase 19: LINE user ID สำหรับ push notification (owner/manager link LINE ได้) */
   line_user_id?: string | null;
+  /** Phase 3: user lifecycle state for deactivate/reactivate */
+  is_active?: boolean;
   createdAt: string; // ISO
   updatedAt: string; // ISO
 }

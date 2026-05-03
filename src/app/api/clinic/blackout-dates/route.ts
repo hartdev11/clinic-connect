@@ -14,8 +14,21 @@ export async function GET(request: NextRequest) {
   try {
     const orgId = session.org_id ?? (await getOrgIdFromClinicId(session.clinicId));
     if (!orgId) return NextResponse.json({ error: "Organization not found" }, { status: 404 });
+    const user = await getEffectiveUser(session);
+    if (!requireRole(user.role, ["owner", "manager", "staff"])) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
     const { searchParams } = new URL(request.url);
     const branchId = searchParams.get("branchId") ?? undefined;
+    if ((user.role === "manager" || user.role === "staff") && !branchId) {
+      return NextResponse.json(
+        { error: "กรุณาเลือกสาขาก่อนดูวันปิดทำการ (จำกัดสิทธิ์ตามสาขา)" },
+        { status: 403 }
+      );
+    }
+    if (branchId && !requireBranchAccess(user.role, user.branch_ids, user.branch_roles, branchId)) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
     const from = searchParams.get("from") ?? undefined;
     const to = searchParams.get("to") ?? undefined;
     const items = await listBlackoutDates(orgId, { branchId: branchId || null, from, to });

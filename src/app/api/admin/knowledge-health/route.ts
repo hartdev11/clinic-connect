@@ -32,10 +32,6 @@ export async function GET(request: NextRequest) {
 
   try {
     const orgId = request.nextUrl.searchParams.get("org_id") || defaultOrgId;
-    const cutoff = new Date();
-    cutoff.setMonth(cutoff.getMonth() - 6);
-    const cutoffStr = cutoff.toISOString();
-
     let clinicQ = db.collection("clinic_knowledge");
     if (orgId) clinicQ = clinicQ.where("org_id", "==", orgId) as typeof clinicQ;
     const clinicSnap = await clinicQ.get();

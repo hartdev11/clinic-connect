@@ -3,14 +3,19 @@
  * Call after booking created/updated.
  */
 import { scheduleBookingReminder as enqueueReminder } from "@/lib/booking-reminder-queue";
+import { cancelBookingReminder as cancelReminder } from "@/lib/booking-reminder-queue";
 
 export async function scheduleBookingReminder(
   bookingId: string,
   bookingDateTime: Date,
   orgId: string,
-  opts?: { lineUserId?: string; customerId?: string }
+  opts?: { lineUserId?: string; customerId?: string; correlationId?: string }
 ): Promise<string | null> {
   return enqueueReminder(bookingId, bookingDateTime, orgId, opts);
+}
+
+export async function cancelBookingReminder(bookingId: string): Promise<void> {
+  await cancelReminder(bookingId);
 }
 
 /**
@@ -23,7 +28,7 @@ export async function scheduleBookingReminder(
  * - หาก notificationStatus = "failed" → ต้องไม่ retry เอง รอ backend
  */
 import { getLineChannelByOrgId } from "@/lib/line-channel-data";
-import { updateBooking } from "@/lib/clinic-data";
+import { createConversationFeedback, updateBooking } from "@/lib/clinic-data";
 import type { Booking } from "@/types/clinic";
 import { NOTIFYABLE_CHANNELS } from "@/types/clinic";
 
@@ -127,8 +132,6 @@ async function sendViaLine(orgId: string, chatUserId: string, text: string): Pro
   const channel = await getLineChannelByOrgId(orgId);
   if (channel?.channel_access_token) {
     accessToken = channel.channel_access_token;
-  } else if (process.env.LINE_ORG_ID === orgId && process.env.LINE_CHANNEL_ACCESS_TOKEN?.trim()) {
-    accessToken = process.env.LINE_CHANNEL_ACCESS_TOKEN.trim();
   }
   if (!accessToken) {
     return { ok: false, error: "LINE Channel not configured" };
@@ -155,23 +158,92 @@ async function sendViaLine(orgId: string, chatUserId: string, text: string): Pro
   }
 }
 
+type NotifyMode = "confirmation" | "rejection";
+
+async function sendViaPartnerChannel(
+  orgId: string,
+  channel: "facebook" | "instagram" | "tiktok" | "web" | "web_chat",
+  chatUserId: string,
+  text: string,
+  mode: NotifyMode,
+  booking?: Booking,
+  bookingId?: string
+): Promise<{ ok: boolean; error?: string }> {
+  try {
+    const { dispatchPartnerWebhooks } = await import("@/lib/partner-webhook-dispatch");
+    const event = mode === "confirmation" ? "booking.confirmed" : "booking.rejected";
+    const summary = await dispatchPartnerWebhooks(orgId, event, {
+      channel,
+      chatUserId,
+      message: text,
+      bookingId: bookingId ?? booking?.id ?? null,
+      booking: booking
+        ? {
+            id: booking.id,
+            customerName: booking.customerName,
+            service: booking.service,
+            procedure: booking.procedure ?? null,
+            scheduledAt: booking.scheduledAt,
+            branchName: booking.branchName ?? null,
+            doctor: booking.doctor ?? null,
+          }
+        : null,
+    }, { correlationId: bookingId ? `booking_notify_${bookingId}_${mode}` : undefined });
+    if (summary.delivered > 0) return { ok: true };
+    return {
+      ok: false,
+      error: `No active partner webhook target for ${event} (${channel}). Configure /api/clinic/webhooks with this event.`,
+    };
+  } catch (err) {
+    return { ok: false, error: (err as Error).message };
+  }
+}
+
+async function sendViaWebConversation(
+  orgId: string,
+  chatUserId: string,
+  text: string,
+  booking?: Booking
+): Promise<{ ok: boolean; error?: string }> {
+  try {
+    await createConversationFeedback({
+      org_id: orgId,
+      branch_id: booking?.branch_id ?? null,
+      user_id: chatUserId,
+      userMessage: "",
+      botReply: text,
+      source: "web",
+    });
+    return { ok: true };
+  } catch (err) {
+    return { ok: false, error: (err as Error).message };
+  }
+}
+
 async function sendViaChannel(
   orgId: string,
   channel: string,
   chatUserId: string,
-  text: string
+  text: string,
+  opts?: { mode?: NotifyMode; booking?: Booking; bookingId?: string }
 ): Promise<{ ok: boolean; error?: string }> {
+  const mode = opts?.mode ?? "confirmation";
   switch (channel) {
     case "line":
       return sendViaLine(orgId, chatUserId, text);
+    case "web":
+    case "web_chat": {
+      const relay = await sendViaPartnerChannel(orgId, channel, chatUserId, text, mode, opts?.booking, opts?.bookingId);
+      if (relay.ok) return relay;
+      // Fallback: เก็บข้อความเข้า conversation log สำหรับช่องทางเว็บ
+      const web = await sendViaWebConversation(orgId, chatUserId, text, opts?.booking);
+      if (web.ok) return web;
+      return { ok: false, error: relay.error ?? web.error };
+    }
     case "facebook":
     case "instagram":
     case "tiktok":
-    case "web":
-    case "web_chat":
-      // TODO: เชื่อมต่อ API ของแต่ละช่องทางเมื่อพร้อม
-      console.warn(`[BookingNotification] Channel "${channel}" not implemented yet`);
-      return { ok: false, error: `Channel ${channel} not implemented` };
+      return sendViaPartnerChannel(orgId, channel, chatUserId, text, mode, opts?.booking, opts?.bookingId);
     default:
       return { ok: false, error: `Unsupported channel: ${channel}` };
   }
@@ -207,6 +279,10 @@ export async function sendBookingConfirmation(input: SendConfirmationInput): Pro
   if (booking.notificationStatus === "failed") {
     return { ok: false, error: "notification_status is failed — backend must handle retry" };
   }
+  if (booking.notificationStatus === "sent") {
+    // Idempotent guard: avoid duplicate customer notifications.
+    return { ok: true };
+  }
 
   if (!booking.chatUserId || !booking.channel) {
     return { ok: false, error: "chatUserId or channel missing" };
@@ -218,7 +294,11 @@ export async function sendBookingConfirmation(input: SendConfirmationInput): Pro
 
   const attemptCount = (booking.notificationAttemptCount ?? 0) + 1;
   const text = buildConfirmationMessage(booking);
-  const result = await sendViaChannel(orgId, booking.channel, booking.chatUserId, text);
+  const result = await sendViaChannel(orgId, booking.channel, booking.chatUserId, text, {
+    mode: "confirmation",
+    booking,
+    bookingId,
+  });
 
   const updates: Parameters<typeof updateBooking>[2] = {
     notificationAttemptCount: attemptCount,
@@ -259,6 +339,10 @@ export async function sendBookingRejection(input: SendRejectionInput): Promise<{
   }
 
   const text = buildRejectionMessage(booking, rejectReason);
-  const result = await sendViaChannel(orgId, booking.channel, booking.chatUserId, text);
+  const result = await sendViaChannel(orgId, booking.channel, booking.chatUserId, text, {
+    mode: "rejection",
+    booking,
+    bookingId,
+  });
   return result;
 }

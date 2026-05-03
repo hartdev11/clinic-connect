@@ -1,20 +1,11 @@
 /**
  * Enterprise Knowledge Brain — Semantic Duplicate Detection
- * Phase 2 #14: ก่อน create — embed draft, query Pinecone similarity > 0.92
+ * Phase 2 #14: ก่อน create — query VM vector search similarity > 0.92
  */
-import { embedKnowledgeText } from "./vector";
-import { getKnowledgeIndex } from "@/lib/pinecone";
 import type { StructuredKnowledgeContext } from "@/types/knowledge-brain";
 
-const NAMESPACE_PREFIX = "kb";
 const SIMILARITY_THRESHOLD = 0.92;
 const TOP_K_CHECK = 5;
-
-function getOrgNamespace(orgId: string): string {
-  return `${NAMESPACE_PREFIX}_${orgId.replace(/[^a-zA-Z0-9_-]/g, "_")}`;
-}
-
-const GLOBAL_NAMESPACE = `${NAMESPACE_PREFIX}_global`;
 
 /** Build embeddable text จาก structured context */
 function buildEmbeddableText(ctx: StructuredKnowledgeContext): string {
@@ -48,19 +39,35 @@ export async function checkSemanticDuplicate(
 ): Promise<DuplicateCheckResult> {
   try {
     const text = buildEmbeddableText(ctx);
-    const embedding = await embedKnowledgeText(text);
-    const index = getKnowledgeIndex();
-    const orgNs = index.namespace(getOrgNamespace(orgId));
-    const globalNs = index.namespace(GLOBAL_NAMESPACE);
-
-    const [orgRes, globalRes] = await Promise.all([
-      orgNs.query({ vector: embedding, topK: TOP_K_CHECK, includeMetadata: true }),
-      globalNs.query({ vector: embedding, topK: TOP_K_CHECK, includeMetadata: true }),
-    ]);
+    const baseUrl =
+      process.env.KNOWLEDGE_VECTOR_URL?.trim().replace(/\/+$/, "") ??
+      process.env.PHASE_G_URL?.trim().replace(/\/+$/, "");
+    if (!baseUrl) {
+      throw new Error("Missing KNOWLEDGE_VECTOR_URL/PHASE_G_URL");
+    }
+    const serviceSecret = process.env.PHASE_SERVICE_SECRET?.trim() ?? "";
+    const res = await fetch(`${baseUrl}/api/knowledge/search`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Service-Secret": serviceSecret,
+      },
+      body: JSON.stringify({
+        tenant_id: orgId,
+        clinic_id: orgId,
+        query: text,
+        top_k: TOP_K_CHECK,
+      }),
+    });
+    if (!res.ok) {
+      throw new Error(`VM search failed: ${res.status}`);
+    }
+    const payload = await res.json().catch(() => ({}));
+    const matches = Array.isArray(payload?.results) ? payload.results : [];
 
     const candidates: Array<{ id: string; score: number }> = [];
-    const addMatch = (m: { id?: string | null; score?: number | null }) => {
-      const id = m.id?.toString?.() ?? "";
+    const addMatch = (m: Record<string, unknown>) => {
+      const id = String(m.id ?? "");
       const score = typeof m.score === "number" ? m.score : 0;
       if (id && score > 0) {
         const normalizedId = id.replace(/^(clinic_|global_)/, "");
@@ -68,8 +75,7 @@ export async function checkSemanticDuplicate(
         candidates.push({ id: normalizedId, score });
       }
     };
-    (orgRes.matches ?? []).forEach(addMatch);
-    (globalRes.matches ?? []).forEach(addMatch);
+    matches.forEach(addMatch);
 
     const byId = new Map<string, number>();
     for (const c of candidates) {

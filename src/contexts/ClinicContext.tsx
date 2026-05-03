@@ -120,7 +120,7 @@ export function ClinicContextProvider({ children }: { children: ReactNode }) {
       mutate,
       needsOnboarding: data?.needsOnboarding ?? false,
     }),
-    [data, effectiveBranchId, currentBranch, selectedBranchId, isLoading, error, mutate, setSelectedBranchId]
+    [data, effectiveBranchId, currentBranch, isLoading, error, mutate, setSelectedBranchId]
   );
 
   return (

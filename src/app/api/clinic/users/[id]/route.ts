@@ -3,6 +3,7 @@ import { getSessionFromCookies } from "@/lib/auth-session";
 import {
   getOrgIdFromClinicId,
   getUserById,
+  deleteUser,
   updateUser,
   getBranchesByOrgId,
 } from "@/lib/clinic-data";
@@ -44,6 +45,7 @@ export async function PATCH(
       branch_ids?: string[] | null;
       branch_roles?: Record<string, "manager" | "staff"> | null;
       default_branch_id?: string | null;
+      is_active?: boolean;
     };
 
     const validRoles = ["owner", "manager", "staff"];
@@ -52,6 +54,7 @@ export async function PATCH(
       branch_ids?: string[] | null;
       branch_roles?: Record<string, "manager" | "staff"> | null;
       default_branch_id?: string | null;
+      is_active?: boolean;
     } = {};
 
     if (role !== undefined) {
@@ -91,11 +94,53 @@ export async function PATCH(
     if (default_branch_id !== undefined) {
       updates.default_branch_id = default_branch_id || null;
     }
+    if (body.is_active !== undefined) {
+      updates.is_active = body.is_active === true;
+    }
 
     await updateUser(id, updates);
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("PATCH /api/clinic/users/[id]:", err);
+    return NextResponse.json(
+      { error: process.env.NODE_ENV === "development" ? String(err) : "Server error" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const session = await getSessionFromCookies();
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  try {
+    const orgId = session.org_id ?? (await getOrgIdFromClinicId(session.clinicId));
+    if (!orgId) {
+      return NextResponse.json({ error: "Organization not found" }, { status: 404 });
+    }
+    const actor = await getEffectiveUser(session);
+    if (!requireRole(actor.role, ["owner", "manager"])) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    const { id } = await params;
+    if (id === session.user_id) {
+      return NextResponse.json({ error: "ไม่สามารถลบบัญชีตัวเองได้" }, { status: 400 });
+    }
+    const targetUser = await getUserById(id);
+    if (!targetUser || targetUser.org_id !== orgId) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+    if (actor.role === "manager" && targetUser.role === "owner") {
+      return NextResponse.json({ error: "Manager ไม่สามารถลบ Owner ได้" }, { status: 403 });
+    }
+    await deleteUser(id);
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    console.error("DELETE /api/clinic/users/[id]:", err);
     return NextResponse.json(
       { error: process.env.NODE_ENV === "development" ? String(err) : "Server error" },
       { status: 500 }

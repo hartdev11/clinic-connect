@@ -1,0 +1,21 @@
+id,category,name,description
+I01,Discovery & Pricing,Direct Price Check,ถามราคาตรงๆ เช่น 1cc เท่าไหร่ มีโปรไหม
+I02,Discovery & Pricing,Compare Tiers,เปรียบเทียบรุ่น/ยี่ห้อ เช่น รุ่น Ultra กับ Prime ต่างกันยังไง
+I03,Discovery & Pricing,Bundle Seeking,หาแพ็คเกจเหมา ทำหลายอย่างพร้อมกันเพื่อส่วนลด
+I04,Discovery & Pricing,Budget Constraint,บอกงบที่มี แล้วให้แอดมินจัดโปรแกรมให้ เช่น มีงบ 5000 ทำอะไรได้บ้าง
+I05,Objection Handling,Fear of Pain,กลัวเจ็บ เช่น แปะยาชานานไหม เจ็บกว่ารอบที่แล้วไหม
+I06,Objection Handling,Safety Authentication,ขอดูเครื่อง ยากล่องแท้ เช่น สแกนเช็ก อย. ได้ไหม แกะกล่องให้ดูต่อหน้าไหม
+I07,Objection Handling,Downtime Concern,กลัวหน้าบวม ช้ำ เช่น ทำแล้วไปทำงานต่อได้เลยไหม กี่วันหายบวม
+I08,Objection Handling,Side Effects,กังวลผลข้างเคียง เช่น ฉีดไปแล้วหน้าจะแข็งไหม ฟิลเลอร์จะไหลไหม
+I09,Comparison & Hesitation,Competitor Price Match,บอกว่าที่อื่นถูกกว่า เช่น คลีนิกนู้นจัดโปร 1900 เองนะ
+I10,Comparison & Hesitation,Review Hunting,ขอดูรีวิวเคสที่เหมือนตัวเอง เช่น มีรีวิวคนอายุ 40+ ที่ทำตัวนี้ไหม
+I11,Comparison & Hesitation,Expert Validation,ถามความเห็นหมอ เช่น หนูต้องทำตัวนี้จริงๆ ใช่ไหม หรือทำอย่างอื่นดีกว่า
+I12,Comparison & Hesitation,Second Opinion,เคยทำที่อื่นมาแล้วไม่ถูกใจ เลยมาปรึกษาเพื่อเริ่มใหม่
+I13,Urgency & Closing,Special Occasion,รีบสวย เช่น จะแต่งงานอาทิตย์หน้า ทำอะไรทันบ้าง จะไปเที่ยวทะเล
+I14,Urgency & Closing,Limited Time Offer,ทักมาเพื่อรับสิทธิ์นาทีทอง เช่น ยังทันโปร 5 ท่านแรกไหมคะ
+I15,Urgency & Closing,Deposit Booking,พร้อมโอนจอง มัดจำ หรือถามหาช่องทางการชำระเงิน ผ่อนชำระ
+I16,Urgency & Closing,Moo-talu,อยากทำเพื่อเสริมดวง เช่น ฉีดปากทรงไหนเรียกทรัพย์ คางแบบนี้อาภัพไหม
+I17,Post-Purchase,Aftercare Query,ถามวิธีดูแลตัวเอง เช่น กินน้ำแข็งได้ไหม ล้างหน้าได้ตอนไหน
+I18,Post-Purchase,Result Follow-up,สงสัยเรื่องผลลัพธ์ เช่น ทำไป 3 วันแล้วทำไมยังไม่เห็นผล
+I19,Post-Purchase,Referral Review,กลับมารีวิวให้ หรือพาเพื่อนมาสมัครเพิ่ม
+I20,Post-Purchase,Complaint Handling,เคลมปัญหา เช่น ทำไปแล้วรู้สึกไม่เท่ากัน มีตุ่มขึ้น

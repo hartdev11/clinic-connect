@@ -17,7 +17,7 @@ import { runWithObservability } from "@/lib/observability/run-with-observability
 
 export const dynamic = "force-dynamic";
 
-async function getAuth(request: NextRequest) {
+async function getAuth() {
   const session = await getSessionFromCookies();
   if (!session) return { error: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) };
   const orgId = session.org_id ?? (await getOrgIdFromClinicId(session.clinicId));
@@ -41,7 +41,7 @@ function parseBody(body: unknown, defaultClinicId: string): ClinicFaqCreate | nu
 
 export async function GET(request: NextRequest) {
   return runWithObservability("/api/clinic/unified-knowledge/faq", request, async () => {
-    const auth = await getAuth(request);
+    const auth = await getAuth();
     if ("error" in auth) return auth.error;
 
     try {
@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   return runWithObservability("/api/clinic/unified-knowledge/faq", request, async () => {
-    const auth = await getAuth(request);
+    const auth = await getAuth();
     if ("error" in auth) return auth.error;
 
     let body: unknown;

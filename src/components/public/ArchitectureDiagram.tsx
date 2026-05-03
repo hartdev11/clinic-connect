@@ -15,7 +15,7 @@ export function ArchitectureDiagram() {
         viewBox="0 0 1000 360"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="w-full h-auto min-w-[800px]"
+        className="w-full h-auto min-w-[640px] md:min-w-[800px]"
         preserveAspectRatio="xMidYMid meet"
       >
         <defs>

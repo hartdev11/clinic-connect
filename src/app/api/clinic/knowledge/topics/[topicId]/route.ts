@@ -4,15 +4,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionFromCookies } from "@/lib/auth-session";
 import { getOrgIdFromClinicId } from "@/lib/clinic-data";
-import { getEffectiveUser, requireRole } from "@/lib/rbac";
+import { getEffectiveUser } from "@/lib/rbac";
+import { canAccessKnowledgeAction } from "@/lib/knowledge-permissions";
 import {
   getKnowledgeTopic,
   getActiveKnowledgeVersion,
   listKnowledgeVersions,
   createKnowledgeVersion,
   deleteKnowledgeTopic,
+  getKnowledgeVersion,
+  setKnowledgeVersionIndexingStatus,
+  markVersionFailed,
+  setActiveVersionAndArchivePrevious,
+  findKnowledgeTopicIdByNormalizedTitle,
 } from "@/lib/knowledge-topics-data";
 import { enqueueKnowledgeVersionEmbed } from "@/lib/knowledge-brain/embedding-queue";
+import { upsertKnowledgeVersionToVector } from "@/lib/knowledge-vector";
 import {
   validateKnowledgeContent,
   getMaxContentLength,
@@ -42,16 +49,13 @@ function parseBody(body: unknown): KnowledgeVersionPayload | null {
   return { topic, category, summary, content, exampleQuestions };
 }
 
-async function getAuth(request: NextRequest) {
+async function getAuth() {
   const session = await getSessionFromCookies();
   if (!session) return { error: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) };
   const orgId = session.org_id ?? (await getOrgIdFromClinicId(session.clinicId));
   if (!orgId) return { error: NextResponse.json({ error: "Organization not found" }, { status: 404 }) };
   const user = await getEffectiveUser(session);
-  if (!requireRole(user.role, ["owner", "manager", "staff"])) {
-    return { error: NextResponse.json({ error: "จำกัดสิทธิ์: คุณไม่มีสิทธิ์เข้าถึงข้อมูล Knowledge" }, { status: 403 }) };
-  }
-  return { orgId, userId: session.user_id ?? "", user };
+  return { orgId, userId: session.user_id ?? "", user, session };
 }
 
 export async function GET(
@@ -60,8 +64,11 @@ export async function GET(
 ) {
   const { topicId } = await params;
   return runWithObservability("/api/clinic/knowledge/topics/[topicId]", request, async () => {
-    const auth = await getAuth(request);
+    const auth = await getAuth();
     if ("error" in auth) return auth.error;
+    if (!canAccessKnowledgeAction("read", auth.session, auth.user.role)) {
+      return NextResponse.json({ error: "Forbidden", code: "INSUFFICIENT_ROLE" }, { status: 403 });
+    }
 
     const topic = await getKnowledgeTopic(auth.orgId, topicId);
     if (!topic) return NextResponse.json({ error: "ไม่พบหัวข้อนี้" }, { status: 404 });
@@ -88,8 +95,11 @@ export async function PUT(
 ) {
   const { topicId } = await params;
   return runWithObservability("/api/clinic/knowledge/topics/[topicId]", request, async () => {
-    const auth = await getAuth(request);
+    const auth = await getAuth();
     if ("error" in auth) return auth.error;
+    if (!canAccessKnowledgeAction("edit", auth.session, auth.user.role)) {
+      return NextResponse.json({ error: "Forbidden", code: "INSUFFICIENT_ROLE" }, { status: 403 });
+    }
 
     let body: unknown;
     try {
@@ -118,6 +128,40 @@ export async function PUT(
       }, { status: 200 });
     }
 
+    const expectedUpdatedAt =
+      body && typeof body === "object" && typeof (body as { expectedUpdatedAt?: unknown }).expectedUpdatedAt === "string"
+        ? (body as { expectedUpdatedAt: string }).expectedUpdatedAt
+        : null;
+    const forceOverwrite = !!(body && typeof body === "object" && (body as { forceOverwrite?: boolean }).forceOverwrite);
+    if (expectedUpdatedAt && !forceOverwrite) {
+      const currentTopic = await getKnowledgeTopic(auth.orgId, topicId);
+      if (!currentTopic) {
+        return NextResponse.json({ error: "ไม่พบหัวข้อนี้" }, { status: 404 });
+      }
+      if (currentTopic.updatedAt !== expectedUpdatedAt) {
+        return NextResponse.json(
+          {
+            error: "Someone updated this topic. View latest version or overwrite?",
+            code: "VERSION_CONFLICT",
+            latestUpdatedAt: currentTopic.updatedAt,
+          },
+          { status: 409 }
+        );
+      }
+    }
+
+    const dupId = await findKnowledgeTopicIdByNormalizedTitle(auth.orgId, payload.topic);
+    if (dupId && dupId !== topicId) {
+      return NextResponse.json(
+        {
+          code: "DUPLICATE_TOPIC",
+          existingTopicId: dupId,
+          error: "มีหัวข้ออื่นใช้ชื่อนี้แล้ว — เลือกใช้ของเดิม เขียนทับ หรือสร้างใหม่",
+        },
+        { status: 409 }
+      );
+    }
+
     try {
       const versionId = await createKnowledgeVersion(
         auth.orgId,
@@ -125,7 +169,25 @@ export async function PUT(
         payload,
         auth.userId
       );
-      await enqueueKnowledgeVersionEmbed(auth.orgId, versionId);
+      const version = await getKnowledgeVersion(auth.orgId, versionId);
+      if (!version) {
+        throw new Error("ไม่พบเวอร์ชันที่เพิ่งสร้าง");
+      }
+      await setKnowledgeVersionIndexingStatus(auth.orgId, versionId, "processing", null);
+      try {
+        await upsertKnowledgeVersionToVector(auth.orgId, topicId, {
+          topic: version.topic,
+          category: version.category,
+          content: version.content,
+          summary: version.summary,
+        });
+        await setActiveVersionAndArchivePrevious(auth.orgId, topicId, versionId);
+      } catch (inlineError) {
+        const reason = inlineError instanceof Error ? inlineError.message : "Inline indexing failed";
+        await markVersionFailed(auth.orgId, versionId);
+        await setKnowledgeVersionIndexingStatus(auth.orgId, versionId, "failed", reason);
+        await enqueueKnowledgeVersionEmbed(auth.orgId, versionId);
+      }
       return {
         response: NextResponse.json({
           versionId,
@@ -150,8 +212,11 @@ export async function DELETE(
 ) {
   const { topicId } = await params;
   return runWithObservability("/api/clinic/knowledge/topics/[topicId]", request, async () => {
-    const auth = await getAuth(request);
+    const auth = await getAuth();
     if ("error" in auth) return auth.error;
+    if (!canAccessKnowledgeAction("delete", auth.session, auth.user.role)) {
+      return NextResponse.json({ error: "Forbidden", code: "INSUFFICIENT_ROLE" }, { status: 403 });
+    }
 
     try {
       await deleteKnowledgeTopic(auth.orgId, topicId, auth.userId);

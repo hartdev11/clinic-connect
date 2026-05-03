@@ -1,12 +1,11 @@
 /**
  * POST /api/clinic/knowledge/process-queue
- * เรียก worker ประมวลผลคิว embedding (owner/manager เท่านั้น)
- * ไม่ต้องตั้ง cron — กดปุ่ม "อัปเดตข้อมูลให้ AI" ในหน้ารายการได้
+ * Internal worker trigger only (platform_admin)
  */
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionFromCookies } from "@/lib/auth-session";
 import { getOrgIdFromClinicId } from "@/lib/clinic-data";
-import { getEffectiveUser, requireRole } from "@/lib/rbac";
+import { getEffectiveUser } from "@/lib/rbac";
 import { processEmbeddingQueue } from "@/lib/knowledge-brain/embedding-queue";
 import { runWithObservability } from "@/lib/observability/run-with-observability";
 
@@ -23,9 +22,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Organization not found" }, { status: 404 });
     }
     const user = await getEffectiveUser(session);
-    if (!requireRole(user.role, ["owner", "manager"])) {
+    const sessionRole = (session.role ?? "").toLowerCase();
+    const effectiveRole = (user.role ?? "").toLowerCase();
+    if (sessionRole !== "platform_admin" && effectiveRole !== "platform_admin") {
       return NextResponse.json(
-        { error: "จำกัดสิทธิ์: เฉพาะ owner หรือ manager เท่านั้น" },
+        { error: "Forbidden", code: "INSUFFICIENT_ROLE" },
         { status: 403 }
       );
     }

@@ -1,0 +1,196 @@
+{
+  "meta": {
+    "version": "2.0",
+    "last_updated": "2026-03-20T02:23:13.813134"
+  },
+  "overview": {
+    "total_users": 456,
+    "total_sessions": 807,
+    "conversion_rate": 0.1078,
+    "ctr": 0.1239,
+    "total_revenue": 1110913,
+    "revenue_per_user": 2436.21,
+    "revenue_per_session": 1376.6
+  },
+  "trend": {
+    "daily": {
+      "2026-03-14": {
+        "revenue": 10000
+      },
+      "2026-03-15": {
+        "revenue": 15000
+      },
+      "2026-03-16": {
+        "revenue": 12000
+      },
+      "2026-03-17": {
+        "revenue": 18000
+      },
+      "2026-03-18": {
+        "revenue": 20000
+      },
+      "2026-03-19": {
+        "revenue": 17000
+      },
+      "2026-03-20": {
+        "revenue": 22000
+      }
+    },
+    "comparison": {
+      "current": {
+        "conversion": 0.09
+      },
+      "previous": {
+        "conversion": 0.07
+      }
+    }
+  },
+  "funnel": {
+    "view": 807,
+    "click": 100,
+    "booking": 87,
+    "dropoff": {
+      "view_to_click": 0.8761,
+      "click_to_booking": 0.13
+    }
+  },
+  "top_procedures": [
+    {
+      "procedure_id": "proc_001",
+      "views": 51,
+      "revenue": 94071.0,
+      "value_per_view": 1844.53
+    },
+    {
+      "procedure_id": "proc_008",
+      "views": 40,
+      "revenue": 85548.0,
+      "value_per_view": 2138.7
+    },
+    {
+      "procedure_id": "proc_006",
+      "views": 42,
+      "revenue": 84002.0,
+      "value_per_view": 2000.05
+    },
+    {
+      "procedure_id": "proc_004",
+      "views": 45,
+      "revenue": 77358.0,
+      "value_per_view": 1719.07
+    },
+    {
+      "procedure_id": "proc_012",
+      "views": 51,
+      "revenue": 74958.0,
+      "value_per_view": 1469.76
+    },
+    {
+      "procedure_id": "proc_005",
+      "views": 41,
+      "revenue": 69319.0,
+      "value_per_view": 1690.71
+    },
+    {
+      "procedure_id": "proc_003",
+      "views": 46,
+      "revenue": 68532.0,
+      "value_per_view": 1489.83
+    },
+    {
+      "procedure_id": "proc_019",
+      "views": 50,
+      "revenue": 62741.0,
+      "value_per_view": 1254.82
+    },
+    {
+      "procedure_id": "proc_013",
+      "views": 40,
+      "revenue": 31831.0,
+      "value_per_view": 795.77
+    },
+    {
+      "procedure_id": "proc_011",
+      "views": 45,
+      "revenue": 0.0,
+      "value_per_view": 0.0
+    }
+  ],
+  "revenue_breakdown": {
+    "by_procedure": {
+      "proc_004": 77358.0,
+      "proc_001": 94071.0,
+      "proc_017": 24899.0,
+      "proc_019": 62741.0,
+      "proc_003": 68532.0,
+      "proc_008": 85548.0,
+      "proc_002": 62840.0,
+      "proc_020": 45767.0,
+      "proc_010": 49295.0,
+      "proc_015": 47823.0,
+      "proc_012": 74958.0,
+      "proc_016": 44493.0,
+      "proc_007": 54684.0,
+      "proc_006": 84002.0,
+      "proc_018": 32315.0,
+      "proc_013": 31831.0,
+      "proc_005": 69319.0,
+      "proc_014": 69606.0,
+      "proc_009": 30831.0,
+      "proc_011": 0.0
+    },
+    "by_channel": {
+      "google": 246,
+      "facebook": 271,
+      "line": 260,
+      "tiktok": 217
+    },
+    "by_branch": {
+      "cnx_01": 318,
+      "bkk_01": 320,
+      "bkk_02": 356
+    }
+  },
+  "channels": [
+    {
+      "channel": "google",
+      "events": 246
+    },
+    {
+      "channel": "facebook",
+      "events": 271
+    },
+    {
+      "channel": "line",
+      "events": 260
+    },
+    {
+      "channel": "tiktok",
+      "events": 217
+    }
+  ],
+  "insights": [
+    "Conversion อยู่ในเกณฑ์ดี สามารถ optimize เพิ่มได้",
+    "CTR ดี → CTA ทำงานได้ดีแล้ว",
+    "ควร push proc_001 ทำรายได้สูงสุด",
+    "CTA ที่ดีที่สุด: cta_05 (conversion 1.0588)"
+  ],
+  "alerts": [],
+  "data_trust": {
+    "last_updated": "2026-03-20T02:23:13.813191",
+    "event_count": 994,
+    "sample_size": 807
+  },
+  "role_specific": {
+    "clinic_owner": {
+      "leads": 807,
+      "conversion": 0.1078,
+      "revenue": 1110913
+    },
+    "affiliate": {
+      "clicks": 100,
+      "bookings": 87,
+      "commission": 111091.3
+    }
+  }
+}

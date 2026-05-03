@@ -34,8 +34,6 @@ export function expandRagQueryForBodyPart(message: string): string {
   if (expansions.length === 0) return message;
   return `${message} ${expansions.join(" ")}`;
 }
-import type { SearchKnowledgeResult } from "@/lib/knowledge-vector";
-
 const MAX_CHUNKS = 5;
 const FETCH_TOP_K = 10;
 

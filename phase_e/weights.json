@@ -1,0 +1,429 @@
+{
+  "proc_057": {
+    "conversion_rate": 0.4444444444444444,
+    "score": 0.35714285714285715,
+    "views": 9,
+    "bookings": 4,
+    "weight": 0.6508
+  },
+  "proc_060": {
+    "conversion_rate": 0.3333333333333333,
+    "score": 0.25,
+    "views": 3,
+    "bookings": 1,
+    "weight": 0.3889
+  },
+  "proc_029": {
+    "conversion_rate": 0.4,
+    "score": 0.3,
+    "views": 5,
+    "bookings": 2,
+    "weight": 0.5111
+  },
+  "proc_016": {
+    "conversion_rate": 0.16666666666666666,
+    "score": 0.18181818181818182,
+    "views": 6,
+    "bookings": 1,
+    "weight": 0.2222
+  },
+  "proc_033": {
+    "conversion_rate": 0.2,
+    "score": 0.2,
+    "views": 5,
+    "bookings": 1,
+    "weight": 0.2667
+  },
+  "proc_040": {
+    "conversion_rate": 0.5,
+    "score": 0.36363636363636365,
+    "views": 6,
+    "bookings": 3,
+    "weight": 0.6667
+  },
+  "proc_059": {
+    "conversion_rate": 0.14285714285714285,
+    "score": 0.16666666666666666,
+    "views": 7,
+    "bookings": 1,
+    "weight": 0.1852
+  },
+  "proc_042": {
+    "conversion_rate": 0.75,
+    "score": 0.4444444444444444,
+    "views": 4,
+    "bookings": 3,
+    "weight": 0.8642
+  },
+  "proc_038": {
+    "conversion_rate": 0.0,
+    "score": 0.1111111111111111,
+    "views": 4,
+    "bookings": 0,
+    "weight": 0.0494
+  },
+  "proc_054": {
+    "conversion_rate": 0.25,
+    "score": 0.23076923076923078,
+    "views": 8,
+    "bookings": 2,
+    "weight": 0.3419
+  },
+  "proc_017": {
+    "conversion_rate": 0.4,
+    "score": 0.3,
+    "views": 5,
+    "bookings": 2,
+    "weight": 0.5111
+  },
+  "proc_053": {
+    "conversion_rate": 0.0,
+    "score": 0.1111111111111111,
+    "views": 4,
+    "bookings": 0,
+    "weight": 0.0494
+  },
+  "proc_052": {
+    "conversion_rate": 0.5,
+    "score": 0.3333333333333333,
+    "views": 4,
+    "bookings": 2,
+    "weight": 0.5926
+  },
+  "proc_048": {
+    "conversion_rate": 0.25,
+    "score": 0.2222222222222222,
+    "views": 4,
+    "bookings": 1,
+    "weight": 0.321
+  },
+  "proc_001": {
+    "conversion_rate": 0.25,
+    "score": 0.2222222222222222,
+    "views": 4,
+    "bookings": 1,
+    "weight": 0.321
+  },
+  "proc_030": {
+    "conversion_rate": 0.5714285714285714,
+    "score": 0.4166666666666667,
+    "views": 7,
+    "bookings": 4,
+    "weight": 0.7963
+  },
+  "proc_018": {
+    "conversion_rate": 0.2,
+    "score": 0.2,
+    "views": 5,
+    "bookings": 1,
+    "weight": 0.2667
+  },
+  "proc_061": {
+    "conversion_rate": 0.2,
+    "score": 0.2,
+    "views": 5,
+    "bookings": 1,
+    "weight": 0.2667
+  },
+  "proc_005": {
+    "conversion_rate": 0.4,
+    "score": 0.3,
+    "views": 5,
+    "bookings": 2,
+    "weight": 0.5111
+  },
+  "proc_050": {
+    "conversion_rate": 0.16666666666666666,
+    "score": 0.18181818181818182,
+    "views": 6,
+    "bookings": 1,
+    "weight": 0.2222
+  },
+  "proc_055": {
+    "conversion_rate": 0.4444444444444444,
+    "score": 0.35714285714285715,
+    "views": 9,
+    "bookings": 4,
+    "weight": 0.6508
+  },
+  "proc_023": {
+    "conversion_rate": 0.0,
+    "score": 0.125,
+    "views": 3,
+    "bookings": 0,
+    "weight": 0.0833
+  },
+  "proc_014": {
+    "conversion_rate": 0.14285714285714285,
+    "score": 0.16666666666666666,
+    "views": 7,
+    "bookings": 1,
+    "weight": 0.1852
+  },
+  "proc_008": {
+    "conversion_rate": 0.0,
+    "score": 0.14285714285714285,
+    "views": 2,
+    "bookings": 0,
+    "weight": 0.127
+  },
+  "proc_021": {
+    "conversion_rate": 0.16666666666666666,
+    "score": 0.18181818181818182,
+    "views": 6,
+    "bookings": 1,
+    "weight": 0.2222
+  },
+  "proc_006": {
+    "conversion_rate": 0.0,
+    "score": 0.125,
+    "views": 3,
+    "bookings": 0,
+    "weight": 0.0833
+  },
+  "proc_009": {
+    "conversion_rate": 0.5,
+    "score": 0.38461538461538464,
+    "views": 8,
+    "bookings": 4,
+    "weight": 0.7179
+  },
+  "proc_024": {
+    "conversion_rate": 0.8,
+    "score": 0.5,
+    "views": 5,
+    "bookings": 4,
+    "weight": 1.0
+  },
+  "proc_027": {
+    "conversion_rate": 0.5714285714285714,
+    "score": 0.4166666666666667,
+    "views": 7,
+    "bookings": 4,
+    "weight": 0.7963
+  },
+  "proc_049": {
+    "conversion_rate": 1.0,
+    "score": 0.5,
+    "views": 3,
+    "bookings": 3,
+    "weight": 1.0
+  },
+  "proc_034": {
+    "conversion_rate": 0.375,
+    "score": 0.3076923076923077,
+    "views": 8,
+    "bookings": 3,
+    "weight": 0.5299
+  },
+  "proc_032": {
+    "conversion_rate": 0.3333333333333333,
+    "score": 0.25,
+    "views": 3,
+    "bookings": 1,
+    "weight": 0.3889
+  },
+  "proc_036": {
+    "conversion_rate": 1.0,
+    "score": 0.3333333333333333,
+    "views": 1,
+    "bookings": 1,
+    "weight": 0.5926
+  },
+  "proc_019": {
+    "conversion_rate": 0.3333333333333333,
+    "score": 0.25,
+    "views": 3,
+    "bookings": 1,
+    "weight": 0.3889
+  },
+  "proc_003": {
+    "conversion_rate": 0.2,
+    "score": 0.2,
+    "views": 5,
+    "bookings": 1,
+    "weight": 0.2667
+  },
+  "proc_056": {
+    "conversion_rate": 0.5,
+    "score": 0.3333333333333333,
+    "views": 4,
+    "bookings": 2,
+    "weight": 0.5926
+  },
+  "proc_011": {
+    "conversion_rate": 0.0,
+    "score": 0.1111111111111111,
+    "views": 4,
+    "bookings": 0,
+    "weight": 0.0494
+  },
+  "proc_051": {
+    "conversion_rate": 0.3333333333333333,
+    "score": 0.25,
+    "views": 3,
+    "bookings": 1,
+    "weight": 0.3889
+  },
+  "proc_065": {
+    "conversion_rate": 0.3333333333333333,
+    "score": 0.25,
+    "views": 3,
+    "bookings": 1,
+    "weight": 0.3889
+  },
+  "proc_020": {
+    "conversion_rate": 0.3333333333333333,
+    "score": 0.25,
+    "views": 3,
+    "bookings": 1,
+    "weight": 0.3889
+  },
+  "proc_004": {
+    "conversion_rate": 0.6666666666666666,
+    "score": 0.375,
+    "views": 3,
+    "bookings": 2,
+    "weight": 0.6944
+  },
+  "proc_063": {
+    "conversion_rate": 0.5,
+    "score": 0.2857142857142857,
+    "views": 2,
+    "bookings": 1,
+    "weight": 0.4762
+  },
+  "proc_044": {
+    "conversion_rate": 0.75,
+    "score": 0.4444444444444444,
+    "views": 4,
+    "bookings": 3,
+    "weight": 0.8642
+  },
+  "proc_041": {
+    "conversion_rate": 0.0,
+    "score": 0.09090909090909091,
+    "views": 6,
+    "bookings": 0,
+    "weight": 0.0
+  },
+  "proc_002": {
+    "conversion_rate": 0.6,
+    "score": 0.4,
+    "views": 5,
+    "bookings": 3,
+    "weight": 0.7556
+  },
+  "proc_026": {
+    "conversion_rate": 0.0,
+    "score": 0.16666666666666666,
+    "views": 1,
+    "bookings": 0,
+    "weight": 0.1852
+  },
+  "proc_046": {
+    "conversion_rate": 0.4,
+    "score": 0.3,
+    "views": 5,
+    "bookings": 2,
+    "weight": 0.5111
+  },
+  "proc_031": {
+    "conversion_rate": 0.0,
+    "score": 0.14285714285714285,
+    "views": 2,
+    "bookings": 0,
+    "weight": 0.127
+  },
+  "proc_045": {
+    "conversion_rate": 1.0,
+    "score": 0.3333333333333333,
+    "views": 1,
+    "bookings": 1,
+    "weight": 0.5926
+  },
+  "proc_028": {
+    "conversion_rate": 0.3333333333333333,
+    "score": 0.25,
+    "views": 3,
+    "bookings": 1,
+    "weight": 0.3889
+  },
+  "proc_035": {
+    "conversion_rate": 0.6666666666666666,
+    "score": 0.45454545454545453,
+    "views": 6,
+    "bookings": 4,
+    "weight": 0.8889
+  },
+  "proc_047": {
+    "conversion_rate": 0.0,
+    "score": 0.14285714285714285,
+    "views": 2,
+    "bookings": 0,
+    "weight": 0.127
+  },
+  "proc_013": {
+    "conversion_rate": 0.0,
+    "score": 0.16666666666666666,
+    "views": 1,
+    "bookings": 0,
+    "weight": 0.1852
+  },
+  "proc_015": {
+    "conversion_rate": 0.0,
+    "score": 0.14285714285714285,
+    "views": 2,
+    "bookings": 0,
+    "weight": 0.127
+  },
+  "proc_062": {
+    "conversion_rate": 0.5,
+    "score": 0.3333333333333333,
+    "views": 4,
+    "bookings": 2,
+    "weight": 0.5926
+  },
+  "proc_025": {
+    "conversion_rate": 0.6666666666666666,
+    "score": 0.375,
+    "views": 3,
+    "bookings": 2,
+    "weight": 0.6944
+  },
+  "proc_058": {
+    "conversion_rate": 0.6666666666666666,
+    "score": 0.375,
+    "views": 3,
+    "bookings": 2,
+    "weight": 0.6944
+  },
+  "proc_039": {
+    "conversion_rate": 0.0,
+    "score": 0.125,
+    "views": 3,
+    "bookings": 0,
+    "weight": 0.0833
+  },
+  "proc_043": {
+    "conversion_rate": 0.0,
+    "score": 0.16666666666666666,
+    "views": 1,
+    "bookings": 0,
+    "weight": 0.1852
+  },
+  "proc_022": {
+    "conversion_rate": 0.0,
+    "score": 0.14285714285714285,
+    "views": 2,
+    "bookings": 0,
+    "weight": 0.127
+  },
+  "proc_037": {
+    "conversion_rate": 0.0,
+    "score": 0.16666666666666666,
+    "views": 1,
+    "bookings": 0,
+    "weight": 0.1852
+  }
+}

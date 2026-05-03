@@ -1,0 +1,977 @@
+- id: proc_001
+  name: Botox
+  category: neurotoxin
+  description: Botox is a neurotoxin treatment for forehead_lines, crow_feet, jaw_slimming
+  indications:
+  - forehead_lines
+  - crow_feet
+  - jaw_slimming
+  downtime: none
+  pain_level: low
+  duration: 4-6 months
+- id: proc_002
+  name: Dysport
+  category: neurotoxin
+  description: Dysport is a neurotoxin treatment for wrinkles, forehead_lines
+  indications:
+  - wrinkles
+  - forehead_lines
+  downtime: none
+  pain_level: low
+  duration: 4-6 months
+- id: proc_003
+  name: Xeomin
+  category: neurotoxin
+  description: Xeomin is a neurotoxin treatment for wrinkles, crow_feet
+  indications:
+  - wrinkles
+  - crow_feet
+  downtime: none
+  pain_level: low
+  duration: 4-6 months
+- id: proc_004
+  name: Nabota
+  category: neurotoxin
+  description: Nabota is a neurotoxin treatment for wrinkles, jaw_slimming
+  indications:
+  - wrinkles
+  - jaw_slimming
+  downtime: none
+  pain_level: low
+  duration: 4-6 months
+- id: proc_005
+  name: Neuronox
+  category: neurotoxin
+  description: Neuronox is a neurotoxin treatment for wrinkles, jaw_slimming
+  indications:
+  - wrinkles
+  - jaw_slimming
+  downtime: none
+  pain_level: low
+  duration: 4-6 months
+- id: proc_006
+  name: Juvederm Filler
+  category: filler
+  description: Juvederm Filler is a filler treatment for nasolabial_fold, lips, chin,
+    cheek_volume
+  indications:
+  - nasolabial_fold
+  - lips
+  - chin
+  - cheek_volume
+  downtime: low
+  pain_level: medium
+  duration: 9-12 months
+- id: proc_007
+  name: Restylane Filler
+  category: filler
+  description: Restylane Filler is a filler treatment for nasolabial_fold, lips, under_eye
+  indications:
+  - nasolabial_fold
+  - lips
+  - under_eye
+  downtime: low
+  pain_level: medium
+  duration: 9-12 months
+- id: proc_008
+  name: Rejuran Healer
+  category: skin_booster
+  description: Rejuran Healer is a skin_booster treatment for skin_repair, pores,
+    acne_scars
+  indications:
+  - skin_repair
+  - pores
+  - acne_scars
+  downtime: low
+  pain_level: medium
+  duration: 6 months
+- id: proc_009
+  name: Profhilo
+  category: skin_booster
+  description: Profhilo is a skin_booster treatment for skin_laxity, hydration
+  indications:
+  - skin_laxity
+  - hydration
+  downtime: low
+  pain_level: low
+  duration: 6 months
+- id: proc_010
+  name: Sculptra
+  category: collagen_stimulator
+  description: Sculptra is a collagen_stimulator treatment for volume_loss, skin_laxity
+  indications:
+  - volume_loss
+  - skin_laxity
+  downtime: low
+  pain_level: medium
+  duration: 24 months
+- id: proc_011
+  name: Radiesse
+  category: collagen_stimulator
+  description: Radiesse is a collagen_stimulator treatment for volume_loss, lifting
+  indications:
+  - volume_loss
+  - lifting
+  downtime: low
+  pain_level: medium
+  duration: 12 months
+- id: proc_012
+  name: Juvelook
+  category: collagen_stimulator
+  description: Juvelook is a collagen_stimulator treatment for acne_scars, skin_texture
+  indications:
+  - acne_scars
+  - skin_texture
+  downtime: low
+  pain_level: medium
+  duration: 12 months
+- id: proc_021
+  name: Ulthera
+  category: energy_lifting
+  description: Ulthera is a energy_lifting treatment for sagging, lifting
+  indications:
+  - sagging
+  - lifting
+  downtime: none
+  pain_level: medium
+  duration: 12 months
+- id: proc_022
+  name: HIFU
+  category: energy_lifting
+  description: HIFU is a energy_lifting treatment for lifting, jawline
+  indications:
+  - lifting
+  - jawline
+  downtime: none
+  pain_level: medium
+  duration: 6-12 months
+- id: proc_023
+  name: Thermage FLX
+  category: energy_lifting
+  description: Thermage FLX is a energy_lifting treatment for skin_tightening
+  indications:
+  - skin_tightening
+  downtime: none
+  pain_level: medium
+  duration: 12 months
+- id: proc_024
+  name: Morpheus8
+  category: rf_microneedling
+  description: Morpheus8 is a rf_microneedling treatment for acne_scars, pores, skin_tightening
+  indications:
+  - acne_scars
+  - pores
+  - skin_tightening
+  downtime: low
+  pain_level: medium
+  duration: 12 months
+- id: proc_025
+  name: Secret RF
+  category: rf_microneedling
+  description: Secret RF is a rf_microneedling treatment for acne_scars, pores
+  indications:
+  - acne_scars
+  - pores
+  downtime: low
+  pain_level: medium
+  duration: 12 months
+- id: proc_026
+  name: Microneedling
+  category: skin_rejuvenation
+  description: Microneedling is a skin_rejuvenation treatment for pores, acne_scars,
+    skin_texture
+  indications:
+  - pores
+  - acne_scars
+  - skin_texture
+  downtime: low
+  pain_level: medium
+  duration: varies
+- id: proc_028
+  name: Fractional CO2 Laser
+  category: laser
+  description: Fractional CO2 Laser is a laser treatment for acne_scars, wrinkles
+  indications:
+  - acne_scars
+  - wrinkles
+  downtime: medium
+  pain_level: medium
+  duration: long_term
+- id: proc_029
+  name: Pico Laser
+  category: laser
+  description: Pico Laser is a laser treatment for pigmentation, melasma, acne_scars
+  indications:
+  - pigmentation
+  - melasma
+  - acne_scars
+  downtime: none
+  pain_level: low
+  duration: varies
+- id: proc_030
+  name: Q-Switch Laser
+  category: laser
+  description: Q-Switch Laser is a laser treatment for melasma, pigmentation
+  indications:
+  - melasma
+  - pigmentation
+  downtime: none
+  pain_level: low
+  duration: varies
+- id: proc_031
+  name: IPL
+  category: laser
+  description: IPL is a laser treatment for dull_skin, redness
+  indications:
+  - dull_skin
+  - redness
+  downtime: none
+  pain_level: low
+  duration: varies
+- id: proc_041
+  name: HydraFacial
+  category: facial
+  description: HydraFacial is a facial treatment for dull_skin, pores, hydration
+  indications:
+  - dull_skin
+  - pores
+  - hydration
+  downtime: none
+  pain_level: none
+  duration: short_term
+- id: proc_042
+  name: Oxygen Facial
+  category: facial
+  description: Oxygen Facial is a facial treatment for dull_skin, hydration
+  indications:
+  - dull_skin
+  - hydration
+  downtime: none
+  pain_level: none
+  duration: short_term
+- id: proc_057
+  name: Subcision
+  category: scar_treatment
+  description: Subcision is a scar_treatment treatment for acne_scars
+  indications:
+  - acne_scars
+  downtime: medium
+  pain_level: medium
+  duration: long_term
+- id: proc_061
+  name: PDO Thread Lift
+  category: thread_lift
+  description: PDO Thread Lift is a thread_lift treatment for lifting, sagging
+  indications:
+  - lifting
+  - sagging
+  downtime: low
+  pain_level: medium
+  duration: 12 months
+- id: proc_062
+  name: Mint Thread Lift
+  category: thread_lift
+  description: Mint Thread Lift is a thread_lift treatment for lifting, jawline
+  indications:
+  - lifting
+  - jawline
+  downtime: low
+  pain_level: medium
+  duration: 12 months
+- id: proc_067
+  name: CoolSculpting
+  category: fat_reduction
+  description: CoolSculpting is a fat_reduction treatment for body_fat
+  indications:
+  - body_fat
+  downtime: none
+  pain_level: low
+  duration: permanent_fat_reduction
+- id: proc_069
+  name: Fat Dissolving Injection
+  category: fat_reduction
+  description: Fat Dissolving Injection is a fat_reduction treatment for double_chin,
+    localized_fat
+  indications:
+  - double_chin
+  - localized_fat
+  downtime: low
+  pain_level: medium
+  duration: varies
+- id: proc_070
+  name: Meso Fat Injection
+  category: fat_reduction
+  description: Meso Fat Injection is a fat_reduction treatment for localized_fat
+  indications:
+  - localized_fat
+  downtime: low
+  pain_level: medium
+  duration: varies
+- id: proc_073
+  name: Chemical Peel
+  category: skin_rejuvenation
+  description: Chemical Peel is a skin_rejuvenation treatment for dull_skin, acne,
+    pigmentation
+  indications:
+  - dull_skin
+  - acne
+  - pigmentation
+  downtime: low
+  pain_level: low
+  duration: varies
+- id: proc_077
+  name: PRP Hair Treatment
+  category: hair
+  description: PRP Hair Treatment is a hair treatment for hair_loss, hair_thinning
+  indications:
+  - hair_loss
+  - hair_thinning
+  downtime: none
+  pain_level: medium
+  duration: varies
+- id: proc_078
+  name: Hair Transplant FUE
+  category: hair
+  description: Hair Transplant FUE is a hair treatment for hair_loss
+  indications:
+  - hair_loss
+  downtime: medium
+  pain_level: medium
+  duration: permanent
+- id: proc_087
+  name: Thread Lift
+  category: thread_lift
+  description: Thread Lift is a thread_lift treatment for lifting, sagging
+  indications:
+  - lifting
+  - sagging
+  downtime: low
+  pain_level: medium
+  duration: 12 months
+- id: proc_013
+  name: Belotero Filler
+  category: filler
+  description: Belotero Filler is a filler treatment for fine_lines, tear_trough
+  indications:
+  - fine_lines
+  - tear_trough
+  downtime: low
+  pain_level: medium
+  duration: 9-12 months
+- id: proc_014
+  name: Yvoire Filler
+  category: filler
+  description: Yvoire Filler is a filler treatment for lips, chin, cheek
+  indications:
+  - lips
+  - chin
+  - cheek
+  downtime: low
+  pain_level: medium
+  duration: 9-12 months
+- id: proc_015
+  name: Neuramis Filler
+  category: filler
+  description: Neuramis Filler is a filler treatment for lips, nasolabial_fold
+  indications:
+  - lips
+  - nasolabial_fold
+  downtime: low
+  pain_level: medium
+  duration: 9-12 months
+- id: proc_016
+  name: Revolax Filler
+  category: filler
+  description: Revolax Filler is a filler treatment for lips, chin
+  indications:
+  - lips
+  - chin
+  downtime: low
+  pain_level: medium
+  duration: 9-12 months
+- id: proc_017
+  name: Teosyal Filler
+  category: filler
+  description: Teosyal Filler is a filler treatment for cheek_volume, nasolabial_fold
+  indications:
+  - cheek_volume
+  - nasolabial_fold
+  downtime: low
+  pain_level: medium
+  duration: 9-12 months
+- id: proc_018
+  name: Rejuran HB
+  category: skin_booster
+  description: Rejuran HB is a skin_booster treatment for hydration, skin_texture
+  indications:
+  - hydration
+  - skin_texture
+  downtime: low
+  pain_level: medium
+  duration: 6 months
+- id: proc_019
+  name: Skinvive
+  category: skin_booster
+  description: Skinvive is a skin_booster treatment for hydration, dull_skin
+  indications:
+  - hydration
+  - dull_skin
+  downtime: low
+  pain_level: low
+  duration: 6 months
+- id: proc_020
+  name: Filorga NCTF
+  category: skin_booster
+  description: Filorga NCTF is a skin_booster treatment for dull_skin, hydration
+  indications:
+  - dull_skin
+  - hydration
+  downtime: low
+  pain_level: low
+  duration: 4 months
+- id: proc_027
+  name: Lenisna
+  category: collagen_stimulator
+  description: Lenisna is a collagen_stimulator treatment for skin_texture
+  indications:
+  - skin_texture
+  downtime: low
+  pain_level: medium
+  duration: 12 months
+- id: proc_032
+  name: Oligio
+  category: energy_lifting
+  description: Oligio is a energy_lifting treatment for skin_tightening
+  indications:
+  - skin_tightening
+  downtime: none
+  pain_level: medium
+  duration: 12 months
+- id: proc_033
+  name: Sofwave
+  category: energy_lifting
+  description: Sofwave is a energy_lifting treatment for lifting
+  indications:
+  - lifting
+  downtime: none
+  pain_level: medium
+  duration: 12 months
+- id: proc_034
+  name: Doublo Gold
+  category: energy_lifting
+  description: Doublo Gold is a energy_lifting treatment for lifting
+  indications:
+  - lifting
+  downtime: none
+  pain_level: medium
+  duration: 6 months
+- id: proc_035
+  name: Liftera
+  category: energy_lifting
+  description: Liftera is a energy_lifting treatment for lifting
+  indications:
+  - lifting
+  downtime: none
+  pain_level: medium
+  duration: 6 months
+- id: proc_036
+  name: Potenza RF
+  category: rf_microneedling
+  description: Potenza RF is a rf_microneedling treatment for pores, acne_scars
+  indications:
+  - pores
+  - acne_scars
+  downtime: low
+  pain_level: medium
+  duration: 12 months
+- id: proc_037
+  name: Sylfirm X
+  category: rf_microneedling
+  description: Sylfirm X is a rf_microneedling treatment for melasma, redness
+  indications:
+  - melasma
+  - redness
+  downtime: low
+  pain_level: medium
+  duration: 12 months
+- id: proc_038
+  name: PicoSure
+  category: laser
+  description: PicoSure is a laser treatment for pigmentation
+  indications:
+  - pigmentation
+  downtime: none
+  pain_level: low
+  duration: varies
+- id: proc_039
+  name: PicoWay
+  category: laser
+  description: PicoWay is a laser treatment for pigmentation
+  indications:
+  - pigmentation
+  downtime: none
+  pain_level: low
+  duration: varies
+- id: proc_040
+  name: Fraxel Laser
+  category: laser
+  description: Fraxel Laser is a laser treatment for skin_texture, pores
+  indications:
+  - skin_texture
+  - pores
+  downtime: medium
+  pain_level: medium
+  duration: long_term
+- id: proc_043
+  name: Nd:YAG Laser
+  category: laser
+  description: Nd:YAG Laser is a laser treatment for vascular_lesions, hair_removal
+  indications:
+  - vascular_lesions
+  - hair_removal
+  downtime: none
+  pain_level: low
+  duration: varies
+- id: proc_044
+  name: Vbeam Laser
+  category: laser
+  description: Vbeam Laser is a laser treatment for redness, rosacea
+  indications:
+  - redness
+  - rosacea
+  downtime: low
+  pain_level: low
+  duration: varies
+- id: proc_045
+  name: Clear Brilliant Laser
+  category: laser
+  description: Clear Brilliant Laser is a laser treatment for pores, dull_skin
+  indications:
+  - pores
+  - dull_skin
+  downtime: low
+  pain_level: low
+  duration: varies
+- id: proc_046
+  name: Acne Laser Treatment
+  category: acne_treatment
+  description: Acne Laser Treatment is a acne_treatment treatment for acne, inflammation
+  indications:
+  - acne
+  - inflammation
+  downtime: none
+  pain_level: low
+  duration: varies
+- id: proc_047
+  name: Acne Injection
+  category: acne_treatment
+  description: Acne Injection is a acne_treatment treatment for inflamed_acne
+  indications:
+  - inflamed_acne
+  downtime: none
+  pain_level: low
+  duration: short_term
+- id: proc_048
+  name: TCA Cross
+  category: scar_treatment
+  description: TCA Cross is a scar_treatment treatment for ice_pick_scars
+  indications:
+  - ice_pick_scars
+  downtime: medium
+  pain_level: medium
+  duration: long_term
+- id: proc_049
+  name: PRP Skin Rejuvenation
+  category: regenerative
+  description: PRP Skin Rejuvenation is a regenerative treatment for skin_rejuvenation,
+    acne_scars
+  indications:
+  - skin_rejuvenation
+  - acne_scars
+  downtime: low
+  pain_level: medium
+  duration: varies
+- id: proc_050
+  name: Cog Thread Lift
+  category: thread_lift
+  description: Cog Thread Lift is a thread_lift treatment for lifting, sagging
+  indications:
+  - lifting
+  - sagging
+  downtime: low
+  pain_level: medium
+  duration: 12 months
+- id: proc_051
+  name: Silhouette Soft Thread
+  category: thread_lift
+  description: Silhouette Soft Thread is a thread_lift treatment for lifting
+  indications:
+  - lifting
+  downtime: low
+  pain_level: medium
+  duration: 18 months
+- id: proc_052
+  name: Fox Eye Thread Lift
+  category: thread_lift
+  description: Fox Eye Thread Lift is a thread_lift treatment for eyebrow_lift
+  indications:
+  - eyebrow_lift
+  downtime: low
+  pain_level: medium
+  duration: 12 months
+- id: proc_053
+  name: Nose Thread Lift
+  category: thread_lift
+  description: Nose Thread Lift is a thread_lift treatment for nose_bridge
+  indications:
+  - nose_bridge
+  downtime: low
+  pain_level: medium
+  duration: 12 months
+- id: proc_054
+  name: Body HIFU Fat Reduction
+  category: fat_reduction
+  description: Body HIFU Fat Reduction is a fat_reduction treatment for body_fat
+  indications:
+  - body_fat
+  downtime: none
+  pain_level: medium
+  duration: varies
+- id: proc_055
+  name: Kybella
+  category: fat_reduction
+  description: Kybella is a fat_reduction treatment for double_chin
+  indications:
+  - double_chin
+  downtime: low
+  pain_level: medium
+  duration: permanent_fat_reduction
+- id: proc_056
+  name: Liposonix
+  category: fat_reduction
+  description: Liposonix is a fat_reduction treatment for body_fat
+  indications:
+  - body_fat
+  downtime: none
+  pain_level: medium
+  duration: varies
+- id: proc_058
+  name: OxyGeneo Facial
+  category: facial
+  description: OxyGeneo Facial is a facial treatment for dull_skin, hydration
+  indications:
+  - dull_skin
+  - hydration
+  downtime: none
+  pain_level: none
+  duration: short_term
+- id: proc_059
+  name: Carbon Laser Facial
+  category: facial
+  description: Carbon Laser Facial is a facial treatment for oily_skin, pores
+  indications:
+  - oily_skin
+  - pores
+  downtime: none
+  pain_level: low
+  duration: short_term
+- id: proc_060
+  name: PRP Hair Treatment
+  category: hair
+  description: PRP Hair Treatment is a hair treatment for hair_loss, hair_thinning
+  indications:
+  - hair_loss
+  - hair_thinning
+  downtime: none
+  pain_level: medium
+  duration: varies
+- id: proc_063
+  name: Hair Laser Therapy
+  category: hair
+  description: Hair Laser Therapy is a hair treatment for hair_thinning
+  indications:
+  - hair_thinning
+  downtime: none
+  pain_level: none
+  duration: varies
+- id: proc_064
+  name: Exosome Hair Therapy
+  category: hair
+  description: Exosome Hair Therapy is a hair treatment for hair_loss
+  indications:
+  - hair_loss
+  downtime: low
+  pain_level: medium
+  duration: varies
+- id: proc_065
+  name: Melasma Laser Treatment
+  category: pigmentation
+  description: Melasma Laser Treatment is a pigmentation treatment for melasma
+  indications:
+  - melasma
+  downtime: low
+  pain_level: low
+  duration: varies
+- id: proc_066
+  name: Skin Whitening Injection
+  category: skin_rejuvenation
+  description: Skin Whitening Injection is a skin_rejuvenation treatment for dull_skin
+  indications:
+  - dull_skin
+  downtime: none
+  pain_level: low
+  duration: varies
+- id: proc_068
+  name: Glutathione Injection
+  category: skin_rejuvenation
+  description: Glutathione Injection is a skin_rejuvenation treatment for dull_skin
+  indications:
+  - dull_skin
+  downtime: none
+  pain_level: low
+  duration: varies
+- id: proc_071
+  name: Vitamin Drip Therapy
+  category: skin_rejuvenation
+  description: Vitamin Drip Therapy is a skin_rejuvenation treatment for dull_skin,
+    fatigue
+  indications:
+  - dull_skin
+  - fatigue
+  downtime: none
+  pain_level: low
+  duration: short_term
+- id: proc_072
+  name: Exosome Skin Therapy
+  category: regenerative
+  description: Exosome Skin Therapy is a regenerative treatment for skin_repair, skin_rejuvenation
+  indications:
+  - skin_repair
+  - skin_rejuvenation
+  downtime: low
+  pain_level: medium
+  duration: varies
+- id: proc_074
+  name: Body RF Skin Tightening
+  category: energy_lifting
+  description: Body RF Skin Tightening is a energy_lifting treatment for skin_tightening
+  indications:
+  - skin_tightening
+  downtime: none
+  pain_level: medium
+  duration: varies
+- id: proc_075
+  name: Stretch Mark Laser
+  category: scar_treatment
+  description: Stretch Mark Laser is a scar_treatment treatment for stretch_marks
+  indications:
+  - stretch_marks
+  downtime: low
+  pain_level: medium
+  duration: varies
+- id: proc_076
+  name: Tattoo Removal Laser
+  category: laser
+  description: Tattoo Removal Laser is a laser treatment for tattoo_removal
+  indications:
+  - tattoo_removal
+  downtime: low
+  pain_level: medium
+  duration: varies
+- id: proc_079
+  name: Mole Removal Laser
+  category: laser
+  description: Mole Removal Laser is a laser treatment for mole_removal
+  indications:
+  - mole_removal
+  downtime: low
+  pain_level: medium
+  duration: permanent
+- id: proc_080
+  name: Skin Tag Removal
+  category: dermatology
+  description: Skin Tag Removal is a dermatology treatment for skin_tags
+  indications:
+  - skin_tags
+  downtime: low
+  pain_level: low
+  duration: permanent
+- id: proc_081
+  name: Wart Removal
+  category: dermatology
+  description: Wart Removal is a dermatology treatment for warts
+  indications:
+  - warts
+  downtime: low
+  pain_level: low
+  duration: permanent
+- id: proc_082
+  name: Facial Lymphatic Massage
+  category: facial
+  description: Facial Lymphatic Massage is a facial treatment for puffiness
+  indications:
+  - puffiness
+  downtime: none
+  pain_level: none
+  duration: short_term
+- id: proc_083
+  name: Stem Cell Skin Therapy
+  category: regenerative
+  description: Stem Cell Skin Therapy is a regenerative treatment for skin_rejuvenation
+  indications:
+  - skin_rejuvenation
+  downtime: low
+  pain_level: medium
+  duration: varies
+- id: proc_084
+  name: Aquashine Skin Booster
+  category: skin_booster
+  description: Aquashine Skin Booster is a skin_booster treatment for hydration, wrinkles
+  indications:
+  - hydration
+  - wrinkles
+  downtime: low
+  pain_level: low
+  duration: 4 months
+- id: proc_085
+  name: AestheFill
+  category: collagen_stimulator
+  description: AestheFill is a collagen_stimulator treatment for skin_rejuvenation
+  indications:
+  - skin_rejuvenation
+  downtime: low
+  pain_level: medium
+  duration: 12 months
+- id: proc_086
+  name: Skin Booster Mesotherapy
+  category: skin_booster
+  description: Skin Booster Mesotherapy is a skin_booster treatment for hydration,
+    skin_texture
+  indications:
+  - hydration
+  - skin_texture
+  downtime: low
+  pain_level: medium
+  duration: varies
+- id: proc_088
+  name: Scar Laser Treatment
+  category: scar_treatment
+  description: Scar Laser Treatment is a scar_treatment treatment for surgical_scars
+  indications:
+  - surgical_scars
+  downtime: low
+  pain_level: medium
+  duration: varies
+- id: proc_089
+  name: Erbium Laser
+  category: laser
+  description: Erbium Laser is a laser treatment for skin_resurfacing
+  indications:
+  - skin_resurfacing
+  downtime: medium
+  pain_level: medium
+  duration: long_term
+- id: proc_090
+  name: Fractional Laser
+  category: laser
+  description: Fractional Laser is a laser treatment for acne_scars, skin_texture
+  indications:
+  - acne_scars
+  - skin_texture
+  downtime: medium
+  pain_level: medium
+  duration: long_term
+- id: proc_091
+  name: Hair Transplant DHI
+  category: hair
+  description: Hair Transplant DHI is a hair treatment for hair_loss
+  indications:
+  - hair_loss
+  downtime: medium
+  pain_level: medium
+  duration: permanent
+- id: proc_092
+  name: Liposuction
+  category: fat_reduction
+  description: Liposuction is a fat_reduction treatment for body_fat
+  indications:
+  - body_fat
+  downtime: high
+  pain_level: high
+  duration: permanent
+- id: proc_093
+  name: Facelift Surgery
+  category: surgery
+  description: Facelift Surgery is a surgery treatment for severe_sagging
+  indications:
+  - severe_sagging
+  downtime: high
+  pain_level: high
+  duration: permanent
+- id: proc_094
+  name: Eyelid Surgery
+  category: surgery
+  description: Eyelid Surgery is a surgery treatment for droopy_eyelids
+  indications:
+  - droopy_eyelids
+  downtime: high
+  pain_level: high
+  duration: permanent
+- id: proc_095
+  name: Chin Implant
+  category: surgery
+  description: Chin Implant is a surgery treatment for chin_augmentation
+  indications:
+  - chin_augmentation
+  downtime: high
+  pain_level: high
+  duration: permanent
+- id: proc_096
+  name: Nose Surgery
+  category: surgery
+  description: Nose Surgery is a surgery treatment for nose_reshaping
+  indications:
+  - nose_reshaping
+  downtime: high
+  pain_level: high
+  duration: permanent
+- id: proc_097
+  name: Dermabrasion
+  category: skin_rejuvenation
+  description: Dermabrasion is a skin_rejuvenation treatment for acne_scars, skin_texture
+  indications:
+  - acne_scars
+  - skin_texture
+  downtime: medium
+  pain_level: medium
+  duration: varies
+- id: proc_098
+  name: Microdermabrasion
+  category: skin_rejuvenation
+  description: Microdermabrasion is a skin_rejuvenation treatment for dull_skin, pores
+  indications:
+  - dull_skin
+  - pores
+  downtime: none
+  pain_level: low
+  duration: varies
+- id: proc_099
+  name: Stem Cell Hair Therapy
+  category: hair
+  description: Stem Cell Hair Therapy is a hair treatment for hair_loss
+  indications:
+  - hair_loss
+  downtime: low
+  pain_level: medium
+  duration: varies
+- id: proc_100
+  name: Exosome Facial Treatment
+  category: regenerative
+  description: Exosome Facial Treatment is a regenerative treatment for skin_repair,
+    anti_aging
+  indications:
+  - skin_repair
+  - anti_aging
+  downtime: low
+  pain_level: low
+  duration: varies

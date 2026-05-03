@@ -1,0 +1,6 @@
+dataset_path: ./dataset
+log_path: ./logs
+default_stage: awareness
+default_intent: consultation
+max_recommendations: 3
+max_context_items: 5

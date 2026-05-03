@@ -58,6 +58,7 @@ if (!REDIS_URL) {
 }
 
 const connection = new Redis(REDIS_URL, { maxRetriesPerRequest: null });
+let shuttingDown = false;
 
 async function processJob(job: { id: string; data: ChatOrchestratorInput }): Promise<ChatOrchestratorOutput> {
   const orgId = job.data.org_id ?? "";
@@ -144,3 +145,19 @@ worker.on("failed", (job, err) => {
 });
 
 console.log("[Chat LLM Worker] Started, queue:", QUEUE_NAME);
+
+async function shutdown(signal: string) {
+  if (shuttingDown) return;
+  shuttingDown = true;
+  console.log(`[Chat LLM Worker] ${signal} received, shutting down...`);
+  await worker.close().catch(() => {});
+  await connection.quit().catch(() => {});
+  process.exit(0);
+}
+
+process.on("SIGINT", () => {
+  void shutdown("SIGINT");
+});
+process.on("SIGTERM", () => {
+  void shutdown("SIGTERM");
+});

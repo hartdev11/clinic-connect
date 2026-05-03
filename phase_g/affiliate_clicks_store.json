@@ -1,0 +1,22 @@
+{
+  "clk_377053703d": {
+    "click_id": "clk_377053703d",
+    "click_session_id": "cs_6710205db4",
+    "affiliate_id": "aff_13eaca6a35",
+    "referral_code": "PGAFD7DEE0",
+    "campaign_id": null,
+    "tenant_id": null,
+    "source_platform": "instagram",
+    "source_type": null,
+    "landing_path": "/clinic-register",
+    "visitor_id": "v_001",
+    "ip_address": null,
+    "user_agent": null,
+    "is_active_link": true,
+    "linked_lead_id": null,
+    "linked_booking_id": null,
+    "linked_revenue": 0.0,
+    "attribution_model": "last_touch",
+    "timestamp": "2026-03-20T10:00:00Z"
+  }
+}

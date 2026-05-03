@@ -12,10 +12,16 @@ import { getEffectiveUser, requireRole } from "@/lib/rbac";
 
 export const dynamic = "force-dynamic";
 
-const VALID_EVENTS = ["booking.created", "handoff.created", "lead.hot"] as const;
+const VALID_EVENTS = [
+  "booking.created",
+  "booking.confirmed",
+  "booking.rejected",
+  "handoff.created",
+  "lead.hot",
+] as const;
 
 /** GET — รายการ webhook configs ของ org */
-export async function GET(request: NextRequest) {
+export async function GET() {
   const session = await getSessionFromCookies();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {

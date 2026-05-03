@@ -146,7 +146,6 @@ export async function createClinicKnowledge(
   data: ClinicKnowledgeCreate,
   userId?: string | null
 ): Promise<string> {
-  const { FieldValue } = await import("firebase-admin/firestore");
   const now = new Date().toISOString();
   const doc = await db.collection(COL_CLINIC).add({
     org_id: data.org_id,

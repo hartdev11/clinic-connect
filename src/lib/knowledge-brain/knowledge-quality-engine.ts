@@ -38,8 +38,7 @@ function gradeFromScore(score: number): KnowledgeQualityGrade {
 
 /** Field completeness — ตรวจว่ามีค่าทุก field ที่จำเป็น */
 function scoreFieldCompleteness(
-  global: GlobalKnowledge,
-  clinic: ClinicKnowledge | null
+  global: GlobalKnowledge
 ): { score: number; warnings: string[] } {
   const warnings: string[] = [];
   let filled = 0;
@@ -111,8 +110,7 @@ function scoreClarity(global: GlobalKnowledge): { score: number; warnings: strin
 
 /** Policy compliance — ตรงกับกฎกลาง */
 function scorePolicyCompliance(
-  text: string,
-  _global: GlobalKnowledge
+  text: string
 ): { score: number; warnings: string[] } {
   const warnings: string[] = [];
   const prohibited = [/วินิจฉัยว่า|diagnos.*as|เป็นโรค\s+แน่นอน/i, /รับประกันผล|100%\s*ปลอดภัย/i];
@@ -134,12 +132,12 @@ export function computeKnowledgeQualityScore(
   opts?: { similarityScore?: number }
 ): KnowledgeQualityResult {
   const allWarnings: string[] = [];
-  const fc = scoreFieldCompleteness(global, clinic);
+  const fc = scoreFieldCompleteness(global);
   const rc = scoreRisksContraindications(global);
   const ld = scoreLengthDepth(global);
   const cl = scoreClarity(global);
   const text = [ctx.service_name, ctx.category, global.description].join(" ");
-  const pc = scorePolicyCompliance(text, global);
+  const pc = scorePolicyCompliance(text);
 
   allWarnings.push(...fc.warnings, ...rc.warnings, ...ld.warnings, ...cl.warnings, ...pc.warnings);
 
@@ -202,6 +200,7 @@ export function shouldLearn(
   input: ShouldLearnInput,
   opts?: { checkDuplicate?: (text: string) => Promise<number>; checkPriceConflict?: (service: string, price: number) => Promise<number | null> }
 ): ShouldLearnResult {
+  void opts;
   const { item, conversationQuality, existingSimilarity, existingPrice, sourceAgeDays } = input;
 
   if (item.confidence < 0.5) {

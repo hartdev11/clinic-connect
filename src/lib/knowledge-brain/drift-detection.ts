@@ -5,7 +5,6 @@
 import { db } from "@/lib/firebase-admin";
 
 const COL_CLINIC = "clinic_knowledge";
-const COL_GLOBAL = "global_knowledge";
 const DEFAULT_EXPIRY_DAYS = 180; // 6 months
 const STALE_MONTHS = 6;
 

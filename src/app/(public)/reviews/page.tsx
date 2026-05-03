@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 
 type Review = {
   id: string;
@@ -11,10 +12,38 @@ type Review = {
   createdAt?: string;
 };
 
-const reviews: Review[] = [];
-
 export default function ReviewsPage() {
-  const loading = false;
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    void (async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch("/api/public/reviews", { credentials: "include" });
+        const data = (await res.json().catch(() => ({}))) as { items?: Review[]; error?: string };
+        if (!alive) return;
+        if (!res.ok) {
+          setReviews([]);
+          setError(data.error ?? "โหลดข้อมูลรีวิวไม่สำเร็จ");
+          return;
+        }
+        setReviews(Array.isArray(data.items) ? data.items : []);
+      } catch {
+        if (!alive) return;
+        setReviews([]);
+        setError("โหลดข้อมูลรีวิวไม่สำเร็จ");
+      } finally {
+        if (alive) setLoading(false);
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-cream-100">
@@ -42,6 +71,15 @@ export default function ReviewsPage() {
       </div>
 
       <div className="max-w-4xl mx-auto px-6 py-12">
+        {error && !loading && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="luxury-card p-5 mb-6 border border-red-200 bg-red-50/60"
+          >
+            <p className="font-body text-sm text-red-700">{error}</p>
+          </motion.div>
+        )}
         {loading ? (
           <div className="space-y-6">
             {[1, 2, 3].map((i) => (

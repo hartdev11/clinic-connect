@@ -65,7 +65,6 @@ export async function getLLMMetricsAdvanced(orgId?: string): Promise<{
   global: LLMMetricsSummary | null;
 }> {
   const hour = getHourKey();
-  const prefix = orgId ? `${orgId}_` : "";
   const snap = await db
     .collection(COLLECTION)
     .where("hour", "==", hour)

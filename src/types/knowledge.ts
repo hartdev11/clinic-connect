@@ -72,6 +72,7 @@ export type KnowledgeTopicCategory = "service" | "price" | "faq";
 
 /** Version status for async embedding flow */
 export type KnowledgeVersionStatus = "draft" | "updating" | "active" | "archived" | "failed";
+export type KnowledgeIndexingStatus = "queued" | "processing" | "indexed" | "failed" | "retrying";
 
 export interface KnowledgeVersionPayload {
   topic: string;
@@ -93,6 +94,13 @@ export interface KnowledgeVersion {
   createdBy: string;
   createdAt: string;
   status: KnowledgeVersionStatus;
+  indexingStatus?: KnowledgeIndexingStatus;
+  indexingError?: string | null;
+  indexedAt?: string | null;
+  /** P2-5: auto-retry count for failed indexing (Firebase `indexing_auto_retry_count`) */
+  indexingAutoRetryCount?: number;
+  /** P2-5: true when max auto-retries exhausted — manual retry required */
+  indexingAutoRetryExhausted?: boolean;
   dataClassification: typeof KNOWLEDGE_DATA_CLASSIFICATION;
 }
 
@@ -118,9 +126,14 @@ export interface KnowledgeTopicListItem {
   lastUpdated: string;
   updatedBy: string;
   status: KnowledgeVersionStatus;
+  indexingStatus?: KnowledgeIndexingStatus;
+  indexingError?: string | null;
+  lastIndexedAt?: string | null;
   activeVersionId: string | null;
   /** Computed at read: fresh (<90d), aging (90–120d), stale (>120d) */
   staleStatus?: KnowledgeStaleStatus;
+  /** P2-5: show badge when auto-retries exhausted */
+  indexingAutoRetryExhausted?: boolean;
 }
 
 export type KnowledgeChangeAction = "created" | "updated" | "rolled_back" | "deleted";

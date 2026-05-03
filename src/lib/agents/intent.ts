@@ -22,6 +22,8 @@ const SYSTEM_PROMPT = `คุณคือ Intent & Context Analyzer
 
 intent ที่อนุญาต: greeting | promotion_inquiry | price_inquiry | service_information | comparison_inquiry | hesitation | booking_request | availability_check | medical_question | aftercare_question | conversation_memory_check | complaint | general_chat | other
 
+สำคัญ: ถ้าลูกค้าถามว่ามีโปรอะไรบ้าง / โปรแบบไหนบ้าง / รายการโปร / โปรทั้งหมด / ราคาโปร → ใช้ intent = promotion_inquiry (ห้ามใช้ general_chat)
+
 service ที่อนุญาต: filler | botox | rejuran | laser | skin | lifting | fat | hair | surgery | tattoo | consultation | other
 
 area ที่อนุญาต: face | lip | chin | nose | jaw | cheek | under_eye | forehead | brow | eye | skin | body | hair | unknown

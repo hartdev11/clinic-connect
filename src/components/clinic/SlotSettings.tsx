@@ -6,12 +6,13 @@
  * - ตารางแพทย์ (doctor_schedules) + บริการที่ทำได้ (procedures)
  * - วันปิด (blackout_dates)
  */
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { RequireRole } from "@/components/rbac/RequireRole";
 import useSWR from "swr";
 import type { DayOfWeek } from "@/types/clinic";
+import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline";
 
 const fetcher = (url: string) =>
   fetch(url, { credentials: "include" }).then((r) => (r.ok ? r.json() : null));
@@ -200,7 +201,7 @@ function BranchHoursForm({
         onClick={onToggle}
       >
         <span>{branchName}</span>
-        <span className="text-mauve-400">{expanded ? "▲" : "▼"}</span>
+        {expanded ? <ChevronUpIcon className="h-4 w-4 text-mauve-400" /> : <ChevronDownIcon className="h-4 w-4 text-mauve-400" />}
       </button>
       {expanded && (
         <div className="p-4 border-t border-cream-200 space-y-4 bg-cream-50/50">

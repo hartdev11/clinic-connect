@@ -4,7 +4,7 @@
  */
 import { useMemo } from "react";
 import { useClinicContext } from "@/contexts/ClinicContext";
-import type { UserRole, BranchRole } from "@/types/organization";
+import type { UserRole } from "@/types/organization";
 
 /**
  * Hook: ตรวจว่า user มี role ที่อนุญาต (org-level)

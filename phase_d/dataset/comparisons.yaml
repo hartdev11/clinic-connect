@@ -1,0 +1,3000 @@
+- id: comp_001
+  items:
+  - proc_001
+  - proc_006
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: dynamic_wrinkles
+  best_for_b: volume_loss
+- id: comp_002
+  items:
+  - proc_001
+  - proc_021
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: forehead_lines
+  best_for_b: skin_sagging
+- id: comp_003
+  items:
+  - proc_001
+  - proc_023
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: wrinkle_relaxation
+  best_for_b: skin_tightening
+- id: comp_004
+  items:
+  - proc_006
+  - proc_010
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: immediate_volume
+  best_for_b: gradual_collagen
+- id: comp_005
+  items:
+  - proc_006
+  - proc_011
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: filler_volume
+  best_for_b: collagen_stimulation
+- id: comp_006
+  items:
+  - proc_021
+  - proc_023
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: ultrasound_lifting
+  best_for_b: rf_tightening
+- id: comp_007
+  items:
+  - proc_021
+  - proc_061
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: non_surgical_lift
+  best_for_b: thread_lift
+- id: comp_008
+  items:
+  - proc_021
+  - proc_093
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: non_surgical
+  best_for_b: surgical_facelift
+- id: comp_009
+  items:
+  - proc_023
+  - proc_024
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: rf_tightening
+  best_for_b: rf_microneedling
+- id: comp_010
+  items:
+  - proc_024
+  - proc_025
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: stronger_rf
+  best_for_b: gentler_rf
+- id: comp_011
+  items:
+  - proc_026
+  - proc_028
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: mild_scars
+  best_for_b: deep_scars
+- id: comp_012
+  items:
+  - proc_028
+  - proc_057
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: rolling_scars
+  best_for_b: tethered_scars
+- id: comp_013
+  items:
+  - proc_029
+  - proc_030
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: melasma
+  best_for_b: freckles
+- id: comp_014
+  items:
+  - proc_029
+  - proc_038
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: pico_laser
+  best_for_b: picosure
+- id: comp_015
+  items:
+  - proc_030
+  - proc_028
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: pigmentation
+  best_for_b: resurfacing
+- id: comp_016
+  items:
+  - proc_008
+  - proc_009
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: skin_repair
+  best_for_b: hydration
+- id: comp_017
+  items:
+  - proc_008
+  - proc_084
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: collagen_stimulation
+  best_for_b: hydration
+- id: comp_018
+  items:
+  - proc_010
+  - proc_011
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: long_term_collagen
+  best_for_b: medium_term
+- id: comp_019
+  items:
+  - proc_010
+  - proc_025
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: sculptra
+  best_for_b: ellanse
+- id: comp_020
+  items:
+  - proc_067
+  - proc_069
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: device_fat
+  best_for_b: injection_fat
+- id: comp_021
+  items:
+  - proc_067
+  - proc_092
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: non_surgical
+  best_for_b: surgical_lipo
+- id: comp_022
+  items:
+  - proc_069
+  - proc_055
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: fat_dissolve
+  best_for_b: kybella
+- id: comp_023
+  items:
+  - proc_077
+  - proc_060
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: prp_hair
+  best_for_b: prp_skin
+- id: comp_024
+  items:
+  - proc_078
+  - proc_091
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: fue_transplant
+  best_for_b: dhi_transplant
+- id: comp_025
+  items:
+  - proc_078
+  - proc_077
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: permanent_hair
+  best_for_b: regenerative
+- id: comp_026
+  items:
+  - proc_041
+  - proc_058
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: hydrafacial
+  best_for_b: oxygeneo
+- id: comp_027
+  items:
+  - proc_041
+  - proc_059
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: hydrafacial
+  best_for_b: carbon_laser
+- id: comp_028
+  items:
+  - proc_042
+  - proc_041
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: oxygen_facial
+  best_for_b: hydrafacial
+- id: comp_029
+  items:
+  - proc_073
+  - proc_028
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: chemical_peel
+  best_for_b: fractional_laser
+- id: comp_030
+  items:
+  - proc_061
+  - proc_050
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: pdo_thread
+  best_for_b: cog_thread
+- id: comp_031
+  items:
+  - proc_001
+  - proc_006
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: dynamic_wrinkles
+  best_for_b: volume_loss
+- id: comp_032
+  items:
+  - proc_001
+  - proc_021
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: forehead_lines
+  best_for_b: skin_sagging
+- id: comp_033
+  items:
+  - proc_001
+  - proc_023
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: wrinkle_relaxation
+  best_for_b: skin_tightening
+- id: comp_034
+  items:
+  - proc_006
+  - proc_010
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: immediate_volume
+  best_for_b: gradual_collagen
+- id: comp_035
+  items:
+  - proc_006
+  - proc_011
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: filler_volume
+  best_for_b: collagen_stimulation
+- id: comp_036
+  items:
+  - proc_021
+  - proc_023
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: ultrasound_lifting
+  best_for_b: rf_tightening
+- id: comp_037
+  items:
+  - proc_021
+  - proc_061
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: non_surgical_lift
+  best_for_b: thread_lift
+- id: comp_038
+  items:
+  - proc_021
+  - proc_093
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: non_surgical
+  best_for_b: surgical_facelift
+- id: comp_039
+  items:
+  - proc_023
+  - proc_024
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: rf_tightening
+  best_for_b: rf_microneedling
+- id: comp_040
+  items:
+  - proc_024
+  - proc_025
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: stronger_rf
+  best_for_b: gentler_rf
+- id: comp_041
+  items:
+  - proc_026
+  - proc_028
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: mild_scars
+  best_for_b: deep_scars
+- id: comp_042
+  items:
+  - proc_028
+  - proc_057
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: rolling_scars
+  best_for_b: tethered_scars
+- id: comp_043
+  items:
+  - proc_029
+  - proc_030
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: melasma
+  best_for_b: freckles
+- id: comp_044
+  items:
+  - proc_029
+  - proc_038
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: pico_laser
+  best_for_b: picosure
+- id: comp_045
+  items:
+  - proc_030
+  - proc_028
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: pigmentation
+  best_for_b: resurfacing
+- id: comp_046
+  items:
+  - proc_008
+  - proc_009
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: skin_repair
+  best_for_b: hydration
+- id: comp_047
+  items:
+  - proc_008
+  - proc_084
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: collagen_stimulation
+  best_for_b: hydration
+- id: comp_048
+  items:
+  - proc_010
+  - proc_011
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: long_term_collagen
+  best_for_b: medium_term
+- id: comp_049
+  items:
+  - proc_010
+  - proc_025
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: sculptra
+  best_for_b: ellanse
+- id: comp_050
+  items:
+  - proc_067
+  - proc_069
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: device_fat
+  best_for_b: injection_fat
+- id: comp_051
+  items:
+  - proc_067
+  - proc_092
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: non_surgical
+  best_for_b: surgical_lipo
+- id: comp_052
+  items:
+  - proc_069
+  - proc_055
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: fat_dissolve
+  best_for_b: kybella
+- id: comp_053
+  items:
+  - proc_077
+  - proc_060
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: prp_hair
+  best_for_b: prp_skin
+- id: comp_054
+  items:
+  - proc_078
+  - proc_091
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: fue_transplant
+  best_for_b: dhi_transplant
+- id: comp_055
+  items:
+  - proc_078
+  - proc_077
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: permanent_hair
+  best_for_b: regenerative
+- id: comp_056
+  items:
+  - proc_041
+  - proc_058
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: hydrafacial
+  best_for_b: oxygeneo
+- id: comp_057
+  items:
+  - proc_041
+  - proc_059
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: hydrafacial
+  best_for_b: carbon_laser
+- id: comp_058
+  items:
+  - proc_042
+  - proc_041
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: oxygen_facial
+  best_for_b: hydrafacial
+- id: comp_059
+  items:
+  - proc_073
+  - proc_028
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: chemical_peel
+  best_for_b: fractional_laser
+- id: comp_060
+  items:
+  - proc_061
+  - proc_050
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: pdo_thread
+  best_for_b: cog_thread
+- id: comp_061
+  items:
+  - proc_001
+  - proc_006
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: dynamic_wrinkles
+  best_for_b: volume_loss
+- id: comp_062
+  items:
+  - proc_001
+  - proc_021
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: forehead_lines
+  best_for_b: skin_sagging
+- id: comp_063
+  items:
+  - proc_001
+  - proc_023
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: wrinkle_relaxation
+  best_for_b: skin_tightening
+- id: comp_064
+  items:
+  - proc_006
+  - proc_010
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: immediate_volume
+  best_for_b: gradual_collagen
+- id: comp_065
+  items:
+  - proc_006
+  - proc_011
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: filler_volume
+  best_for_b: collagen_stimulation
+- id: comp_066
+  items:
+  - proc_021
+  - proc_023
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: ultrasound_lifting
+  best_for_b: rf_tightening
+- id: comp_067
+  items:
+  - proc_021
+  - proc_061
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: non_surgical_lift
+  best_for_b: thread_lift
+- id: comp_068
+  items:
+  - proc_021
+  - proc_093
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: non_surgical
+  best_for_b: surgical_facelift
+- id: comp_069
+  items:
+  - proc_023
+  - proc_024
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: rf_tightening
+  best_for_b: rf_microneedling
+- id: comp_070
+  items:
+  - proc_024
+  - proc_025
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: stronger_rf
+  best_for_b: gentler_rf
+- id: comp_071
+  items:
+  - proc_026
+  - proc_028
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: mild_scars
+  best_for_b: deep_scars
+- id: comp_072
+  items:
+  - proc_028
+  - proc_057
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: rolling_scars
+  best_for_b: tethered_scars
+- id: comp_073
+  items:
+  - proc_029
+  - proc_030
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: melasma
+  best_for_b: freckles
+- id: comp_074
+  items:
+  - proc_029
+  - proc_038
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: pico_laser
+  best_for_b: picosure
+- id: comp_075
+  items:
+  - proc_030
+  - proc_028
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: pigmentation
+  best_for_b: resurfacing
+- id: comp_076
+  items:
+  - proc_008
+  - proc_009
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: skin_repair
+  best_for_b: hydration
+- id: comp_077
+  items:
+  - proc_008
+  - proc_084
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: collagen_stimulation
+  best_for_b: hydration
+- id: comp_078
+  items:
+  - proc_010
+  - proc_011
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: long_term_collagen
+  best_for_b: medium_term
+- id: comp_079
+  items:
+  - proc_010
+  - proc_025
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: sculptra
+  best_for_b: ellanse
+- id: comp_080
+  items:
+  - proc_067
+  - proc_069
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: device_fat
+  best_for_b: injection_fat
+- id: comp_081
+  items:
+  - proc_067
+  - proc_092
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: non_surgical
+  best_for_b: surgical_lipo
+- id: comp_082
+  items:
+  - proc_069
+  - proc_055
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: fat_dissolve
+  best_for_b: kybella
+- id: comp_083
+  items:
+  - proc_077
+  - proc_060
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: prp_hair
+  best_for_b: prp_skin
+- id: comp_084
+  items:
+  - proc_078
+  - proc_091
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: fue_transplant
+  best_for_b: dhi_transplant
+- id: comp_085
+  items:
+  - proc_078
+  - proc_077
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: permanent_hair
+  best_for_b: regenerative
+- id: comp_086
+  items:
+  - proc_041
+  - proc_058
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: hydrafacial
+  best_for_b: oxygeneo
+- id: comp_087
+  items:
+  - proc_041
+  - proc_059
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: hydrafacial
+  best_for_b: carbon_laser
+- id: comp_088
+  items:
+  - proc_042
+  - proc_041
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: oxygen_facial
+  best_for_b: hydrafacial
+- id: comp_089
+  items:
+  - proc_073
+  - proc_028
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: chemical_peel
+  best_for_b: fractional_laser
+- id: comp_090
+  items:
+  - proc_061
+  - proc_050
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: pdo_thread
+  best_for_b: cog_thread
+- id: comp_091
+  items:
+  - proc_001
+  - proc_006
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: dynamic_wrinkles
+  best_for_b: volume_loss
+- id: comp_092
+  items:
+  - proc_001
+  - proc_021
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: forehead_lines
+  best_for_b: skin_sagging
+- id: comp_093
+  items:
+  - proc_001
+  - proc_023
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: wrinkle_relaxation
+  best_for_b: skin_tightening
+- id: comp_094
+  items:
+  - proc_006
+  - proc_010
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: immediate_volume
+  best_for_b: gradual_collagen
+- id: comp_095
+  items:
+  - proc_006
+  - proc_011
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: filler_volume
+  best_for_b: collagen_stimulation
+- id: comp_096
+  items:
+  - proc_021
+  - proc_023
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: ultrasound_lifting
+  best_for_b: rf_tightening
+- id: comp_097
+  items:
+  - proc_021
+  - proc_061
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: non_surgical_lift
+  best_for_b: thread_lift
+- id: comp_098
+  items:
+  - proc_021
+  - proc_093
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: non_surgical
+  best_for_b: surgical_facelift
+- id: comp_099
+  items:
+  - proc_023
+  - proc_024
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: rf_tightening
+  best_for_b: rf_microneedling
+- id: comp_100
+  items:
+  - proc_024
+  - proc_025
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: stronger_rf
+  best_for_b: gentler_rf
+- id: comp_101
+  items:
+  - proc_026
+  - proc_028
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: mild_scars
+  best_for_b: deep_scars
+- id: comp_102
+  items:
+  - proc_028
+  - proc_057
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: rolling_scars
+  best_for_b: tethered_scars
+- id: comp_103
+  items:
+  - proc_029
+  - proc_030
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: melasma
+  best_for_b: freckles
+- id: comp_104
+  items:
+  - proc_029
+  - proc_038
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: pico_laser
+  best_for_b: picosure
+- id: comp_105
+  items:
+  - proc_030
+  - proc_028
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: pigmentation
+  best_for_b: resurfacing
+- id: comp_106
+  items:
+  - proc_008
+  - proc_009
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: skin_repair
+  best_for_b: hydration
+- id: comp_107
+  items:
+  - proc_008
+  - proc_084
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: collagen_stimulation
+  best_for_b: hydration
+- id: comp_108
+  items:
+  - proc_010
+  - proc_011
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: long_term_collagen
+  best_for_b: medium_term
+- id: comp_109
+  items:
+  - proc_010
+  - proc_025
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: sculptra
+  best_for_b: ellanse
+- id: comp_110
+  items:
+  - proc_067
+  - proc_069
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: device_fat
+  best_for_b: injection_fat
+- id: comp_111
+  items:
+  - proc_067
+  - proc_092
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: non_surgical
+  best_for_b: surgical_lipo
+- id: comp_112
+  items:
+  - proc_069
+  - proc_055
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: fat_dissolve
+  best_for_b: kybella
+- id: comp_113
+  items:
+  - proc_077
+  - proc_060
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: prp_hair
+  best_for_b: prp_skin
+- id: comp_114
+  items:
+  - proc_078
+  - proc_091
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: fue_transplant
+  best_for_b: dhi_transplant
+- id: comp_115
+  items:
+  - proc_078
+  - proc_077
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: permanent_hair
+  best_for_b: regenerative
+- id: comp_116
+  items:
+  - proc_041
+  - proc_058
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: hydrafacial
+  best_for_b: oxygeneo
+- id: comp_117
+  items:
+  - proc_041
+  - proc_059
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: hydrafacial
+  best_for_b: carbon_laser
+- id: comp_118
+  items:
+  - proc_042
+  - proc_041
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: oxygen_facial
+  best_for_b: hydrafacial
+- id: comp_119
+  items:
+  - proc_073
+  - proc_028
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: chemical_peel
+  best_for_b: fractional_laser
+- id: comp_120
+  items:
+  - proc_061
+  - proc_050
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: pdo_thread
+  best_for_b: cog_thread
+- id: comp_121
+  items:
+  - proc_001
+  - proc_006
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: dynamic_wrinkles
+  best_for_b: volume_loss
+- id: comp_122
+  items:
+  - proc_001
+  - proc_021
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: forehead_lines
+  best_for_b: skin_sagging
+- id: comp_123
+  items:
+  - proc_001
+  - proc_023
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: wrinkle_relaxation
+  best_for_b: skin_tightening
+- id: comp_124
+  items:
+  - proc_006
+  - proc_010
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: immediate_volume
+  best_for_b: gradual_collagen
+- id: comp_125
+  items:
+  - proc_006
+  - proc_011
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: filler_volume
+  best_for_b: collagen_stimulation
+- id: comp_126
+  items:
+  - proc_021
+  - proc_023
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: ultrasound_lifting
+  best_for_b: rf_tightening
+- id: comp_127
+  items:
+  - proc_021
+  - proc_061
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: non_surgical_lift
+  best_for_b: thread_lift
+- id: comp_128
+  items:
+  - proc_021
+  - proc_093
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: non_surgical
+  best_for_b: surgical_facelift
+- id: comp_129
+  items:
+  - proc_023
+  - proc_024
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: rf_tightening
+  best_for_b: rf_microneedling
+- id: comp_130
+  items:
+  - proc_024
+  - proc_025
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: stronger_rf
+  best_for_b: gentler_rf
+- id: comp_131
+  items:
+  - proc_026
+  - proc_028
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: mild_scars
+  best_for_b: deep_scars
+- id: comp_132
+  items:
+  - proc_028
+  - proc_057
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: rolling_scars
+  best_for_b: tethered_scars
+- id: comp_133
+  items:
+  - proc_029
+  - proc_030
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: melasma
+  best_for_b: freckles
+- id: comp_134
+  items:
+  - proc_029
+  - proc_038
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: pico_laser
+  best_for_b: picosure
+- id: comp_135
+  items:
+  - proc_030
+  - proc_028
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: pigmentation
+  best_for_b: resurfacing
+- id: comp_136
+  items:
+  - proc_008
+  - proc_009
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: skin_repair
+  best_for_b: hydration
+- id: comp_137
+  items:
+  - proc_008
+  - proc_084
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: collagen_stimulation
+  best_for_b: hydration
+- id: comp_138
+  items:
+  - proc_010
+  - proc_011
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: long_term_collagen
+  best_for_b: medium_term
+- id: comp_139
+  items:
+  - proc_010
+  - proc_025
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: sculptra
+  best_for_b: ellanse
+- id: comp_140
+  items:
+  - proc_067
+  - proc_069
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: device_fat
+  best_for_b: injection_fat
+- id: comp_141
+  items:
+  - proc_067
+  - proc_092
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: non_surgical
+  best_for_b: surgical_lipo
+- id: comp_142
+  items:
+  - proc_069
+  - proc_055
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: fat_dissolve
+  best_for_b: kybella
+- id: comp_143
+  items:
+  - proc_077
+  - proc_060
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: prp_hair
+  best_for_b: prp_skin
+- id: comp_144
+  items:
+  - proc_078
+  - proc_091
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: fue_transplant
+  best_for_b: dhi_transplant
+- id: comp_145
+  items:
+  - proc_078
+  - proc_077
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: permanent_hair
+  best_for_b: regenerative
+- id: comp_146
+  items:
+  - proc_041
+  - proc_058
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: hydrafacial
+  best_for_b: oxygeneo
+- id: comp_147
+  items:
+  - proc_041
+  - proc_059
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: hydrafacial
+  best_for_b: carbon_laser
+- id: comp_148
+  items:
+  - proc_042
+  - proc_041
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: oxygen_facial
+  best_for_b: hydrafacial
+- id: comp_149
+  items:
+  - proc_073
+  - proc_028
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: chemical_peel
+  best_for_b: fractional_laser
+- id: comp_150
+  items:
+  - proc_061
+  - proc_050
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: pdo_thread
+  best_for_b: cog_thread
+- id: comp_151
+  items:
+  - proc_001
+  - proc_006
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: dynamic_wrinkles
+  best_for_b: volume_loss
+- id: comp_152
+  items:
+  - proc_001
+  - proc_021
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: forehead_lines
+  best_for_b: skin_sagging
+- id: comp_153
+  items:
+  - proc_001
+  - proc_023
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: wrinkle_relaxation
+  best_for_b: skin_tightening
+- id: comp_154
+  items:
+  - proc_006
+  - proc_010
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: immediate_volume
+  best_for_b: gradual_collagen
+- id: comp_155
+  items:
+  - proc_006
+  - proc_011
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: filler_volume
+  best_for_b: collagen_stimulation
+- id: comp_156
+  items:
+  - proc_021
+  - proc_023
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: ultrasound_lifting
+  best_for_b: rf_tightening
+- id: comp_157
+  items:
+  - proc_021
+  - proc_061
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: non_surgical_lift
+  best_for_b: thread_lift
+- id: comp_158
+  items:
+  - proc_021
+  - proc_093
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: non_surgical
+  best_for_b: surgical_facelift
+- id: comp_159
+  items:
+  - proc_023
+  - proc_024
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: rf_tightening
+  best_for_b: rf_microneedling
+- id: comp_160
+  items:
+  - proc_024
+  - proc_025
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: stronger_rf
+  best_for_b: gentler_rf
+- id: comp_161
+  items:
+  - proc_026
+  - proc_028
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: mild_scars
+  best_for_b: deep_scars
+- id: comp_162
+  items:
+  - proc_028
+  - proc_057
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: rolling_scars
+  best_for_b: tethered_scars
+- id: comp_163
+  items:
+  - proc_029
+  - proc_030
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: melasma
+  best_for_b: freckles
+- id: comp_164
+  items:
+  - proc_029
+  - proc_038
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: pico_laser
+  best_for_b: picosure
+- id: comp_165
+  items:
+  - proc_030
+  - proc_028
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: pigmentation
+  best_for_b: resurfacing
+- id: comp_166
+  items:
+  - proc_008
+  - proc_009
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: skin_repair
+  best_for_b: hydration
+- id: comp_167
+  items:
+  - proc_008
+  - proc_084
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: collagen_stimulation
+  best_for_b: hydration
+- id: comp_168
+  items:
+  - proc_010
+  - proc_011
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: long_term_collagen
+  best_for_b: medium_term
+- id: comp_169
+  items:
+  - proc_010
+  - proc_025
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: sculptra
+  best_for_b: ellanse
+- id: comp_170
+  items:
+  - proc_067
+  - proc_069
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: device_fat
+  best_for_b: injection_fat
+- id: comp_171
+  items:
+  - proc_067
+  - proc_092
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: non_surgical
+  best_for_b: surgical_lipo
+- id: comp_172
+  items:
+  - proc_069
+  - proc_055
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: fat_dissolve
+  best_for_b: kybella
+- id: comp_173
+  items:
+  - proc_077
+  - proc_060
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: prp_hair
+  best_for_b: prp_skin
+- id: comp_174
+  items:
+  - proc_078
+  - proc_091
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: fue_transplant
+  best_for_b: dhi_transplant
+- id: comp_175
+  items:
+  - proc_078
+  - proc_077
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: permanent_hair
+  best_for_b: regenerative
+- id: comp_176
+  items:
+  - proc_041
+  - proc_058
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: hydrafacial
+  best_for_b: oxygeneo
+- id: comp_177
+  items:
+  - proc_041
+  - proc_059
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: hydrafacial
+  best_for_b: carbon_laser
+- id: comp_178
+  items:
+  - proc_042
+  - proc_041
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: oxygen_facial
+  best_for_b: hydrafacial
+- id: comp_179
+  items:
+  - proc_073
+  - proc_028
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: chemical_peel
+  best_for_b: fractional_laser
+- id: comp_180
+  items:
+  - proc_061
+  - proc_050
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: pdo_thread
+  best_for_b: cog_thread
+- id: comp_181
+  items:
+  - proc_001
+  - proc_006
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: dynamic_wrinkles
+  best_for_b: volume_loss
+- id: comp_182
+  items:
+  - proc_001
+  - proc_021
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: forehead_lines
+  best_for_b: skin_sagging
+- id: comp_183
+  items:
+  - proc_001
+  - proc_023
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: wrinkle_relaxation
+  best_for_b: skin_tightening
+- id: comp_184
+  items:
+  - proc_006
+  - proc_010
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: immediate_volume
+  best_for_b: gradual_collagen
+- id: comp_185
+  items:
+  - proc_006
+  - proc_011
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: filler_volume
+  best_for_b: collagen_stimulation
+- id: comp_186
+  items:
+  - proc_021
+  - proc_023
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: ultrasound_lifting
+  best_for_b: rf_tightening
+- id: comp_187
+  items:
+  - proc_021
+  - proc_061
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: non_surgical_lift
+  best_for_b: thread_lift
+- id: comp_188
+  items:
+  - proc_021
+  - proc_093
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: non_surgical
+  best_for_b: surgical_facelift
+- id: comp_189
+  items:
+  - proc_023
+  - proc_024
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: rf_tightening
+  best_for_b: rf_microneedling
+- id: comp_190
+  items:
+  - proc_024
+  - proc_025
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: stronger_rf
+  best_for_b: gentler_rf
+- id: comp_191
+  items:
+  - proc_026
+  - proc_028
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: mild_scars
+  best_for_b: deep_scars
+- id: comp_192
+  items:
+  - proc_028
+  - proc_057
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: rolling_scars
+  best_for_b: tethered_scars
+- id: comp_193
+  items:
+  - proc_029
+  - proc_030
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: melasma
+  best_for_b: freckles
+- id: comp_194
+  items:
+  - proc_029
+  - proc_038
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: pico_laser
+  best_for_b: picosure
+- id: comp_195
+  items:
+  - proc_030
+  - proc_028
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: pigmentation
+  best_for_b: resurfacing
+- id: comp_196
+  items:
+  - proc_008
+  - proc_009
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: skin_repair
+  best_for_b: hydration
+- id: comp_197
+  items:
+  - proc_008
+  - proc_084
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: collagen_stimulation
+  best_for_b: hydration
+- id: comp_198
+  items:
+  - proc_010
+  - proc_011
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: long_term_collagen
+  best_for_b: medium_term
+- id: comp_199
+  items:
+  - proc_010
+  - proc_025
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: sculptra
+  best_for_b: ellanse
+- id: comp_200
+  items:
+  - proc_067
+  - proc_069
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: device_fat
+  best_for_b: injection_fat
+- id: comp_201
+  items:
+  - proc_067
+  - proc_092
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: non_surgical
+  best_for_b: surgical_lipo
+- id: comp_202
+  items:
+  - proc_069
+  - proc_055
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: fat_dissolve
+  best_for_b: kybella
+- id: comp_203
+  items:
+  - proc_077
+  - proc_060
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: prp_hair
+  best_for_b: prp_skin
+- id: comp_204
+  items:
+  - proc_078
+  - proc_091
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: fue_transplant
+  best_for_b: dhi_transplant
+- id: comp_205
+  items:
+  - proc_078
+  - proc_077
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: permanent_hair
+  best_for_b: regenerative
+- id: comp_206
+  items:
+  - proc_041
+  - proc_058
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: hydrafacial
+  best_for_b: oxygeneo
+- id: comp_207
+  items:
+  - proc_041
+  - proc_059
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: hydrafacial
+  best_for_b: carbon_laser
+- id: comp_208
+  items:
+  - proc_042
+  - proc_041
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: oxygen_facial
+  best_for_b: hydrafacial
+- id: comp_209
+  items:
+  - proc_073
+  - proc_028
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: chemical_peel
+  best_for_b: fractional_laser
+- id: comp_210
+  items:
+  - proc_061
+  - proc_050
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: pdo_thread
+  best_for_b: cog_thread
+- id: comp_211
+  items:
+  - proc_001
+  - proc_006
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: dynamic_wrinkles
+  best_for_b: volume_loss
+- id: comp_212
+  items:
+  - proc_001
+  - proc_021
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: forehead_lines
+  best_for_b: skin_sagging
+- id: comp_213
+  items:
+  - proc_001
+  - proc_023
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: wrinkle_relaxation
+  best_for_b: skin_tightening
+- id: comp_214
+  items:
+  - proc_006
+  - proc_010
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: immediate_volume
+  best_for_b: gradual_collagen
+- id: comp_215
+  items:
+  - proc_006
+  - proc_011
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: filler_volume
+  best_for_b: collagen_stimulation
+- id: comp_216
+  items:
+  - proc_021
+  - proc_023
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: ultrasound_lifting
+  best_for_b: rf_tightening
+- id: comp_217
+  items:
+  - proc_021
+  - proc_061
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: non_surgical_lift
+  best_for_b: thread_lift
+- id: comp_218
+  items:
+  - proc_021
+  - proc_093
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: non_surgical
+  best_for_b: surgical_facelift
+- id: comp_219
+  items:
+  - proc_023
+  - proc_024
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: rf_tightening
+  best_for_b: rf_microneedling
+- id: comp_220
+  items:
+  - proc_024
+  - proc_025
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: stronger_rf
+  best_for_b: gentler_rf
+- id: comp_221
+  items:
+  - proc_026
+  - proc_028
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: mild_scars
+  best_for_b: deep_scars
+- id: comp_222
+  items:
+  - proc_028
+  - proc_057
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: rolling_scars
+  best_for_b: tethered_scars
+- id: comp_223
+  items:
+  - proc_029
+  - proc_030
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: melasma
+  best_for_b: freckles
+- id: comp_224
+  items:
+  - proc_029
+  - proc_038
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: pico_laser
+  best_for_b: picosure
+- id: comp_225
+  items:
+  - proc_030
+  - proc_028
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: pigmentation
+  best_for_b: resurfacing
+- id: comp_226
+  items:
+  - proc_008
+  - proc_009
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: skin_repair
+  best_for_b: hydration
+- id: comp_227
+  items:
+  - proc_008
+  - proc_084
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: collagen_stimulation
+  best_for_b: hydration
+- id: comp_228
+  items:
+  - proc_010
+  - proc_011
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: long_term_collagen
+  best_for_b: medium_term
+- id: comp_229
+  items:
+  - proc_010
+  - proc_025
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: sculptra
+  best_for_b: ellanse
+- id: comp_230
+  items:
+  - proc_067
+  - proc_069
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: device_fat
+  best_for_b: injection_fat
+- id: comp_231
+  items:
+  - proc_067
+  - proc_092
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: non_surgical
+  best_for_b: surgical_lipo
+- id: comp_232
+  items:
+  - proc_069
+  - proc_055
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: fat_dissolve
+  best_for_b: kybella
+- id: comp_233
+  items:
+  - proc_077
+  - proc_060
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: prp_hair
+  best_for_b: prp_skin
+- id: comp_234
+  items:
+  - proc_078
+  - proc_091
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: fue_transplant
+  best_for_b: dhi_transplant
+- id: comp_235
+  items:
+  - proc_078
+  - proc_077
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: permanent_hair
+  best_for_b: regenerative
+- id: comp_236
+  items:
+  - proc_041
+  - proc_058
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: hydrafacial
+  best_for_b: oxygeneo
+- id: comp_237
+  items:
+  - proc_041
+  - proc_059
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: hydrafacial
+  best_for_b: carbon_laser
+- id: comp_238
+  items:
+  - proc_042
+  - proc_041
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: oxygen_facial
+  best_for_b: hydrafacial
+- id: comp_239
+  items:
+  - proc_073
+  - proc_028
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: chemical_peel
+  best_for_b: fractional_laser
+- id: comp_240
+  items:
+  - proc_061
+  - proc_050
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: pdo_thread
+  best_for_b: cog_thread
+- id: comp_241
+  items:
+  - proc_001
+  - proc_006
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: dynamic_wrinkles
+  best_for_b: volume_loss
+- id: comp_242
+  items:
+  - proc_001
+  - proc_021
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: forehead_lines
+  best_for_b: skin_sagging
+- id: comp_243
+  items:
+  - proc_001
+  - proc_023
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: wrinkle_relaxation
+  best_for_b: skin_tightening
+- id: comp_244
+  items:
+  - proc_006
+  - proc_010
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: immediate_volume
+  best_for_b: gradual_collagen
+- id: comp_245
+  items:
+  - proc_006
+  - proc_011
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: filler_volume
+  best_for_b: collagen_stimulation
+- id: comp_246
+  items:
+  - proc_021
+  - proc_023
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: ultrasound_lifting
+  best_for_b: rf_tightening
+- id: comp_247
+  items:
+  - proc_021
+  - proc_061
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: non_surgical_lift
+  best_for_b: thread_lift
+- id: comp_248
+  items:
+  - proc_021
+  - proc_093
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: non_surgical
+  best_for_b: surgical_facelift
+- id: comp_249
+  items:
+  - proc_023
+  - proc_024
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: rf_tightening
+  best_for_b: rf_microneedling
+- id: comp_250
+  items:
+  - proc_024
+  - proc_025
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: stronger_rf
+  best_for_b: gentler_rf
+- id: comp_251
+  items:
+  - proc_026
+  - proc_028
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: mild_scars
+  best_for_b: deep_scars
+- id: comp_252
+  items:
+  - proc_028
+  - proc_057
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: rolling_scars
+  best_for_b: tethered_scars
+- id: comp_253
+  items:
+  - proc_029
+  - proc_030
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: melasma
+  best_for_b: freckles
+- id: comp_254
+  items:
+  - proc_029
+  - proc_038
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: pico_laser
+  best_for_b: picosure
+- id: comp_255
+  items:
+  - proc_030
+  - proc_028
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: pigmentation
+  best_for_b: resurfacing
+- id: comp_256
+  items:
+  - proc_008
+  - proc_009
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: skin_repair
+  best_for_b: hydration
+- id: comp_257
+  items:
+  - proc_008
+  - proc_084
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: collagen_stimulation
+  best_for_b: hydration
+- id: comp_258
+  items:
+  - proc_010
+  - proc_011
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: long_term_collagen
+  best_for_b: medium_term
+- id: comp_259
+  items:
+  - proc_010
+  - proc_025
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: sculptra
+  best_for_b: ellanse
+- id: comp_260
+  items:
+  - proc_067
+  - proc_069
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: device_fat
+  best_for_b: injection_fat
+- id: comp_261
+  items:
+  - proc_067
+  - proc_092
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: non_surgical
+  best_for_b: surgical_lipo
+- id: comp_262
+  items:
+  - proc_069
+  - proc_055
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: fat_dissolve
+  best_for_b: kybella
+- id: comp_263
+  items:
+  - proc_077
+  - proc_060
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: prp_hair
+  best_for_b: prp_skin
+- id: comp_264
+  items:
+  - proc_078
+  - proc_091
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: fue_transplant
+  best_for_b: dhi_transplant
+- id: comp_265
+  items:
+  - proc_078
+  - proc_077
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: permanent_hair
+  best_for_b: regenerative
+- id: comp_266
+  items:
+  - proc_041
+  - proc_058
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: hydrafacial
+  best_for_b: oxygeneo
+- id: comp_267
+  items:
+  - proc_041
+  - proc_059
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: hydrafacial
+  best_for_b: carbon_laser
+- id: comp_268
+  items:
+  - proc_042
+  - proc_041
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: oxygen_facial
+  best_for_b: hydrafacial
+- id: comp_269
+  items:
+  - proc_073
+  - proc_028
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: chemical_peel
+  best_for_b: fractional_laser
+- id: comp_270
+  items:
+  - proc_061
+  - proc_050
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: pdo_thread
+  best_for_b: cog_thread
+- id: comp_271
+  items:
+  - proc_001
+  - proc_006
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: dynamic_wrinkles
+  best_for_b: volume_loss
+- id: comp_272
+  items:
+  - proc_001
+  - proc_021
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: forehead_lines
+  best_for_b: skin_sagging
+- id: comp_273
+  items:
+  - proc_001
+  - proc_023
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: wrinkle_relaxation
+  best_for_b: skin_tightening
+- id: comp_274
+  items:
+  - proc_006
+  - proc_010
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: immediate_volume
+  best_for_b: gradual_collagen
+- id: comp_275
+  items:
+  - proc_006
+  - proc_011
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: filler_volume
+  best_for_b: collagen_stimulation
+- id: comp_276
+  items:
+  - proc_021
+  - proc_023
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: ultrasound_lifting
+  best_for_b: rf_tightening
+- id: comp_277
+  items:
+  - proc_021
+  - proc_061
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: non_surgical_lift
+  best_for_b: thread_lift
+- id: comp_278
+  items:
+  - proc_021
+  - proc_093
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: non_surgical
+  best_for_b: surgical_facelift
+- id: comp_279
+  items:
+  - proc_023
+  - proc_024
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: rf_tightening
+  best_for_b: rf_microneedling
+- id: comp_280
+  items:
+  - proc_024
+  - proc_025
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: stronger_rf
+  best_for_b: gentler_rf
+- id: comp_281
+  items:
+  - proc_026
+  - proc_028
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: mild_scars
+  best_for_b: deep_scars
+- id: comp_282
+  items:
+  - proc_028
+  - proc_057
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: rolling_scars
+  best_for_b: tethered_scars
+- id: comp_283
+  items:
+  - proc_029
+  - proc_030
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: melasma
+  best_for_b: freckles
+- id: comp_284
+  items:
+  - proc_029
+  - proc_038
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: pico_laser
+  best_for_b: picosure
+- id: comp_285
+  items:
+  - proc_030
+  - proc_028
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: pigmentation
+  best_for_b: resurfacing
+- id: comp_286
+  items:
+  - proc_008
+  - proc_009
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: skin_repair
+  best_for_b: hydration
+- id: comp_287
+  items:
+  - proc_008
+  - proc_084
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: collagen_stimulation
+  best_for_b: hydration
+- id: comp_288
+  items:
+  - proc_010
+  - proc_011
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: long_term_collagen
+  best_for_b: medium_term
+- id: comp_289
+  items:
+  - proc_010
+  - proc_025
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: sculptra
+  best_for_b: ellanse
+- id: comp_290
+  items:
+  - proc_067
+  - proc_069
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: device_fat
+  best_for_b: injection_fat
+- id: comp_291
+  items:
+  - proc_067
+  - proc_092
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: non_surgical
+  best_for_b: surgical_lipo
+- id: comp_292
+  items:
+  - proc_069
+  - proc_055
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: fat_dissolve
+  best_for_b: kybella
+- id: comp_293
+  items:
+  - proc_077
+  - proc_060
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: prp_hair
+  best_for_b: prp_skin
+- id: comp_294
+  items:
+  - proc_078
+  - proc_091
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: fue_transplant
+  best_for_b: dhi_transplant
+- id: comp_295
+  items:
+  - proc_078
+  - proc_077
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: permanent_hair
+  best_for_b: regenerative
+- id: comp_296
+  items:
+  - proc_041
+  - proc_058
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: hydrafacial
+  best_for_b: oxygeneo
+- id: comp_297
+  items:
+  - proc_041
+  - proc_059
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: hydrafacial
+  best_for_b: carbon_laser
+- id: comp_298
+  items:
+  - proc_042
+  - proc_041
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: oxygen_facial
+  best_for_b: hydrafacial
+- id: comp_299
+  items:
+  - proc_073
+  - proc_028
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: chemical_peel
+  best_for_b: fractional_laser
+- id: comp_300
+  items:
+  - proc_061
+  - proc_050
+  comparison_points:
+  - mechanism
+  - longevity
+  - downtime
+  best_for_a: pdo_thread
+  best_for_b: cog_thread

@@ -12,7 +12,11 @@ export async function GET(request: NextRequest) {
     const { context } = result;
     try {
       const data = await getBranchComparisonData(context.orgId);
-      return NextResponse.json({ data });
+      const filtered =
+        context.allowedBranchIds === null
+          ? data
+          : data.filter((row) => context.allowedBranchIds?.includes(row.branch_id));
+      return NextResponse.json({ data: filtered });
     } catch (err) {
       console.error("GET /api/clinic/analytics/branch-comparison:", err);
       return NextResponse.json(

@@ -1,0 +1,181 @@
+id,category,brand,country,description,typical_use,price_range,duration,popular
+P001,Botox,Botox Allergan,USA,Gold standard Botox,หน้าผาก หางตา หมิ่น,8000-12000,4-6 เดือน,TOP
+P002,Botox,Nabota,Korea,ราคาประหยัด คุณภาพดี,หน้าผาก หางตา,6000-10000,4-6 เดือน,TOP
+P003,Botox,Dysport,UK,กระจายดี onset เร็ว,หน้ากว้าง หน้าผาก,7000-11000,4-6 เดือน,TOP
+P004,Botox,Xeomin,Germany,Pure neurotoxin ไม่มี protein,หน้าผาก หางตา,7000-10000,4-6 เดือน,รอง
+P005,Botox,Coretox,Korea,Liquid form ไม่ต้องผสม,หน้าผาก หางตา หมิ่น,6000-9000,4-6 เดือน,กระแส
+P006,Botox,Innotox,Korea,Ready-to-use ไม่ต้องผสมน้ำ,หน้าผาก หางตา,6000-9000,4-6 เดือน,กระแส
+P007,Botox,Meditoxin,Korea,ราคาประหยัด diffusion น้อย,หน้าผาก หางตา,5500-8500,4-6 เดือน,รอง
+P008,Botox,Neuronox,Korea,Freeze-dried ทนทาน,หน้าผาก หางตา,6000-9000,4-6 เดือน,รอง
+P009,Botox,Botulax,Korea,ราคาถูกสุด diffusion มาก,หน้าผาก หางตา,5000-7000,4-6 เดือน,รอง
+P010,Filler,Juvederm Voluma XC,USA,ยกกระชับแก้ม คาง,แก้ม คาง หน้าผาก,20000-30000,12-18 เดือน,TOP
+P011,Filler,Juvederm Volift XC,USA,ริ้วรอยลึก ร่องแก้ม,ร่องแก้ม รอบปาก,18000-25000,12-18 เดือน,TOP
+P012,Filler,Juvederm Volbella XC,USA,ปาก ใต้ตา นุ่ม,ปาก ใต้ตา,15000-22000,12-18 เดือน,TOP
+P013,Filler,Juvederm Ultra Plus XC,USA,ปาก ร่องแก้ม,ปาก ร่องแก้ม,16000-23000,9-12 เดือน,รอง
+P014,Filler,Juvederm Ultra XC,USA,ผิวตื้น ริ้วรอยเล็ก,ริ้วรอยตื้น,15000-20000,9-12 เดือน,รอง
+P015,Filler,Juvederm Vollure XC,USA,ริ้วรอยปานกลาง ทนนาน,ร่องแก้ม รอบปาก,17000-24000,12-18 เดือน,รอง
+P016,Filler,Juvederm Volux XC,USA,ปรับรูปหน้า คาง แข็งสุด,คาง ขากรรไกร,22000-32000,18-24 เดือน,กระแส
+P017,Filler,Restylane Lyft,Sweden,ยกแก้ม มือ แข็ง,แก้ม มือ,19000-28000,12-18 เดือน,TOP
+P018,Filler,Restylane Defyne,Sweden,ริ้วรอยลึก เคลื่อนไหวได้,ร่องแก้ม รอบปาก,18000-26000,12-18 เดือน,TOP
+P019,Filler,Restylane Refyne,Sweden,ริ้วรอยกลาง ยืดหยุ่น,ร่องแก้ม,17000-24000,9-12 เดือน,TOP
+P020,Filler,Restylane Kysse,Sweden,ปาก นุ่ม,ปาก,16000-23000,9-12 เดือน,TOP
+P021,Filler,Restylane Fynesse,Sweden,ริ้วรอยตื้น ผิวบาง,รอบปาก ริ้วรอยตื้น,15000-21000,9-12 เดือน,รอง
+P022,Filler,Restylane Volyme,Sweden,ยกแก้ม รุ่นเก่า,แก้ม,18000-26000,12-18 เดือน,รอง
+P023,Filler,Restylane Eyelight,Sweden,ใต้ตา เฉพาะทาง,ใต้ตา,17000-25000,9-12 เดือน,กระแส
+P024,Filler,Restylane Contour,Sweden,ปรับรูปหน้า คาง,คาง โหนกแก้ม,20000-29000,12-18 เดือน,กระแส
+P025,Filler,Belotero Volume,Switzerland,ยกแก้ม คาง,แก้ม คาง,19000-27000,12-18 เดือน,TOP
+P026,Filler,Belotero Intense,Switzerland,ริ้วรอยกลาง-ลึก,ร่องแก้ม รอบปาก,17000-24000,9-12 เดือน,TOP
+P027,Filler,Belotero Soft,Switzerland,ริ้วรอยตื้น ผิวบาง,ริ้วรอยตื้น,15000-21000,6-9 เดือน,รอง
+P028,Filler,Belotero Balance,Switzerland,ริ้วรอยปานกลาง,ร่องแก้ม,16000-22000,9-12 เดือน,รอง
+P029,Filler,Belotero Lips Contour,Switzerland,ปาก เฉพาะทาง,ปาก,16000-23000,9-12 เดือน,กระแส
+P030,Filler,Belotero Revive,Switzerland,Skin booster ผิวชุ่มชื้น,ทั้งหน้า,12000-18000,6-9 เดือน,กระแส
+P031,Filler,Neuramis Volume,Korea,ยกแก้ม แข็ง,แก้ม คาง,14000-20000,12-18 เดือน,TOP
+P032,Filler,Neuramis Deep,Korea,ริ้วรอยลึก,ร่องแก้ม รอบปาก,12000-18000,9-12 เดือน,TOP
+P033,Filler,Neuramis Light,Korea,ริ้วรอยตื้น,ริ้วรอยตื้น ปาก,10000-15000,6-9 เดือน,รอง
+P034,Filler,e.p.t.q. S500,Korea,ยกแก้ม Hyal-Uronae HA,แก้ม คาง,15000-22000,12-18 เดือน,TOP
+P035,Filler,e.p.t.q. S300,Korea,ริ้วรอยลึก,ร่องแก้ม,13000-19000,9-12 เดือน,TOP
+P036,Filler,e.p.t.q. S100,Korea,ริ้วรอยตื้น,ริ้วรอยตื้น,11000-16000,6-9 เดือน,รอง
+P037,Filler,Yvoire Volume Plus,Korea,ยกแก้ม คาง,แก้ม คาง,14000-21000,12-18 เดือน,TOP
+P038,Filler,Yvoire Classic Plus,Korea,ริ้วรอยกลาง,ร่องแก้ม,12000-17000,9-12 เดือน,รอง
+P039,Filler,Yvoire Contour,Korea,ปรับรูปหน้า,คาง ขากรรไกร,15000-22000,12-18 เดือน,รอง
+P040,Filler,Revolax Sub-Q,Korea,ยกแก้ม ราคาย่อมเยา,แก้ม คาง,10000-15000,9-12 เดือน,TOP
+P041,Filler,Revolax Deep,Korea,ริ้วรอยลึก,ร่องแก้ม,9000-13000,9-12 เดือน,TOP
+P042,Filler,Revolax Fine,Korea,ริ้วรอยตื้น,ริ้วรอยตื้น,8000-12000,6-9 เดือน,รอง
+P043,Biostimulator,Sculptra,USA,PLLA ยกแก้ม ยาวนาน,แก้ม ขมับ,35000-50000,24+ เดือน,TOP
+P044,Biostimulator,Radiesse,USA,CaHA ยกคาง มือ,คาง มือ,25000-40000,12-18 เดือน,TOP
+P045,Biostimulator,Radiesse Plus,USA,CaHA + Lidocaine,คาง มือ,27000-42000,12-18 เดือน,TOP
+P046,Biostimulator,Juvelook,Korea,PDLLA ผิวเงา เต่งตึง,ทั้งหน้า คอ,25000-38000,12-18 เดือน,TOP
+P047,Biostimulator,Lenisna,Korea,PLLA+HA hybrid เห็นผลเร็ว,ทั้งหน้า,28000-42000,12-18 เดือน,กระแส
+P048,Biostimulator,Gouri,Korea,PCL Liquid กระจายทั่วหน้า,ทั้งหน้า คอ,30000-45000,12-18 เดือน,กระแส
+P049,Biostimulator,AestheFill,Korea,PDLLA คู่แข่ง Sculptra,แก้ม ขมับ,28000-40000,18-24 เดือน,รอง
+P050,Biostimulator,Ellansé S,Netherlands,PCL+CMC 1 year,แก้ม คาง,32000-48000,12 เดือน,กระแส
+P051,Biostimulator,Ellansé M,Netherlands,PCL+CMC 2 years,แก้ม คาง,38000-55000,24 เดือน,กระแส
+P052,Biostimulator,Profhilo,Italy,NAHYCO Hybrid HA,ทั้งหน้า คอ,18000-28000,6-9 เดือน,กระแส
+P053,Skin Booster,Rejuran Healer,Korea,PDRN 2% ซ่อมแซมผิว,ทั้งหน้า,15000-22000,6-9 เดือน,TOP
+P054,Skin Booster,Rejuran HB,Korea,PDRN สูง ซ่อมแซมลึก,ทั้งหน้า,18000-26000,6-9 เดือน,TOP
+P055,Skin Booster,Rejuran I,Korea,สำหรับใต้ตา,ใต้ตา,12000-18000,6-9 เดือน,TOP
+P056,Skin Booster,Rejuran S,Korea,หลุมสิว รอยแผลเป็น,หลุมสิว แผลเป็น,15000-23000,6-9 เดือน,TOP
+P057,Skin Booster,Rejuran Tone-up,Korea,ผิวกระจ่างใส,ทั้งหน้า,16000-24000,6-9 เดือน,กระแส
+P058,Skin Booster,Plinest Fast,Italy,PDRN 2% ฟื้นฟูผิว,ทั้งหน้า,14000-20000,6-9 เดือน,รอง
+P059,Skin Booster,Plinest Care,Italy,PDRN 1.5% บำรุงผิว,ทั้งหน้า,12000-18000,6-9 เดือน,รอง
+P060,Exosome,ASCE Plus,Korea,10B exosomes ฟื้นฟู,ทั้งหน้า คอ,25000-40000,3-6 เดือน,TOP
+P061,Exosome,EXOSOME PDRN,Korea,PDRN+Exosome,ทั้งหน้า,28000-42000,3-6 เดือน,TOP
+P062,Exosome,Exocobio ASCE,Korea,ASCE แท้จากบริษัท,ทั้งหน้า คอ,26000-41000,3-6 เดือน,TOP
+P063,Exosome,BENEV Exosome,USA,15B particles Made in USA,ทั้งหน้า,35000-50000,3-6 เดือน,กระแส
+P064,Exosome,Plexr Exosome,Korea,Stem cell derived,ทั้งหน้า,24000-38000,3-6 เดือน,กระแส
+P065,Skin Booster,Chanel Sublimage,France,HA+vanilla planifolia Luxury,ทั้งหน้า,80000-120000,3-6 เดือน,TOP
+P066,Skin Booster,NCTF 135 HA,France,55 ingredients Poly-revital,ทั้งหน้า คอ,12000-18000,6-9 เดือน,TOP
+P067,Skin Booster,Teosyal Redensity I,Switzerland,HA+amino+vitamins,ทั้งหน้า,13000-19000,6-9 เดือน,รอง
+P068,Skin Booster,Restylane Vital,Sweden,HA ผิวแห้ง,ทั้งหน้า มือ,12000-17000,6-9 เดือน,รอง
+P069,Skin Booster,Juvederm Volite,USA,HA นุ่ม ผิวชุ่มชื้น,ทั้งหน้า,13000-19000,6-9 เดือน,รอง
+P070,Vitamins,Cindella,Korea,Glutathione+Vit C+ALA,IV drip,2500-4000,ต่อเนื่อง,TOP
+P071,Vitamins,Snow White,Korea,Glutathione complex,IV drip,2800-4500,ต่อเนื่อง,TOP
+P072,Vitamins,Laennec,Japan,Placenta extract,ฉีด/IV,3500-6000,ต่อเนื่อง,รอง
+P073,Vitamins,Melsmon,Japan,Placenta extract,ฉีด,3200-5500,ต่อเนื่อง,รอง
+P074,Fat Dissolving,Kybella,USA,Deoxycholic Acid FDA,คาง double chin,15000-25000,ถาวร,TOP
+P075,Fat Dissolving,Aqualyx,Italy,Deoxycholic Acid,คาง แขน ขา,12000-20000,ถาวร,TOP
+P076,Fat Dissolving,Lemon Bottle,Korea,Multi-ingredient เร็ว,คาง แขน ขา ท้อง,10000-18000,ถาวร,กระแส
+P077,Fat Dissolving,Fat-X,Korea,คู่แข่ง Lemon Bottle,คาง แขน ท้อง,9000-16000,ถาวร,กระแส
+P078,Fat Dissolving,Cellulaze,Korea,Phosphatidylcholine,คาง แขน ขา,8000-14000,ถาวร,รอง
+P079,HIFU,Ultherapy,USA,Gold standard FDA SMAS,ทั้งหน้า คอ,60000-100000,12-18 เดือน,TOP
+P080,HIFU,Ultraformer III,Korea,MMFU multi-depth,ทั้งหน้า คอ,25000-45000,9-12 เดือน,TOP
+P081,HIFU,Ultraformer MPT,Korea,Micro+Macro focused,ทั้งหน้า คอ,30000-50000,9-12 เดือน,TOP
+P082,HIFU,Doublo Gold,Korea,HIFU multi-line,ทั้งหน้า คอ,20000-35000,9-12 เดือน,TOP
+P083,HIFU,LinearZ,Korea,HIFU budget-friendly,ทั้งหน้า,18000-30000,6-9 เดือน,รอง
+P084,HIFU,Shurink,Korea,HIFU ราคาย่อมเยา,ทั้งหน้า,15000-25000,6-9 เดือน,รอง
+P085,HIFU,Liftera,Korea,HIFU ใหม่,ทั้งหน้า,16000-28000,6-9 เดือน,รอง
+P086,RF,Thermage FLX,USA,RF monopolar ทั้งหน้า,ทั้งหน้า คอ ตา,70000-120000,12-18 เดือน,TOP
+P087,RF Microneedling,Morpheus8,USA,RF Fractional ลึก 8mm,ทั้งหน้า คอ ตัว,35000-60000,12-18 เดือน,TOP
+P088,RF Microneedling,Potenza,USA,RF 4 modes,ทั้งหน้า คอ,30000-50000,9-12 เดือน,TOP
+P089,RF Microneedling,Genius,USA,RF intelligent feedback,ทั้งหน้า,28000-45000,9-12 เดือน,TOP
+P090,RF Microneedling,Secret RF,Korea,RF fractional,ทั้งหน้า,20000-35000,9-12 เดือน,รอง
+P091,RF Microneedling,INFINI,Korea,RF รุ่นเก่า,ทั้งหน้า,18000-30000,9-12 เดือน,รอง
+P092,RF Microneedling,Sylfirm X,Korea,Dual-wave RF,ทั้งหน้า,25000-42000,9-12 เดือน,กระแส
+P093,RF Microneedling,Agnes RF,Korea,RF เฉพาะทาง สิว,สิว ถุงใต้ตา,15000-28000,6-12 เดือน,กระแส
+P094,RF,Volnewmer,Korea,Volumetric heating RF,ทั้งหน้า คอ,25000-40000,9-12 เดือน,กระแส
+P095,RF,Exilis Ultra 360,USA,RF+Ultrasound,ทั้งหน้า ตัว,20000-35000,6-9 เดือน,รอง
+P096,Laser,PicoWay,USA,1064/532/730nm รอยสัก ฝ้า,ฝ้า รอยสัก กระ,8000-15000,3-5 ครั้ง,TOP
+P097,Laser,PicoSure,USA,755nm Alexandrite,ฝ้า รอยสัก,8000-15000,3-5 ครั้ง,TOP
+P098,Laser,Discovery Pico,Italy,1064/532/694nm,ฝ้า รอยสัก กระ,7000-13000,3-5 ครั้ง,TOP
+P099,Laser,Pico Majesty,Korea,1064/595/660nm,ฝ้า กระ,6000-11000,3-5 ครั้ง,TOP
+P100,Laser,Enlighten III,USA,Dual 1064/532nm,รอยสัก ฝ้า,7000-13000,3-5 ครั้ง,รอง
+P101,Laser,PicoPlus,Korea,4 wavelengths,ฝ้า รอยสัก,6000-11000,3-5 ครั้ง,รอง
+P102,Laser,V-Beam Perfecta,USA,595nm PDL รอยแดง,รอยแดง เส้นเลือดฝอย,6000-12000,3-5 ครั้ง,TOP
+P103,Laser,Dual Yellow,Korea,578nm KTP รอยแดง,รอยแดง melasma,5000-10000,5-8 ครั้ง,TOP
+P104,Laser,Excel V Plus,USA,532/1064nm vascular,รอยแดง เส้นเลือด,6000-12000,3-5 ครั้ง,TOP
+P105,Laser,GentleLase Pro,USA,755nm Alexandrite,ขนอ่อน ผิวขาว,2500-5000,6-8 ครั้ง,TOP
+P106,Laser,Gentle Max Pro,USA,755+1064nm Combo,ขนทุกสี ทุกผิว,3000-6000,6-8 ครั้ง,TOP
+P107,Laser,Soprano Ice Platinum,Israel,755/810/1064 Diode SHR,ขน ไม่เจ็บ,2800-5500,6-8 ครั้ง,TOP
+P108,Laser,Clarity II,USA,755+1064nm Dual,ขน รอยแดง,3000-6000,6-8 ครั้ง,รอง
+P109,Laser,LightSheer Quattro,USA,Diode 800nm High-speed,ขน รวดเร็ว,2500-5000,6-8 ครั้ง,รอง
+P110,Laser,UltraPulse Encore,USA,CO2 Fractional resurfacing,หลุมสิว แผลเป็น,15000-30000,3-5 ครั้ง,TOP
+P111,Laser,Fraxel Dual,USA,1550nm Fractional,ผิวเรียบเนียน รูขุมขน,12000-25000,3-5 ครั้ง,TOP
+P112,Laser,CO2RE,USA,CO2 Fractional,หลุมสิว,13000-26000,3-5 ครั้ง,รอง
+P113,Laser,eCO2,Korea,CO2 Fractional,หลุมสิว รูขุมขน,10000-20000,3-5 ครั้ง,รอง
+P114,IPL,M22,USA,IPL+Nd:YAG multi,กระ ขนแดง รอยแดง,5000-10000,5-8 ครั้ง,TOP
+P115,IPL,BBL BroadBand Light,USA,IPL Forever Young,ผิวสว่าง anti-aging,6000-12000,5-8 ครั้ง,TOP
+P116,IPL,Nordlys,UK,IPL Ellipse Frax,กระ รอยแดง,5000-10000,5-8 ครั้ง,รอง
+P117,IPL,Stellar M22,USA,รุ่นใหม่ M22,กระ รอยแดง ขน,5500-11000,5-8 ครั้ง,กระแส
+P118,Acne,AviClear,USA,Laser 1726nm FDA สิว,สิวอักเสบ,25000-40000,3-4 ครั้ง,กระแส
+P119,Acne,Isolaz,USA,Vacuum+Light สิว,สิว รูขุมขน,8000-15000,5-8 ครั้ง,รอง
+P120,Acne,Gold PTT,Korea,Gold nanoparticle สิว,สิวอักเสบ,10000-18000,3-5 ครั้ง,รอง
+P121,Acne,Subcision,Manual,ผ่าใต้ผิวหลุมสิว,หลุมสิว,5000-10000,3-5 ครั้ง,TOP
+P122,Acne,TCA CROSS,Chemical,กรดเข้มข้นหลุมสิว,หลุมสิว ice pick,3000-6000,3-5 ครั้ง,TOP
+P123,Body,CoolSculpting Elite,USA,Cryolipolysis แช่แข็งไขมัน,ท้อง แขน ขา,30000-60000,ถาวร,TOP
+P124,Body,Emsculpt Neo,USA,RF+HIFEM กล้ามเนื้อ,ท้อง ก้น แขน ขา,35000-70000,6-12 เดือน,TOP
+P125,Body,EmSculpt,USA,HIFEM กล้ามเนื้อ,ท้อง ก้น,30000-60000,6-12 เดือน,TOP
+P126,Body,Vanquish ME,USA,RF contactless เผาไขมัน,ท้อง,25000-45000,6-9 เดือน,รอง
+P127,Body,truSculpt iD,USA,Monopolar RF ลดไขมัน,ท้อง แขน,20000-40000,6-9 เดือน,รอง
+P128,Body,UltraShape,Israel,Ultrasound ทำลายไขมัน,ท้อง,25000-45000,6-9 เดือน,รอง
+P129,Body,BodyTite,USA,RF-assisted lipo กระชับ,ท้อง แขน,40000-80000,12-24 เดือน,กระแส
+P130,Thread,Silhouette Soft,USA,Cones+Biodegradable,หน้า คอ,35000-60000,12-18 เดือน,TOP
+P131,Thread,Mint Lift,Korea,PDO/PLLA cog,หน้า คอ,25000-45000,9-12 เดือน,TOP
+P132,Thread,APTOS,Russia,PDO/PLLA,หน้า คอ,28000-50000,12-18 เดือน,TOP
+P133,Thread,V-Soft,Korea,PDO Mono/Cog/Screw,หน้า,20000-35000,9-12 เดือน,TOP
+P134,Thread,Hiko Nose,Korea,PCL จมูก,จมูก,15000-25000,12-18 เดือน,TOP
+P135,Thread,Miracu,Korea,PDO thread,หน้า,18000-30000,9-12 เดือน,รอง
+P136,Thread,N-Finders,Korea,PDO thread,หน้า,17000-28000,9-12 เดือน,รอง
+P137,Treatment,HydraFacial MD,USA,Vacuum+infusion,ทั้งหน้า,3500-6000,ทุกเดือน,TOP
+P138,Treatment,Aqua Peel,Korea,คู่แข่ง Hydrafacial,ทั้งหน้า,2500-4500,ทุกเดือน,TOP
+P139,Treatment,Intraceuticals,USA,Oxygen+serum,ทั้งหน้า,4000-7000,ทุกเดือน,รอง
+P140,Treatment,Omnilux,UK,LED light therapy,ทั้งหน้า สิว,2000-4000,2 ครั้ง/สัปดาห์,รอง
+P141,Treatment,NuFace,USA,Microcurrent face lift,ทั้งหน้า,ใช้เอง,ต่อเนื่อง,รอง
+P142,Treatment,Jett Plasma Lift,USA,Plasma fibroblast,หนังตาตก ริ้วรอย,15000-30000,6-12 เดือน,กระแส
+P143,Treatment,CryoStar,Italy,Whole body cryotherapy,ทั้งตัว,3000-6000,ต่อเนื่อง,กระแส
+P144,Filler,Hyabell Volume,Korea,ยกแก้ม,แก้ม คาง,12000-18000,9-12 เดือน,รอง
+P145,Filler,Hyabell Basic,Korea,ทั่วไป,ร่องแก้ม ปาก,10000-15000,6-9 เดือน,รอง
+P146,Filler,Princess Volume,Austria,ยกแก้ม,แก้ม,13000-19000,9-12 เดือน,รอง
+P147,Filler,Princess Filler,Austria,ริ้วรอยกลาง,ร่องแก้ม,11000-16000,6-9 เดือน,รอง
+P148,Biostimulator,Ellansé L,Netherlands,PCL+CMC 3 years,แก้ม คาง,42000-60000,36 เดือน,กระแส
+P149,Biostimulator,Ellansé E,Netherlands,PCL+CMC 4 years,แก้ม คาง,48000-68000,48 เดือน,กระแส
+P150,RF,Venus Legacy,Canada,RF multipolar+Pulsed EM,ทั้งหน้า ตัว,18000-32000,6-9 เดือน,รอง
+P151,RF,Endymed Intensif,Israel,RF Microneedling,ทั้งหน้า,20000-35000,9-12 เดือน,รอง
+P152,HIFU,Sofwave,USA,Superb Synchronous Ultrasound,ทั้งหน้า คอ,35000-55000,9-12 เดือน,กระแส
+P153,Body,Emface,USA,HIFEM Facial ยกหน้า,ทั้งหน้า,25000-45000,6-9 เดือน,กระแส
+P154,Laser,Gentle YAG Pro-U,USA,1064nm Nd:YAG ขนดำ,ขนดำ ผิวคำ,2500-5000,6-8 ครั้ง,รอง
+P155,Laser,RevLite SI,USA,Q-switched Nd:YAG,ฝ้า รอยสัก,6000-11000,5-8 ครั้ง,รอง
+P156,Skin Booster,Restylane Vital Light,Sweden,HA ผิวบาง,ทั้งหน้า คอ,11000-16000,6-9 เดือน,รอง
+P157,Body,Forma,USA,RF body tightening,ตัว,15000-28000,6-9 เดือน,รอง
+P158,Treatment,Chemical Peel Medium,Thailand,TCA 20-30%,ทั้งหน้า,3000-6000,3-5 ครั้ง,TOP
+P159,Treatment,Chemical Peel Deep,Thailand,TCA 40-50% Phenol,ทั้งหน้า,5000-10000,1-3 ครั้ง,รอง
+P160,Treatment,Microneedling,Manual,Derma roller pen,ทั้งหน้า,2500-5000,4-6 ครั้ง,TOP
+P161,Vitamins,Vitamin C Mega Dose,Thailand,High-dose Vit C IV,IV drip,1500-3000,ต่อเนื่อง,TOP
+P162,Vitamins,NAD Plus,Thailand,NAD+ anti-aging,IV drip,8000-15000,ต่อเนื่อง,กระแส
+P163,Vitamins,Liver Detox,Thailand,Detox complex,IV drip,2000-4000,ต่อเนื่อง,TOP
+P164,Vitamins,Collagen Booster,Thailand,Collagen+Vit complex,IV drip,2500-4500,ต่อเนื่อง,TOP
+P165,Treatment,Oxygen Facial,Thailand,O2 + hydration,ทั้งหน้า,2000-4000,ต่อเนื่อง,รอง
+P166,Treatment,Diamond Peel,Thailand,Microdermabrasion,ทั้งหน้า,1500-3000,ต่อเนื่อง,TOP
+P167,Treatment,Carbon Laser Peel,Thailand,Carbon + Q-switch,ทั้งหน้า,3000-6000,4-6 ครั้ง,TOP
+P168,Acne,Blue Light Therapy,Thailand,LED 415nm สิว,ทั้งหน้า,1500-3000,8-12 ครั้ง,รอง
+P169,Acne,Acne Extraction,Thailand,ตํางสิว,ทั้งหน้า,800-1500,ต่อเนื่อง,TOP
+P170,Treatment,Mesotherapy Face,Thailand,Vitamins + HA cocktail,ทั้งหน้า,3000-6000,4-6 ครั้ง,TOP
+P171,Treatment,Mesotherapy Hair,Thailand,Hair growth cocktail,ศรีษะ,4000-8000,6-10 ครั้ง,TOP
+P172,Body,Mesotherapy Fat,Thailand,Fat dissolving cocktail,แขน ท้อง ขา,5000-10000,6-8 ครั้ง,TOP
+P173,Body,Cavitation,Thailand,Ultrasound fat reduction,ท้อง แขน,3000-6000,6-8 ครั้ง,รอง
+P174,Body,Vacuum RF,Thailand,Suction + RF,ท้อง ขา,2500-5000,8-12 ครั้ง,รอง
+P175,Treatment,Facial Massage,Thailand,Manual lymphatic,ทั้งหน้า คอ,1500-3000,ต่อเนื่อง,TOP
+P176,Treatment,Gua Sha Facial,Thailand,Traditional + modern,ทั้งหน้า,2000-4000,ต่อเนื่อง,กระแส
+P177,Body,Slimming Wrap,Thailand,Body wrap detox,ตัว,2000-4000,6-8 ครั้ง,รอง
+P178,Body,Pressotherapy,Thailand,Lymphatic drainage machine,ขา,2000-4000,8-10 ครั้ง,รอง
+P179,Treatment,Vampire Facial,Thailand,PRP + microneedling,ทั้งหน้า,8000-15000,3-5 ครั้ง,TOP
+P180,Treatment,Hair PRP,Thailand,PRP scalp injection,ศรีษะ,10000-18000,3-6 ครั้ง,TOP

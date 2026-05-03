@@ -4,12 +4,22 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { PACKAGES } from "@/lib/packages-config";
 import { cn } from "@/lib/utils";
+import { type ComponentType } from "react";
+import {
+  SparklesIcon,
+  CpuChipIcon,
+  BuildingOffice2Icon,
+  ShieldCheckIcon,
+  CheckIcon,
+} from "@heroicons/react/24/solid";
 
-const PLAN_ICONS: Record<string, string> = {
-  starter: "✦",
-  professional: "◈",
-  multi_branch: "⬡",
-  enterprise: "◇",
+type IconComponent = ComponentType<{ className?: string }>;
+
+const PLAN_ICONS: Record<string, IconComponent> = {
+  starter: SparklesIcon,
+  professional: CpuChipIcon,
+  multi_branch: BuildingOffice2Icon,
+  enterprise: ShieldCheckIcon,
 };
 
 export default function UpgradePage() {
@@ -19,7 +29,7 @@ export default function UpgradePage() {
     <div className="min-h-screen bg-cream-100">
       {/* Hero — same as Packages */}
       <div
-        className="relative overflow-hidden py-20 px-6 text-center"
+        className="relative overflow-hidden py-16 sm:py-20 px-4 sm:px-6 text-center"
         style={{
           background:
             "linear-gradient(145deg, var(--mauve-800) 0%, var(--mauve-600) 60%, var(--rg-500) 100%)",
@@ -44,7 +54,7 @@ export default function UpgradePage() {
           <p className="font-body text-xs text-rg-300 tracking-widest uppercase mb-4">
             เลือกแผนที่เหมาะกับคุณ
           </p>
-          <h1 className="font-display text-5xl font-light text-cream-100 mb-4">
+          <h1 className="font-display text-4xl sm:text-5xl font-light text-cream-100 mb-4">
             อัพเกรดแผน
           </h1>
           <p className="font-body text-sm text-rg-300 max-w-md mx-auto leading-relaxed">
@@ -54,7 +64,7 @@ export default function UpgradePage() {
       </div>
 
       {/* Pricing cards — same layout as Packages */}
-      <div className="max-w-6xl mx-auto px-6 py-16">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
           {PACKAGES.map((pkg, i) => (
             <motion.div
@@ -94,7 +104,10 @@ export default function UpgradePage() {
                       : "bg-cream-200 text-mauve-500"
                   )}
                 >
-                  {PLAN_ICONS[pkg.id] ?? "✦"}
+                  {(() => {
+                    const Icon = PLAN_ICONS[pkg.id] ?? SparklesIcon;
+                    return <Icon className="h-6 w-6" />;
+                  })()}
                 </div>
 
                 <h3 className="font-display text-xl font-semibold text-mauve-800 mb-1">
@@ -127,9 +140,7 @@ export default function UpgradePage() {
                       key={j}
                       className="flex items-start gap-2.5 text-sm font-body"
                     >
-                      <span className="text-rg-500 flex-shrink-0 mt-0.5">
-                        ✓
-                      </span>
+                      <CheckIcon className="h-4 w-4 text-rg-500 flex-shrink-0 mt-0.5" />
                       <span className="text-mauve-600">{f}</span>
                     </li>
                   ))}

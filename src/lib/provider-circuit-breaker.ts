@@ -12,9 +12,6 @@ const COLLECTION = "provider_circuit_breaker";
 const FAILURE_THRESHOLD = 5; // consecutive failures to open
 const SUCCESS_THRESHOLD = 3; // consecutive successes to half-open
 const COOLDOWN_MS = 60_000; // 1 min open before half-open
-const WINDOW_MS = 60_000; // 1 min rolling window for error ratio
-const ERROR_RATIO_THRESHOLD = 0.6; // 60% error rate
-const MIN_CALLS_FOR_RATIO = 10;
 
 interface ProviderState {
   state: "closed" | "open" | "half_open";

@@ -11,6 +11,10 @@ import { getStripe } from "@/lib/stripe";
 import { processStripeWebhookEvent } from "@/lib/stripe-webhook-handler";
 import { sendWebhookDeadLetterEmail } from "@/lib/email";
 import type { WebhookRetryJobData } from "@/lib/webhook-retry-queue";
+import { getLineChannelByOrgId } from "@/lib/line-channel-data";
+import { runLineClinicReply } from "@/lib/line-inbound-ai";
+import { pushLineMessages, pushLineTextMessage, type LineOutboundMessage } from "@/lib/line-messaging";
+import { toSignedUrlIfFirebaseStorage } from "@/lib/promotion-storage";
 
 const QUEUE_NAME = "webhook-retry";
 
@@ -39,16 +43,65 @@ if (!REDIS_URL) {
 const connection = new Redis(REDIS_URL, { maxRetriesPerRequest: null });
 
 async function processJob(job: { id: string; data: WebhookRetryJobData }): Promise<void> {
-  const { source, eventId } = job.data;
+  const { source, eventId, correlationId } = job.data;
 
   if (source === "stripe") {
+    console.log("[Webhook Retry Worker] processing stripe", { eventId, correlationId });
     const stripe = getStripe();
     const event = await stripe.events.retrieve(eventId);
-    await processStripeWebhookEvent(event);
+    await processStripeWebhookEvent(event, { correlationId });
   }
-  // LINE: reply token expires quickly, skip replay for now
   if (source === "line") {
-    throw new Error("LINE webhook retry not implemented (reply token expires)");
+    const payload = (job.data.payload ?? {}) as {
+      orgId?: string;
+      lineUserId?: string;
+      text?: string;
+      branchId?: string | null;
+      correlationId?: string;
+    };
+    const orgId = payload.orgId?.trim() ?? "";
+    const lineUserId = payload.lineUserId?.trim() ?? "";
+    const text = payload.text?.trim() ?? "";
+    if (!orgId || !lineUserId || !text) {
+      throw new Error(`Invalid LINE retry payload for ${eventId}`);
+    }
+    const traceId = payload.correlationId ?? correlationId ?? `${source}:${eventId}`;
+    const channel = await getLineChannelByOrgId(orgId);
+    const token = channel?.channel_access_token?.trim() ?? "";
+    if (!token) {
+      throw new Error(`LINE channel token missing for org ${orgId}`);
+    }
+    const { reply, media } = await runLineClinicReply({
+      orgId,
+      lineUserId,
+      text,
+      branchId: payload.branchId ?? undefined,
+    });
+    const outbound: LineOutboundMessage[] = [];
+    if (reply.trim()) {
+      outbound.push({ type: "text", text: reply.trim() });
+    }
+    if (media?.length) {
+      const signed = await Promise.all(media.slice(0, 4).map((u) => toSignedUrlIfFirebaseStorage(u.trim())));
+      for (const url of signed) {
+        if (url.startsWith("https://")) {
+          outbound.push({ type: "image", originalContentUrl: url, previewImageUrl: url });
+        }
+      }
+    }
+    if (outbound.length === 0) {
+      throw new Error("LINE retry generated empty outbound message");
+    }
+    const pushed = await pushLineMessages(token, lineUserId, outbound);
+    if (!pushed.ok) {
+      const textOnly = outbound.find((m) => m.type === "text");
+      if (textOnly && textOnly.type === "text") {
+        const fallback = await pushLineTextMessage(token, lineUserId, textOnly.text);
+        if (fallback.ok) return;
+      }
+      throw new Error(`LINE push retry failed: ${pushed.status} ${pushed.body.slice(0, 120)}`);
+    }
+    console.log("[Webhook Retry Worker] delivered line retry", { eventId, correlationId: traceId });
   }
 }
 

@@ -42,6 +42,12 @@ export async function GET(request: NextRequest) {
     const branchId = searchParams.get("branchId") ?? undefined;
     const channel = searchParams.get("channel") ?? undefined;
     const doctorId = searchParams.get("doctorId") ?? undefined;
+    if ((user.role === "manager" || user.role === "staff") && !branchId) {
+      return NextResponse.json(
+        { error: "กรุณาเลือกสาขาก่อนดูปฏิทินนัดหมาย (จำกัดสิทธิ์ตามสาขา)", code: "FORBIDDEN" },
+        { status: 403 }
+      );
+    }
     if (branchId && !requireBranchAccess(user.role, user.branch_ids, user.branch_roles, branchId)) {
       return NextResponse.json({ error: "Forbidden", code: "FORBIDDEN" }, { status: 403 });
     }

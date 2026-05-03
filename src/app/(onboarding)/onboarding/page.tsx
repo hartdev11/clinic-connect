@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/Button";
@@ -55,6 +55,7 @@ export default function OnboardingPage() {
   const [saving, setSaving] = useState(false);
   const [completeLoading, setCompleteLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [onboardingError, setOnboardingError] = useState("");
 
   const { data: presetsData } = useSWR<{ items: OnboardingServicePreset[] }>(
     step === 2 ? "/api/onboarding/step2" : null,
@@ -66,8 +67,8 @@ export default function OnboardingPage() {
     fetcher
   );
 
-  const presets = presetsData?.items ?? [];
-  const services = clinicServices?.items ?? [];
+  const presets = useMemo(() => presetsData?.items ?? [], [presetsData?.items]);
+  const services = useMemo(() => clinicServices?.items ?? [], [clinicServices?.items]);
 
   const { data: step1Data } = useSWR<{
     clinicName: string;
@@ -138,7 +139,14 @@ export default function OnboardingPage() {
       if (field === "lineOA") payload.lineOA = value;
       if (field === "businessHours") payload.businessHours = value;
       saveStep1(payload)
-        .then(() => {})
+        .then(async (res) => {
+          if (!res.ok) {
+            const j = await res.json().catch(() => ({}));
+            setOnboardingError(j.error ?? "บันทึกข้อมูลไม่สำเร็จ");
+          } else {
+            setOnboardingError("");
+          }
+        })
         .finally(() => setSaving(false));
     },
     []
@@ -156,9 +164,10 @@ export default function OnboardingPage() {
   });
 
   const handleNext = async () => {
+    setOnboardingError("");
     if (step === 1) {
       setSaving(true);
-      await saveStep1({
+      const res = await saveStep1({
         clinicName: form1.clinicName,
         address: form1.address,
         phone: form1.phone,
@@ -166,6 +175,11 @@ export default function OnboardingPage() {
         businessHours: form1.businessHours,
       });
       setSaving(false);
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        setOnboardingError(j.error ?? "บันทึกข้อมูลขั้นที่ 1 ไม่สำเร็จ");
+        return;
+      }
       setStep(2);
     } else if (step === 2) {
       setSaving(true);
@@ -189,7 +203,7 @@ export default function OnboardingPage() {
       setSaving(false);
       if (!res.ok) {
         const j = await res.json();
-        alert(j.error ?? "เกิดข้อผิดพลาด");
+        setOnboardingError(j.error ?? "เกิดข้อผิดพลาด");
         return;
       }
       setStep(3);
@@ -197,19 +211,24 @@ export default function OnboardingPage() {
     } else if (step === 3) {
       setSaving(true);
       const updates = Object.entries(form3Prices).map(([id, custom_price]) => ({ id, custom_price }));
-      await fetch("/api/onboarding/step3", {
+      const res = await fetch("/api/onboarding/step3", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({ updates }),
       });
       setSaving(false);
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        setOnboardingError(j.error ?? "บันทึกข้อมูลขั้นที่ 3 ไม่สำเร็จ");
+        return;
+      }
       setStep(4);
     } else if (step === 4) {
       const valid = form4Promos.filter((p) => p.name.trim());
       if (valid.length > 0) {
         setSaving(true);
-        await fetch("/api/onboarding/step4", {
+        const res = await fetch("/api/onboarding/step4", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
@@ -222,17 +241,27 @@ export default function OnboardingPage() {
           }),
         });
         setSaving(false);
+        if (!res.ok) {
+          const j = await res.json().catch(() => ({}));
+          setOnboardingError(j.error ?? "บันทึกโปรโมชันไม่สำเร็จ");
+          return;
+        }
       }
       setStep(5);
     } else if (step === 5) {
       setSaving(true);
-      await fetch("/api/onboarding/step5", {
+      const saveRes = await fetch("/api/onboarding/step5", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify(form5),
       });
       setSaving(false);
+      if (!saveRes.ok) {
+        const j = await saveRes.json().catch(() => ({}));
+        setOnboardingError(j.error ?? "บันทึกข้อมูลขั้นที่ 5 ไม่สำเร็จ");
+        return;
+      }
       setCompleteLoading(true);
       const res = await fetch("/api/onboarding/complete", {
         method: "POST",
@@ -243,7 +272,7 @@ export default function OnboardingPage() {
         setSuccess(true);
       } else {
         const j = await res.json();
-        alert(j.error ?? "เกิดข้อผิดพลาด");
+        setOnboardingError(j.error ?? "เกิดข้อผิดพลาด");
       }
     }
   };
@@ -302,6 +331,11 @@ export default function OnboardingPage() {
             />
           </div>
         </div>
+        {onboardingError && (
+          <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {onboardingError}
+          </div>
+        )}
 
         <AnimatePresence mode="wait">
           {step === 1 && (

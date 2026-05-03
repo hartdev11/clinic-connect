@@ -62,7 +62,7 @@ export default function AgencyDashboardPage() {
       <div className="space-y-6">
         <div className="luxury-card p-6 animate-pulse">
           <div className="h-6 w-48 bg-cream-200 rounded mb-4" />
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {[1, 2, 3].map((i) => (
               <div key={i} className="h-24 bg-cream-200 rounded-xl" />
             ))}
@@ -92,6 +92,13 @@ export default function AgencyDashboardPage() {
 
   return (
     <div className="space-y-8">
+      {statsError && (
+        <div className="luxury-card p-4 border border-amber-200 bg-amber-50">
+          <p className="text-sm text-amber-800">
+            โหลดสถิติ Agency ไม่สำเร็จชั่วคราว กำลังแสดงข้อมูลเท่าที่มี (บางค่าจะเป็น &quot;—&quot;)
+          </p>
+        </div>
+      )}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}

@@ -1,0 +1,194 @@
+{
+  "cust_30c32b9c8f": {
+    "customer_id": "cust_30c32b9c8f",
+    "tenant_id": "t_001",
+    "clinic_id": "c_001",
+    "branch_id": "b_001",
+    "external_user_id": "user_pg_001",
+    "first_source_platform": "line",
+    "first_source_type": "line_oa",
+    "source_history": [
+      {
+        "timestamp": "2026-03-20T10:00:00Z",
+        "source_platform": "line",
+        "source_type": "line_oa",
+        "campaign_id": null,
+        "affiliate_id": null
+      }
+    ],
+    "tags": [],
+    "latest_lead_score": 100,
+    "latest_lead_level": "hot",
+    "recommendation_history": [
+      {
+        "procedure_id": "proc_001",
+        "promotion_id": null,
+        "cta_strategy": "push_booking_now"
+      }
+    ],
+    "booking_history": [],
+    "first_seen_at": "2026-03-20T10:00:00Z",
+    "last_seen_at": "2026-03-20T10:00:00Z",
+    "last_message_text": "อยากจอง botox วันนี้ ราคาเท่าไหร่"
+  },
+  "cust_ddc5e209e3": {
+    "customer_id": "cust_ddc5e209e3",
+    "tenant_id": "t_001",
+    "clinic_id": "c_001",
+    "branch_id": "b_001",
+    "external_user_id": "line_user_001",
+    "first_source_platform": "line",
+    "first_source_type": "line_oa",
+    "source_history": [
+      {
+        "timestamp": "2026-03-20T10:00:00Z",
+        "source_platform": "line",
+        "source_type": "line_oa",
+        "campaign_id": null,
+        "affiliate_id": null
+      }
+    ],
+    "tags": [],
+    "latest_lead_score": 96,
+    "latest_lead_level": "hot",
+    "recommendation_history": [
+      {
+        "procedure_id": "proc_001",
+        "promotion_id": null,
+        "cta_strategy": "push_booking_now"
+      }
+    ],
+    "booking_history": [],
+    "first_seen_at": "2026-03-20T10:00:00Z",
+    "last_seen_at": "2026-03-20T10:00:00Z",
+    "last_message_text": "อยากจอง botox วันนี้"
+  },
+  "cust_b1d826b8f2": {
+    "customer_id": "cust_b1d826b8f2",
+    "tenant_id": "t_001",
+    "clinic_id": "c_001",
+    "branch_id": "b_001",
+    "external_user_id": "ig_user_001",
+    "first_source_platform": "instagram",
+    "first_source_type": "instagram_dm",
+    "source_history": [
+      {
+        "timestamp": "2026-03-20T10:05:00Z",
+        "source_platform": "instagram",
+        "source_type": "instagram_dm",
+        "campaign_id": null,
+        "affiliate_id": null
+      }
+    ],
+    "tags": [],
+    "latest_lead_score": 54,
+    "latest_lead_level": "cold",
+    "recommendation_history": [
+      {
+        "procedure_id": "proc_001",
+        "promotion_id": null,
+        "cta_strategy": "soft_consultation"
+      }
+    ],
+    "booking_history": [],
+    "first_seen_at": "2026-03-20T10:05:00Z",
+    "last_seen_at": "2026-03-20T10:05:00Z",
+    "last_message_text": "botox ราคาเท่าไหร่"
+  },
+  "cust_d665136ad2": {
+    "customer_id": "cust_d665136ad2",
+    "tenant_id": "t_001",
+    "clinic_id": "c_001",
+    "branch_id": "b_001",
+    "external_user_id": "fb_user_001",
+    "first_source_platform": "facebook",
+    "first_source_type": "facebook_messenger",
+    "source_history": [
+      {
+        "timestamp": "2026-03-20T10:10:00Z",
+        "source_platform": "facebook",
+        "source_type": "facebook_messenger",
+        "campaign_id": null,
+        "affiliate_id": null
+      }
+    ],
+    "tags": [],
+    "latest_lead_score": 51,
+    "latest_lead_level": "cold",
+    "recommendation_history": [
+      {
+        "procedure_id": "proc_001",
+        "promotion_id": null,
+        "cta_strategy": "soft_consultation"
+      }
+    ],
+    "booking_history": [],
+    "first_seen_at": "2026-03-20T10:10:00Z",
+    "last_seen_at": "2026-03-20T10:10:00Z",
+    "last_message_text": "มีโปร filler ไหม"
+  },
+  "cust_1fbeb7fab9": {
+    "customer_id": "cust_1fbeb7fab9",
+    "tenant_id": "t_001",
+    "clinic_id": "c_001",
+    "branch_id": "b_001",
+    "external_user_id": "tt_user_001",
+    "first_source_platform": "tiktok",
+    "first_source_type": "tiktok_dm",
+    "source_history": [
+      {
+        "timestamp": "2026-03-20T10:15:00Z",
+        "source_platform": "tiktok",
+        "source_type": "tiktok_dm",
+        "campaign_id": null,
+        "affiliate_id": null
+      }
+    ],
+    "tags": [],
+    "latest_lead_score": 36,
+    "latest_lead_level": "cold",
+    "recommendation_history": [
+      {
+        "procedure_id": "proc_001",
+        "promotion_id": null,
+        "cta_strategy": "soft_consultation"
+      }
+    ],
+    "booking_history": [],
+    "first_seen_at": "2026-03-20T10:15:00Z",
+    "last_seen_at": "2026-03-20T10:15:00Z",
+    "last_message_text": "อยากหน้าเรียวทำอะไรดี"
+  },
+  "cust_bb5df91326": {
+    "customer_id": "cust_bb5df91326",
+    "tenant_id": "t_001",
+    "clinic_id": "c_001",
+    "branch_id": "b_001",
+    "external_user_id": "web_session_001",
+    "first_source_platform": "web",
+    "first_source_type": "web_chat",
+    "source_history": [
+      {
+        "timestamp": "2026-03-20T10:20:00Z",
+        "source_platform": "web",
+        "source_type": "web_chat",
+        "campaign_id": null,
+        "affiliate_id": null
+      }
+    ],
+    "tags": [],
+    "latest_lead_score": 53,
+    "latest_lead_level": "cold",
+    "recommendation_history": [
+      {
+        "procedure_id": "proc_001",
+        "promotion_id": null,
+        "cta_strategy": "soft_consultation"
+      }
+    ],
+    "booking_history": [],
+    "first_seen_at": "2026-03-20T10:20:00Z",
+    "last_seen_at": "2026-03-20T10:20:00Z",
+    "last_message_text": "สนใจ ulthera ขอข้อมูลหน่อย"
+  }
+}

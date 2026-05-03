@@ -1,0 +1,22 @@
+{
+  "meta": {
+    "version": "2.0",
+    "last_updated": ""
+  },
+  "overview": {},
+  "trend": {
+    "daily": {},
+    "comparison": {}
+  },
+  "funnel": {},
+  "top_procedures": [],
+  "revenue_breakdown": {},
+  "channels": [],
+  "insights": [],
+  "alerts": [],
+  "data_trust": {},
+  "role_specific": {
+    "clinic_owner": {},
+    "affiliate": {}
+  }
+}

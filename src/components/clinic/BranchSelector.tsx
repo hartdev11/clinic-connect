@@ -20,7 +20,7 @@ type BranchSelectorProps = {
 
 export function BranchSelector({ value, onChange, className }: BranchSelectorProps) {
   const { data, isLoading } = useSWR<{ items: Branch[] }>("/api/clinic/branches", apiFetcher);
-  const branches = data?.items ?? [];
+  const branches = useMemo(() => data?.items ?? [], [data?.items]);
   const showSelector = branches.length > 1;
 
   const options = useMemo(() => {
@@ -42,7 +42,7 @@ export function BranchSelector({ value, onChange, className }: BranchSelectorPro
             const v = e.target.value;
             onChange(v === "all" ? null : v);
           }}
-          className="luxury-card px-4 py-2.5 pr-10 appearance-none cursor-pointer text-sm font-medium text-mauve-700 bg-cream-50/80 border border-rg-200 hover:border-rg-300 focus:border-rg-400 focus:outline-none focus:ring-2 focus:ring-rg-200/50 rounded-xl min-w-[140px]"
+          className="luxury-card w-full sm:w-auto px-4 py-2.5 pr-10 appearance-none cursor-pointer text-sm font-medium text-mauve-700 bg-cream-50/80 border border-rg-200 hover:border-rg-300 focus:border-rg-400 focus:outline-none focus:ring-2 focus:ring-rg-200/50 rounded-xl min-w-0 sm:min-w-[140px]"
           aria-label="เลือกสาขา"
         >
           {options.map((opt) => (

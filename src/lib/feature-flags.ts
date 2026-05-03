@@ -9,7 +9,8 @@ import type { OrgPlan } from "@/types/organization";
  * Design only: เปิดได้เฉพาะ plan enterprise
  * ❌ ไม่ implement Phase 1
  */
-export function isKnowledgeWashingMachineEnabled(_orgPlan?: OrgPlan): boolean {
+export function isKnowledgeWashingMachineEnabled(orgPlan?: OrgPlan): boolean {
+  void orgPlan;
   const env = process.env.KNOWLEDGE_WASHING_MACHINE_ENABLED?.trim().toLowerCase();
   if (env !== "true") return false;
   // เมื่อ implement: return orgPlan === "enterprise";

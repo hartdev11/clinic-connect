@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/Input";
 import { SectionHeader } from "@/components/layout/SectionHeader";
 import { useClinicContext } from "@/contexts/ClinicContext";
 import { RequireRole } from "@/components/rbac/RequireRole";
+import { useToast } from "@/components/ui/Toast";
 import useSWR from "swr";
 
 const fetcher = (url: string) =>
@@ -18,6 +19,7 @@ const fetcher = (url: string) =>
 
 export function OrganizationSettings() {
   const { currentOrg, org_id } = useClinicContext();
+  const { addToast } = useToast();
   const { data: profile, mutate } = useSWR<{
     id: string;
     clinicName: string;
@@ -55,14 +57,15 @@ export function OrganizationSettings() {
       });
       if (!res.ok) {
         const json = await res.json();
-        alert(json.error || "บันทึกไม่สำเร็จ");
+        addToast({ title: json.error || "บันทึกไม่สำเร็จ", variant: "error" });
         return;
       }
       setSaved(true);
+      addToast({ title: "บันทึกข้อมูลองค์กรสำเร็จ", variant: "success" });
       mutate();
       setTimeout(() => setSaved(false), 3000);
-    } catch (err) {
-      alert("เกิดข้อผิดพลาด");
+    } catch {
+      addToast({ title: "เกิดข้อผิดพลาด", message: "ไม่สามารถบันทึกข้อมูลได้", variant: "error" });
     } finally {
       setLoading(false);
     }

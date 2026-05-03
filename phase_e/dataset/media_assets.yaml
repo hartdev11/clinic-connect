@@ -1,0 +1,280 @@
+- id: media_001
+  procedure_id: proc_001
+  type: before_after
+  url: https://cdn.clinic.ai/media/proc_001_before_after.jpg
+  tags:
+  - result
+  - before_after
+  performance:
+    conversion_rate: 0.1
+    click_rate: 0.18
+- id: media_101
+  procedure_id: proc_001
+  type: review
+  url: https://cdn.clinic.ai/media/proc_001_review.jpg
+  tags:
+  - testimonial
+  - review
+  performance:
+    conversion_rate: 0.07
+    click_rate: 0.12
+- id: media_002
+  procedure_id: proc_006
+  type: before_after
+  url: https://cdn.clinic.ai/media/proc_006_before_after.jpg
+  tags:
+  - result
+  - before_after
+  performance:
+    conversion_rate: 0.12
+    click_rate: 0.21
+- id: media_102
+  procedure_id: proc_006
+  type: review
+  url: https://cdn.clinic.ai/media/proc_006_review.jpg
+  tags:
+  - testimonial
+  - review
+  performance:
+    conversion_rate: 0.09
+    click_rate: 0.14
+- id: media_003
+  procedure_id: proc_021
+  type: before_after
+  url: https://cdn.clinic.ai/media/proc_021_before_after.jpg
+  tags:
+  - result
+  - before_after
+  performance:
+    conversion_rate: 0.14
+    click_rate: 0.24
+- id: media_103
+  procedure_id: proc_021
+  type: review
+  url: https://cdn.clinic.ai/media/proc_021_review.jpg
+  tags:
+  - testimonial
+  - review
+  performance:
+    conversion_rate: 0.05
+    click_rate: 0.16
+- id: media_004
+  procedure_id: proc_023
+  type: before_after
+  url: https://cdn.clinic.ai/media/proc_023_before_after.jpg
+  tags:
+  - result
+  - before_after
+  performance:
+    conversion_rate: 0.16
+    click_rate: 0.15
+- id: media_104
+  procedure_id: proc_023
+  type: review
+  url: https://cdn.clinic.ai/media/proc_023_review.jpg
+  tags:
+  - testimonial
+  - review
+  performance:
+    conversion_rate: 0.07
+    click_rate: 0.18
+- id: media_005
+  procedure_id: proc_028
+  type: before_after
+  url: https://cdn.clinic.ai/media/proc_028_before_after.jpg
+  tags:
+  - result
+  - before_after
+  performance:
+    conversion_rate: 0.08
+    click_rate: 0.18
+- id: media_105
+  procedure_id: proc_028
+  type: review
+  url: https://cdn.clinic.ai/media/proc_028_review.jpg
+  tags:
+  - testimonial
+  - review
+  performance:
+    conversion_rate: 0.09
+    click_rate: 0.1
+- id: media_006
+  procedure_id: proc_029
+  type: before_after
+  url: https://cdn.clinic.ai/media/proc_029_before_after.jpg
+  tags:
+  - result
+  - before_after
+  performance:
+    conversion_rate: 0.1
+    click_rate: 0.21
+- id: media_106
+  procedure_id: proc_029
+  type: review
+  url: https://cdn.clinic.ai/media/proc_029_review.jpg
+  tags:
+  - testimonial
+  - review
+  performance:
+    conversion_rate: 0.05
+    click_rate: 0.12
+- id: media_007
+  procedure_id: proc_030
+  type: before_after
+  url: https://cdn.clinic.ai/media/proc_030_before_after.jpg
+  tags:
+  - result
+  - before_after
+  performance:
+    conversion_rate: 0.12
+    click_rate: 0.24
+- id: media_107
+  procedure_id: proc_030
+  type: review
+  url: https://cdn.clinic.ai/media/proc_030_review.jpg
+  tags:
+  - testimonial
+  - review
+  performance:
+    conversion_rate: 0.07
+    click_rate: 0.14
+- id: media_008
+  procedure_id: proc_041
+  type: before_after
+  url: https://cdn.clinic.ai/media/proc_041_before_after.jpg
+  tags:
+  - result
+  - before_after
+  performance:
+    conversion_rate: 0.14
+    click_rate: 0.15
+- id: media_108
+  procedure_id: proc_041
+  type: review
+  url: https://cdn.clinic.ai/media/proc_041_review.jpg
+  tags:
+  - testimonial
+  - review
+  performance:
+    conversion_rate: 0.09
+    click_rate: 0.16
+- id: media_009
+  procedure_id: proc_042
+  type: before_after
+  url: https://cdn.clinic.ai/media/proc_042_before_after.jpg
+  tags:
+  - result
+  - before_after
+  performance:
+    conversion_rate: 0.16
+    click_rate: 0.18
+- id: media_109
+  procedure_id: proc_042
+  type: review
+  url: https://cdn.clinic.ai/media/proc_042_review.jpg
+  tags:
+  - testimonial
+  - review
+  performance:
+    conversion_rate: 0.05
+    click_rate: 0.18
+- id: media_010
+  procedure_id: proc_061
+  type: before_after
+  url: https://cdn.clinic.ai/media/proc_061_before_after.jpg
+  tags:
+  - result
+  - before_after
+  performance:
+    conversion_rate: 0.08
+    click_rate: 0.21
+- id: media_110
+  procedure_id: proc_061
+  type: review
+  url: https://cdn.clinic.ai/media/proc_061_review.jpg
+  tags:
+  - testimonial
+  - review
+  performance:
+    conversion_rate: 0.07
+    click_rate: 0.1
+- id: media_011
+  procedure_id: proc_069
+  type: before_after
+  url: https://cdn.clinic.ai/media/proc_069_before_after.jpg
+  tags:
+  - result
+  - before_after
+  performance:
+    conversion_rate: 0.1
+    click_rate: 0.24
+- id: media_111
+  procedure_id: proc_069
+  type: review
+  url: https://cdn.clinic.ai/media/proc_069_review.jpg
+  tags:
+  - testimonial
+  - review
+  performance:
+    conversion_rate: 0.09
+    click_rate: 0.12
+- id: media_012
+  procedure_id: proc_077
+  type: before_after
+  url: https://cdn.clinic.ai/media/proc_077_before_after.jpg
+  tags:
+  - result
+  - before_after
+  performance:
+    conversion_rate: 0.12
+    click_rate: 0.15
+- id: media_112
+  procedure_id: proc_077
+  type: review
+  url: https://cdn.clinic.ai/media/proc_077_review.jpg
+  tags:
+  - testimonial
+  - review
+  performance:
+    conversion_rate: 0.05
+    click_rate: 0.14
+- id: media_013
+  procedure_id: proc_078
+  type: before_after
+  url: https://cdn.clinic.ai/media/proc_078_before_after.jpg
+  tags:
+  - result
+  - before_after
+  performance:
+    conversion_rate: 0.14
+    click_rate: 0.18
+- id: media_113
+  procedure_id: proc_078
+  type: review
+  url: https://cdn.clinic.ai/media/proc_078_review.jpg
+  tags:
+  - testimonial
+  - review
+  performance:
+    conversion_rate: 0.07
+    click_rate: 0.16
+- id: media_014
+  procedure_id: proc_087
+  type: before_after
+  url: https://cdn.clinic.ai/media/proc_087_before_after.jpg
+  tags:
+  - result
+  - before_after
+  performance:
+    conversion_rate: 0.16
+    click_rate: 0.21
+- id: media_114
+  procedure_id: proc_087
+  type: review
+  url: https://cdn.clinic.ai/media/proc_087_review.jpg
+  tags:
+  - testimonial
+  - review
+  performance:
+    conversion_rate: 0.09
+    click_rate: 0.18

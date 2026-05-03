@@ -3,10 +3,8 @@
  * Activity log: prompt version, model, tokens, agents, latency, evaluation
  */
 import { db } from "@/lib/firebase-admin";
-import type { AIActivityLog } from "@/types/ai-enterprise";
 
 const COLLECTION = "ai_activity_logs";
-const RETENTION_DAYS = 30;
 
 export interface LogAIActivityInput {
   org_id: string;

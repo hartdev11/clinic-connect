@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { AuthLayout } from "@/components/layout/AuthLayout";
+import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 
 type AgencyBrand = { id: string; name: string; logoUrl?: string | null; primaryColor?: string | null };
 
@@ -144,7 +145,7 @@ export default function LoginPage() {
               className="flex items-center gap-2 p-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm font-body"
               role="alert"
             >
-              <span>⚠</span> {error}
+              <ExclamationTriangleIcon className="h-4 w-4" /> {error}
             </motion.div>
           )}
 

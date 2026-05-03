@@ -11,25 +11,6 @@ export interface OnboardingServicePreset {
   description: string;
 }
 
-/** Categories for beauty/clinic services */
-const CATEGORIES = [
-  "botox",
-  "filler",
-  "laser",
-  "thread_lift",
-  "skin_booster",
-  "prp",
-  "body_contouring",
-  "aesthetic",
-  "facial",
-  "acne",
-  "pigmentation",
-  "hair",
-  "eyelash",
-  "nails",
-  "other",
-] as const;
-
 /** Preset services — extend as needed to reach 200 */
 const PRESETS: Omit<OnboardingServicePreset, "id">[] = [
   { name: "โบท็อกซ์ 1 จุด", category: "botox", defaultPrice: 1500, duration: 30, description: "ฉีดโบท็อกซ์ลดริ้วรอย 1 จุด" },

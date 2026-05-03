@@ -1,5 +1,11 @@
 import type { ConversationState } from "../agents/conversation-state";
 import type { IntentResult } from "../agents/types";
+import {
+  isAskingForOtherPromotionsCount,
+  isExplicitPromotionListingAsk,
+  isPromotionDetailScopeAsk,
+  isPromotionOpinionOrSuitabilityAsk,
+} from "../agents/promotion-listing-intent";
 
 /**
  * Duplicate Intent Guard
@@ -22,8 +28,18 @@ import type { IntentResult } from "../agents/types";
  */
 export function isDuplicateIntent(
   prevState: ConversationState,
-  intentResult: IntentResult
+  intentResult: IntentResult,
+  opts?: { userMessage?: string }
 ): boolean {
+  if (
+    opts?.userMessage &&
+    (isExplicitPromotionListingAsk(opts.userMessage) ||
+      isAskingForOtherPromotionsCount(opts.userMessage) ||
+      isPromotionDetailScopeAsk(opts.userMessage) ||
+      isPromotionOpinionOrSuitabilityAsk(opts.userMessage))
+  ) {
+    return false;
+  }
   // ถ้าไม่มี state ก่อนหน้า → ไม่ซ้ำ (ถามได้)
   if (!prevState.intent || !prevState.service || !prevState.area) {
     return false;

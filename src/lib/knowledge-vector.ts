@@ -4,7 +4,6 @@
  * Enterprise: Embedding version drift — เก็บ version ใน metadata, ใช้ versioned namespace
  */
 import { getOpenAI } from "@/lib/agents/clients";
-import { getKnowledgeIndex, getEmbeddingNamespace } from "@/lib/pinecone";
 import type {
   KnowledgeDocument,
   KnowledgeLevel,
@@ -13,6 +12,91 @@ import type {
 const EMBEDDING_MODEL = "text-embedding-3-small";
 /** เมื่อเปลี่ยน model ต้อง bump version — ใช้ namespace ใหม่หรือ re-embed */
 export const EMBEDDING_VERSION = "text-embedding-3-small-v1";
+const KNOWLEDGE_UPLOAD_PATH = "/api/knowledge/upload";
+
+function resolveKnowledgeVectorBaseUrl(): string | null {
+  return (
+    process.env.KNOWLEDGE_VECTOR_URL?.trim().replace(/\/+$/, "") ??
+    process.env.PHASE_G_URL?.trim().replace(/\/+$/, "") ??
+    null
+  );
+}
+
+function toKnowledgeSourceType(input: string): string {
+  const value = input.toLowerCase();
+  if (value.includes("faq")) return "faq_knowledge";
+  if (value.includes("price")) return "pricing_knowledge";
+  return "procedure_knowledge";
+}
+
+async function uploadKnowledgeToVm(payload: Record<string, unknown>): Promise<void> {
+  const baseUrl = resolveKnowledgeVectorBaseUrl();
+  if (!baseUrl) {
+    console.error("[Knowledge Upload] Missing KNOWLEDGE_VECTOR_URL/PHASE_G_URL");
+    return;
+  }
+  const serviceSecret = process.env.PHASE_SERVICE_SECRET?.trim() ?? "";
+  try {
+    const res = await fetch(`${baseUrl}${KNOWLEDGE_UPLOAD_PATH}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Service-Secret": serviceSecret,
+      },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      const details = await res.text().catch(() => "");
+      console.error("[Knowledge Upload] VM upload failed", res.status, details.slice(0, 300));
+    }
+  } catch (error) {
+    console.error("[Knowledge Upload] VM upload request error", error);
+  }
+}
+
+async function searchKnowledgeOnVm(payload: Record<string, unknown>): Promise<SearchKnowledgeResult[]> {
+  const baseUrl = resolveKnowledgeVectorBaseUrl();
+  if (!baseUrl) return [];
+  const serviceSecret = process.env.PHASE_SERVICE_SECRET?.trim() ?? "";
+  try {
+    const res = await fetch(`${baseUrl}/api/knowledge/search`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Service-Secret": serviceSecret,
+      },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) return [];
+    const data = await res.json().catch(() => ({}));
+    const rows = Array.isArray(data?.results) ? data.results : [];
+    return rows.map((row: Record<string, unknown>) => ({
+      id: String(row.id ?? ""),
+      score: typeof row.score === "number" ? row.score : undefined,
+      metadata: (row.metadata as Record<string, unknown> | undefined) ?? undefined,
+    }));
+  } catch {
+    return [];
+  }
+}
+
+async function deleteKnowledgeOnVm(payload: Record<string, unknown>): Promise<void> {
+  const baseUrl = resolveKnowledgeVectorBaseUrl();
+  if (!baseUrl) return;
+  const serviceSecret = process.env.PHASE_SERVICE_SECRET?.trim() ?? "";
+  try {
+    await fetch(`${baseUrl}/api/knowledge/delete`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Service-Secret": serviceSecret,
+      },
+      body: JSON.stringify(payload),
+    });
+  } catch {
+    // ignore delete errors in cleanup path
+  }
+}
 
 /** E3.5 — สร้าง embedding จากข้อความ (Phase 14: cache-first) */
 export async function embedText(text: string): Promise<number[]> {
@@ -34,39 +118,27 @@ export async function embedText(text: string): Promise<number[]> {
   return embedding;
 }
 
-function toPineconeMetadata(doc: KnowledgeDocument): Record<string, string | number | boolean> {
-  const m: Record<string, string | number | boolean> = {
-    level: doc.level,
-    topic: doc.topic,
-    category: doc.category,
-    key_points: JSON.stringify(doc.key_points),
-    is_active: doc.is_active,
-    source: doc.source,
-    content: doc.text.slice(0, 2000), // E4 RAG: เก็บ content สำหรับ retrieve
-    embedding_version: EMBEDDING_VERSION, // Enterprise: drift tracking
-  };
-  if (doc.org_id) m.org_id = doc.org_id;
-  if (doc.branch_id) m.branch_id = doc.branch_id;
-  if (doc.expires_at) m.expires_at = doc.expires_at;
-  if (doc.archived_at) m.archived_at = doc.archived_at;
-  return m;
-}
-
 /** E3.6 — upsert knowledge document ลง Pinecone (versioned namespace) */
 export async function upsertKnowledgeDoc(doc: KnowledgeDocument): Promise<void> {
-  const embedding = await embedText(doc.text);
-  const index = getKnowledgeIndex();
-  const ns = index.namespace(getEmbeddingNamespace());
-
-  await ns.upsert({
-    records: [
-      {
-        id: doc.id,
-        values: embedding,
-        metadata: toPineconeMetadata(doc),
-      },
-    ],
+  await uploadKnowledgeToVm({
+    tenant_id: doc.org_id ?? "global",
+    clinic_id: doc.org_id ?? "global",
+    scope: "clinic",
+    source_type: toKnowledgeSourceType(doc.category ?? doc.source ?? "procedure"),
+    content: doc.text,
+    topic: doc.topic,
+    language: "th",
+    document_id: doc.id,
+    document_version: EMBEDDING_VERSION,
   });
+
+  // DISABLED: Using ChromaDB via VM instead
+  // const embedding = await embedText(doc.text);
+  // const index = getKnowledgeIndex();
+  // const ns = index.namespace(getEmbeddingNamespace());
+  // await ns.upsert({
+  //   records: [{ id: doc.id, values: embedding, metadata: toPineconeMetadata(doc) }],
+  // });
 }
 
 /** Enterprise redesign — upsert topic version to Pinecone (async worker). Same namespace + metadata shape as RAG. */
@@ -86,23 +158,34 @@ export async function upsertKnowledgeVersionToVector(
     .concat((version.summary ?? []).filter(Boolean))
     .join("\n")
     .slice(0, 8191);
-  const embedding = await embedText(text);
-  const index = getKnowledgeIndex();
-  const ns = index.namespace(getEmbeddingNamespace());
   const id = `${orgId}_${topicId}`;
-  const metadata: Record<string, string | number | boolean> = {
-    level: "org",
-    org_id: orgId,
+  await uploadKnowledgeToVm({
+    tenant_id: orgId,
+    clinic_id: orgId,
+    scope: "clinic",
+    source_type: toKnowledgeSourceType(version.category),
+    content: text,
     topic: version.topic,
-    category: version.category,
-    content: version.content.slice(0, 2000),
-    is_active: true,
-    source: "knowledge_topics",
-    embedding_version: EMBEDDING_VERSION,
-  };
-  await ns.upsert({
-    records: [{ id, values: embedding, metadata }],
+    language: "th",
+    document_id: id,
+    document_version: EMBEDDING_VERSION,
   });
+
+  // DISABLED: Using ChromaDB via VM instead
+  // const embedding = await embedText(text);
+  // const index = getKnowledgeIndex();
+  // const ns = index.namespace(getEmbeddingNamespace());
+  // const metadata: Record<string, string | number | boolean> = {
+  //   level: "org",
+  //   org_id: orgId,
+  //   topic: version.topic,
+  //   category: version.category,
+  //   content: version.content.slice(0, 2000),
+  //   is_active: true,
+  //   source: "knowledge_topics",
+  //   embedding_version: EMBEDDING_VERSION,
+  // };
+  // await ns.upsert({ records: [{ id, values: embedding, metadata }] });
 }
 
 /** Phase 16: Upsert learned knowledge (source: human_handoff) */
@@ -114,27 +197,38 @@ export async function upsertLearnedKnowledgeToVector(
   content: string,
   meta?: { handoffId?: string; confidence?: number }
 ): Promise<void> {
-  const version: KnowledgeVersionForVector = { topic, category, content, summary: [topic] };
+  void meta;
   const text = [content].join("\n").slice(0, 8191);
-  const embedding = await embedText(text);
-  const index = getKnowledgeIndex();
-  const ns = index.namespace(getEmbeddingNamespace());
   const id = `${orgId}_learned_${docId}`;
-  const metadata: Record<string, string | number | boolean> = {
-    level: "org",
-    org_id: orgId,
+  await uploadKnowledgeToVm({
+    tenant_id: orgId,
+    clinic_id: orgId,
+    scope: "clinic",
+    source_type: toKnowledgeSourceType(category),
+    content: text,
     topic,
-    category,
-    content: content.slice(0, 2000),
-    is_active: true,
-    source: "human_handoff",
-    embedding_version: EMBEDDING_VERSION,
-    ...(meta?.handoffId && { handoff_id: meta.handoffId }),
-    ...(typeof meta?.confidence === "number" && { confidence: meta.confidence }),
-  };
-  await ns.upsert({
-    records: [{ id, values: embedding, metadata }],
+    language: "th",
+    document_id: id,
+    document_version: EMBEDDING_VERSION,
   });
+
+  // DISABLED: Using ChromaDB via VM instead
+  // const embedding = await embedText(text);
+  // const index = getKnowledgeIndex();
+  // const ns = index.namespace(getEmbeddingNamespace());
+  // const metadata: Record<string, string | number | boolean> = {
+  //   level: "org",
+  //   org_id: orgId,
+  //   topic,
+  //   category,
+  //   content: content.slice(0, 2000),
+  //   is_active: true,
+  //   source: "human_handoff",
+  //   embedding_version: EMBEDDING_VERSION,
+  //   ...(meta?.handoffId && { handoff_id: meta.handoffId }),
+  //   ...(typeof meta?.confidence === "number" && { confidence: meta.confidence }),
+  // };
+  // await ns.upsert({ records: [{ id, values: embedding, metadata }] });
 }
 
 /** Phase 16: Remove learned knowledge from Pinecone. */
@@ -142,18 +236,20 @@ export async function deleteLearnedKnowledgeFromVector(
   orgId: string,
   docId: string
 ): Promise<void> {
-  const index = getKnowledgeIndex();
-  const ns = index.namespace(getEmbeddingNamespace());
-  const id = `${orgId}_learned_${docId}`;
-  await ns.deleteOne({ id });
+  await deleteKnowledgeOnVm({
+    tenant_id: orgId,
+    clinic_id: orgId,
+    document_id: `${orgId}_learned_${docId}`,
+  });
 }
 
 /** Remove topic vector when topic is deleted (multi-tenant safe). */
 export async function deleteKnowledgeVectorById(orgId: string, topicId: string): Promise<void> {
-  const index = getKnowledgeIndex();
-  const ns = index.namespace(getEmbeddingNamespace());
-  const id = `${orgId}_${topicId}`;
-  await ns.deleteOne({ id });
+  await deleteKnowledgeOnVm({
+    tenant_id: orgId,
+    clinic_id: orgId,
+    document_id: `${orgId}_${topicId}`,
+  });
 }
 
 /** E4.1 — context สำหรับ pyramid filter */
@@ -270,29 +366,18 @@ export async function searchKnowledge(
   filters?: SearchKnowledgeFilters,
   topK = 5
 ): Promise<SearchKnowledgeResult[]> {
-  const embedding = await embedText(query);
-  const index = getKnowledgeIndex();
-  const ns = index.namespace(getEmbeddingNamespace());
-
-  const filter: Record<string, unknown> = {};
-  if (filters?.org_id) filter.org_id = { $eq: filters.org_id };
-  if (filters?.branch_id) filter.branch_id = { $eq: filters.branch_id };
-  if (filters?.category) filter.category = { $eq: filters.category };
-  if (filters?.is_active !== undefined) filter.is_active = { $eq: filters.is_active };
-
-  const res = await ns.query({
-    vector: embedding,
-    topK,
-    includeMetadata: true,
-    filter: Object.keys(filter).length > 0 ? filter : undefined,
+  const results = await searchKnowledgeOnVm({
+    tenant_id: filters?.org_id ?? null,
+    clinic_id: filters?.org_id ?? null,
+    query,
+    top_k: topK,
+    filters: {
+      org_id: filters?.org_id,
+      branch_id: filters?.branch_id,
+      category: filters?.category,
+      is_active: filters?.is_active,
+    },
   });
-
-  const results = (res.matches ?? []).map((m) => ({
-    id: m.id ?? "",
-    score: m.score,
-    metadata: m.metadata as Record<string, unknown> | undefined,
-  }));
-
   return filterByTenantIsolation(results, filters?.org_id);
 }
 
@@ -302,31 +387,18 @@ export async function searchKnowledgeWithPyramid(
   context: KnowledgeSearchContext,
   options?: { topK?: number; category?: string; is_active?: boolean }
 ): Promise<SearchKnowledgeResult[]> {
-  const embedding = await embedText(query);
-  const index = getKnowledgeIndex();
-  const ns = index.namespace(getEmbeddingNamespace());
-
-  const pyramidFilter = buildKnowledgePyramidFilter(context);
-  const extra: Record<string, unknown>[] = [];
-  if (options?.category) extra.push({ category: { $eq: options.category } });
-  if (options?.is_active !== undefined) extra.push({ is_active: { $eq: options.is_active } });
-
-  let filter: Record<string, unknown> | undefined;
-  if (pyramidFilter) extra.unshift(pyramidFilter);
-  if (extra.length > 0) filter = extra.length === 1 ? extra[0] : { $and: extra };
-
-  const res = await ns.query({
-    vector: embedding,
-    topK: options?.topK ?? 5,
-    includeMetadata: true,
-    filter,
+  const results = await searchKnowledgeOnVm({
+    tenant_id: context.org_id ?? null,
+    clinic_id: context.org_id ?? null,
+    query,
+    top_k: options?.topK ?? 5,
+    filters: {
+      pyramid: buildKnowledgePyramidFilter(context),
+      category: options?.category,
+      is_active: options?.is_active,
+      org_id: context.org_id,
+      branch_id: context.branch_id,
+    },
   });
-
-  const results = (res.matches ?? []).map((m) => ({
-    id: m.id ?? "",
-    score: m.score,
-    metadata: m.metadata as Record<string, unknown> | undefined,
-  }));
-
   return filterByTenantIsolation(results, context.org_id);
 }

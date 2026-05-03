@@ -26,6 +26,9 @@ export async function GET(request: NextRequest) {
     const branchId = searchParams.get("branchId") ?? undefined;
     const ch = searchParams.get("channel") ?? undefined;
     const channelFilter = ch && VALID_CHANNELS.includes(ch as (typeof VALID_CHANNELS)[number]) ? ch : undefined;
+    if ((user.role === "manager" || user.role === "staff") && !branchId) {
+      return NextResponse.json({ error: "กรุณาเลือกสาขาก่อนดูรายงาน (จำกัดสิทธิ์ตามสาขา)" }, { status: 403 });
+    }
 
     if (branchId && !requireBranchAccess(user.role, user.branch_ids, user.branch_roles, branchId)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });

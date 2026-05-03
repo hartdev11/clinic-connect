@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getPurchaseRecordByEmail, setVerificationToken } from "@/lib/purchase-record";
 import { sendVerificationEmail, buildVerificationLink } from "@/lib/email";
 import crypto from "crypto";
+import { checkDistributedRateLimit, getClientIp } from "@/lib/distributed-rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -19,12 +20,27 @@ export async function POST(request: NextRequest) {
   if (!email) {
     return NextResponse.json({ error: "กรุณากรอกอีเมล" }, { status: 400 });
   }
+  const ip = getClientIp(request);
+  const byIp = await checkDistributedRateLimit(`public:verify-email:ip:${ip}`, 10, 60 * 10);
+  if (!byIp.allowed) {
+    return NextResponse.json(
+      { success: true, message: "ถ้าอีเมลนี้มีอยู่ในระบบ จะส่งลิงก์ยืนยันให้อีกครั้ง" },
+      { status: 200 }
+    );
+  }
+  const byEmail = await checkDistributedRateLimit(`public:verify-email:email:${email.toLowerCase()}`, 3, 60 * 30);
+  if (!byEmail.allowed) {
+    return NextResponse.json(
+      { success: true, message: "ถ้าอีเมลนี้มีอยู่ในระบบ จะส่งลิงก์ยืนยันให้อีกครั้ง" },
+      { status: 200 }
+    );
+  }
   const record = await getPurchaseRecordByEmail(email);
   if (!record) {
-    return NextResponse.json(
-      { error: "ไม่พบการซื้อแพ็คเกจด้วยอีเมลนี้" },
-      { status: 404 }
-    );
+    return NextResponse.json({
+      success: true,
+      message: "ถ้าอีเมลนี้มีอยู่ในระบบ จะส่งลิงก์ยืนยันให้อีกครั้ง",
+    });
   }
   if (record.email_verified) {
     return NextResponse.json({

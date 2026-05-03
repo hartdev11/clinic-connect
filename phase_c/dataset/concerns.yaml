@@ -1,0 +1,196 @@
+- id: wrinkles
+  concern: wrinkles
+  description: wrinkles is a aging concern
+  category: aging
+  related_procedures:
+  - proc_001
+  - proc_021
+  - proc_023
+- id: fine_lines
+  concern: fine lines
+  description: fine lines is a aging concern
+  category: aging
+  related_procedures:
+  - proc_001
+  - proc_008
+- id: forehead_lines
+  concern: forehead lines
+  description: forehead lines is a aging concern
+  category: aging
+  related_procedures:
+  - proc_001
+- id: crow_feet
+  concern: crow feet
+  description: crow feet is a aging concern
+  category: aging
+  related_procedures:
+  - proc_001
+- id: nasolabial_folds
+  concern: nasolabial folds
+  description: nasolabial folds is a aging concern
+  category: aging
+  related_procedures:
+  - proc_006
+- id: marionette_lines
+  concern: marionette lines
+  description: marionette lines is a aging concern
+  category: aging
+  related_procedures:
+  - proc_006
+- id: sagging_skin
+  concern: sagging skin
+  description: sagging skin is a aging concern
+  category: aging
+  related_procedures:
+  - proc_021
+  - proc_023
+  - proc_061
+- id: neck_laxity
+  concern: neck laxity
+  description: neck laxity is a aging concern
+  category: aging
+  related_procedures:
+  - proc_023
+- id: collagen_loss
+  concern: collagen loss
+  description: collagen loss is a aging concern
+  category: aging
+  related_procedures:
+  - proc_010
+  - proc_011
+- id: facial_volume_loss
+  concern: facial volume loss
+  description: facial volume loss is a aging concern
+  category: aging
+  related_procedures:
+  - proc_006
+  - proc_010
+- id: under_eye_hollow
+  concern: under eye hollow
+  description: under eye hollow is a eyes concern
+  category: eyes
+  related_procedures:
+  - proc_006
+- id: dark_circles
+  concern: dark circles
+  description: dark circles is a eyes concern
+  category: eyes
+  related_procedures:
+  - proc_029
+  - proc_030
+- id: eye_bags
+  concern: eye bags
+  description: eye bags is a eyes concern
+  category: eyes
+  related_procedures:
+  - proc_062
+- id: pigmentation
+  concern: pigmentation
+  description: pigmentation is a skin concern
+  category: skin
+  related_procedures:
+  - proc_029
+  - proc_030
+- id: melasma
+  concern: melasma
+  description: melasma is a skin concern
+  category: skin
+  related_procedures:
+  - proc_029
+- id: freckles
+  concern: freckles
+  description: freckles is a skin concern
+  category: skin
+  related_procedures:
+  - proc_030
+- id: dull_skin
+  concern: dull skin
+  description: dull skin is a skin concern
+  category: skin
+  related_procedures:
+  - proc_041
+  - proc_042
+- id: dehydrated_skin
+  concern: dehydrated skin
+  description: dehydrated skin is a skin concern
+  category: skin
+  related_procedures:
+  - proc_008
+- id: enlarged_pores
+  concern: enlarged pores
+  description: enlarged pores is a skin concern
+  category: skin
+  related_procedures:
+  - proc_041
+- id: acne
+  concern: acne
+  description: acne is a skin concern
+  category: skin
+  related_procedures:
+  - proc_026
+  - proc_073
+- id: acne_scars
+  concern: acne scars
+  description: acne scars is a skin concern
+  category: skin
+  related_procedures:
+  - proc_028
+  - proc_026
+- id: uneven_skin_texture
+  concern: uneven skin texture
+  description: uneven skin texture is a skin concern
+  category: skin
+  related_procedures:
+  - proc_028
+- id: jawline_contour
+  concern: jawline contour
+  description: jawline contour is a facial_contour concern
+  category: facial_contour
+  related_procedures:
+  - proc_004
+- id: chin_shape
+  concern: chin shape
+  description: chin shape is a facial_contour concern
+  category: facial_contour
+  related_procedures:
+  - proc_004
+- id: cheek_volume
+  concern: cheek volume
+  description: cheek volume is a facial_contour concern
+  category: facial_contour
+  related_procedures:
+  - proc_006
+- id: facial_asymmetry
+  concern: facial asymmetry
+  description: facial asymmetry is a facial_contour concern
+  category: facial_contour
+  related_procedures:
+  - proc_006
+  - proc_004
+- id: skin_laxity
+  concern: skin laxity
+  description: skin laxity is a aging concern
+  category: aging
+  related_procedures:
+  - proc_021
+  - proc_023
+- id: hair_loss
+  concern: hair loss
+  description: hair loss is a hair concern
+  category: hair
+  related_procedures:
+  - proc_077
+  - proc_078
+- id: thinning_hair
+  concern: thinning hair
+  description: thinning hair is a hair concern
+  category: hair
+  related_procedures:
+  - proc_077
+  - proc_078
+- id: scalp_visibility
+  concern: scalp visibility
+  description: scalp visibility is a hair concern
+  category: hair
+  related_procedures:
+  - proc_078

@@ -1,10 +1,10 @@
+import type { AggregatedAnalyticsContext } from "../types";
 /**
  * Manager Agent (Orchestrator) — Phase 6
  * Routes intents to correct agent for Role Manager prioritization
  * Does NOT run pipeline — provides routing hints to Role Manager
  */
 import { fallbackIntentFromKeywords } from "@/lib/agents/intent";
-import type { AggregatedAnalyticsContext } from "../types";
 import type { IntentType } from "@/lib/agents/types";
 
 export type ManagerRoute =
@@ -65,8 +65,9 @@ function detectObjection(userMessage: string | null | undefined): boolean {
  */
 export function runManagerRouting(
   userMessage: string,
-  _analyticsContext: AggregatedAnalyticsContext
+  analyticsContext?: AggregatedAnalyticsContext
 ): ManagerRoutingOutput {
+  void analyticsContext;
   const intentResult = fallbackIntentFromKeywords(userMessage);
   const intent = intentResult?.intent ?? "general_chat";
 

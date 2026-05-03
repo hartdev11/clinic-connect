@@ -273,7 +273,7 @@ export default function HandoffPage() {
   ];
 
   return (
-    <div className="p-6 space-y-4">
+    <div className="p-4 sm:p-6 space-y-4">
       <PageHeader
         title="Handoff"
         subtitle="คิวส่งต่อลูกค้า — รับสายและตอบแชท"
@@ -293,7 +293,7 @@ export default function HandoffPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-[500px]">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 min-h-[500px]">
         {/* LEFT — Queue */}
         <div className="luxury-card p-4 space-y-3">
           <h3 className="font-display font-semibold text-mauve-800">คิวรอ</h3>
@@ -352,7 +352,7 @@ export default function HandoffPage() {
                   </button>
                 ))}
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <Input
                   value={chatInput}
                   onChange={(e) => setChatInput(e.target.value)}

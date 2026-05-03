@@ -46,14 +46,19 @@ export async function setLineEventReply(eventId: string, replyJson: string): Pro
 /**
  * Check if idempotency key was already used. (Generic; for other flows later.)
  */
-export async function getIdempotencyResult(_key: string): Promise<unknown | null> {
+export async function getIdempotencyResult(key: string): Promise<unknown | null> {
+  void key;
   return null;
 }
 
 /**
  * Store idempotency result. (Generic; for other flows later.)
  */
-export async function setIdempotencyResult(_key: string, _result: unknown, _ttlSec: number): Promise<void> {}
+export async function setIdempotencyResult(key: string, result: unknown, ttlSec: number): Promise<void> {
+  void key;
+  void result;
+  void ttlSec;
+}
 
 /**
  * Generate idempotency key.

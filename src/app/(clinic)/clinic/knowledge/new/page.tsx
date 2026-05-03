@@ -1,12 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Input, Textarea } from "@/components/ui/Input";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { getMaxContentLength } from "@/lib/knowledge-validation";
+import { KnowledgeErrorState } from "@/components/clinic/KnowledgeErrorState";
+import { KnowledgeDuplicateModal } from "@/components/clinic/KnowledgeDuplicateModal";
+import { getMaxContentLength, validateKnowledgeContent } from "@/lib/knowledge-validation";
 import type { KnowledgeTopicCategory, KnowledgeVersionPayload } from "@/types/knowledge";
 
 const CATEGORY_OPTIONS: { value: KnowledgeTopicCategory; label: string }[] = [
@@ -32,7 +34,32 @@ export default function KnowledgeNewPage() {
   const [error, setError] = useState<string | null>(null);
   const [assistWarning, setAssistWarning] = useState<string | null>(null);
   const [financialConfirm, setFinancialConfirm] = useState(false);
+  const [duplicateWarning, setDuplicateWarning] = useState<string | null>(null);
+  const [duplicatePeerId, setDuplicatePeerId] = useState<string | null>(null);
+  const [dupModalOpen, setDupModalOpen] = useState(false);
+  const [dupActionLoading, setDupActionLoading] = useState(false);
   const maxLen = getMaxContentLength();
+  const contentLength = form.content?.length ?? 0;
+
+  const validationMessages = useMemo(() => {
+    const messages: Array<{ level: "error" | "warning"; text: string }> = [];
+    const content = form.content?.trim() ?? "";
+    if (content && content.length < 50) {
+      messages.push({ level: "error", text: "รายละเอียดต้องยาวอย่างน้อย 50 ตัวอักษร เพื่อคุณภาพคำตอบของ AI" });
+    }
+    const hasDigits = /\d/.test(content);
+    const hasCurrency = /(บาท|฿|thb|baht)/i.test(content);
+    if (hasDigits && !hasCurrency) {
+      messages.push({ level: "warning", text: "พบตัวเลขราคา แต่ไม่พบสกุลเงิน (เช่น บาท / ฿) กรุณาระบุให้ชัดเจน" });
+    }
+    if (content.length > 5000) {
+      messages.push({ level: "warning", text: "เนื้อหาเกิน 5,000 ตัวอักษร ระบบจะตัดแบ่งข้อความอัตโนมัติ" });
+    }
+    if (duplicateWarning) {
+      messages.push({ level: "warning", text: duplicateWarning });
+    }
+    return messages;
+  }, [form.content, duplicateWarning]);
 
   const queryParam = searchParams.get("query");
   useEffect(() => {
@@ -40,6 +67,31 @@ export default function KnowledgeNewPage() {
       setForm((f) => ({ ...f, topic: queryParam.trim().slice(0, 200), content: queryParam.trim().slice(0, 2000) }));
     }
   }, [queryParam]);
+
+  useEffect(() => {
+    const topic = form.topic?.trim();
+    if (!topic || topic.length < 2) {
+      setDuplicateWarning(null);
+      setDuplicatePeerId(null);
+      return;
+    }
+    const timeout = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/clinic/knowledge/topics?search=${encodeURIComponent(topic)}`, { credentials: "include" });
+        const data = await res.json().catch(() => ({}));
+        const topics = Array.isArray(data?.topics) ? data.topics : [];
+        const match = topics.find(
+          (item: { topic?: string }) => (item.topic ?? "").trim().toLowerCase() === topic.toLowerCase()
+        ) as { id?: string; topic?: string } | undefined;
+        setDuplicatePeerId(match?.id ?? null);
+        setDuplicateWarning(match ? "พบหัวข้อใกล้เคียง/ซ้ำในระบบแล้ว ควรตรวจสอบก่อนบันทึก" : null);
+      } catch {
+        setDuplicateWarning(null);
+        setDuplicatePeerId(null);
+      }
+    }, 350);
+    return () => clearTimeout(timeout);
+  }, [form.topic]);
 
   const handleAssist = async () => {
     if (!form.topic?.trim()) {
@@ -94,36 +146,39 @@ export default function KnowledgeNewPage() {
     setExampleInput("");
   };
 
-  const handleSubmit = async (confirmFinancial = false) => {
-    if (!form.topic?.trim() || !form.content?.trim()) {
-      setError("กรุณากรอกหัวข้อและรายละเอียดทั้งหมด");
-      return;
-    }
-    setError(null);
+  const categoryLabel =
+    CATEGORY_OPTIONS.find((o) => o.value === (form.category ?? "service"))?.label ?? form.category ?? "";
+
+  const runCreate = async (
+    confirmFinancial: boolean,
+    extra: { overwriteTopicId?: string; forceCreateNew?: boolean } = {}
+  ) => {
     setLoading(true);
+    setError(null);
     try {
       const res = await fetch("/api/clinic/knowledge/topics", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
-          topic: form.topic.trim(),
+          topic: (form.topic ?? "").trim(),
           category: form.category ?? "service",
           summary: form.summary ?? [],
-          content: form.content.trim(),
+          content: (form.content ?? "").trim(),
           exampleQuestions: form.exampleQuestions ?? [],
-          confirmFinancial: confirmFinancial,
+          confirmFinancial,
+          ...extra,
         }),
       });
       const data = await res.json().catch(() => ({}));
       if (data.needsConfirmation && data.message) {
         setFinancialConfirm(true);
-        setLoading(false);
         return;
       }
       if (!res.ok) {
         throw new Error(data.error ?? "บันทึกไม่สำเร็จ");
       }
+      setDupModalOpen(false);
       router.push("/clinic/knowledge");
       router.refresh();
     } catch (e) {
@@ -131,6 +186,34 @@ export default function KnowledgeNewPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSubmit = async (confirmFinancial = false) => {
+    if (!form.topic?.trim() || !form.content?.trim()) {
+      setError("กรุณากรอกหัวข้อและรายละเอียดทั้งหมด");
+      return;
+    }
+    if ((form.content?.trim().length ?? 0) < 50) {
+      setError("รายละเอียดต้องยาวอย่างน้อย 50 ตัวอักษร");
+      return;
+    }
+    const contentValidation = validateKnowledgeContent(form.content.trim());
+    if (!contentValidation.valid) {
+      setError(contentValidation.message ?? "เนื้อหาไม่ถูกต้อง");
+      return;
+    }
+    if (contentValidation.financialWarning && !confirmFinancial) {
+      setFinancialConfirm(true);
+      return;
+    }
+    setError(null);
+
+    if (duplicatePeerId) {
+      setDupModalOpen(true);
+      return;
+    }
+
+    await runCreate(confirmFinancial || contentValidation.financialWarning === true, {});
   };
 
   return (
@@ -232,7 +315,7 @@ export default function KnowledgeNewPage() {
               maxLength={maxLen + 100}
             />
             <p className="mt-1 font-body text-sm text-mauve-400">
-              {form.content?.length ?? 0} / {maxLen.toLocaleString()} ตัวอักษร
+              {contentLength} / {maxLen.toLocaleString()} ตัวอักษร
             </p>
           </div>
 
@@ -276,8 +359,19 @@ export default function KnowledgeNewPage() {
           </div>
 
           {error && (
-            <div className="p-4 rounded-2xl bg-red-50 border border-red-100 font-body text-red-800 text-sm">
-              {error}
+            <KnowledgeErrorState message={error} />
+          )}
+          {validationMessages.length > 0 && (
+            <div className="rounded-2xl border border-cream-200 bg-white p-4">
+              <p className="font-body text-sm font-semibold text-mauve-700">Validation checks</p>
+              <ul className="mt-2 space-y-1 font-body text-sm">
+                {validationMessages.map((msg, idx) => (
+                  <li key={idx} className={msg.level === "error" ? "text-red-700" : "text-amber-700"}>
+                    {msg.level === "error" ? "• [Error] " : "• [Warning] "}
+                    {msg.text}
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
           {assistWarning && (
@@ -294,7 +388,7 @@ export default function KnowledgeNewPage() {
                 <Button variant="secondary" size="sm" onClick={() => setFinancialConfirm(false)}>
                   แก้ไขเนื้อหา
                 </Button>
-                <Button variant="primary" size="sm" onClick={() => handleSubmit(true)} loading={loading}>
+                <Button variant="primary" size="sm" onClick={() => void handleSubmit(true)} loading={loading}>
                   บันทึกหลังยืนยัน
                 </Button>
               </div>
@@ -305,7 +399,7 @@ export default function KnowledgeNewPage() {
             <Button
               variant="primary"
               size="md"
-              onClick={() => handleSubmit(false)}
+              onClick={() => void handleSubmit(false)}
               disabled={loading || !!financialConfirm}
               loading={loading}
             >
@@ -317,6 +411,28 @@ export default function KnowledgeNewPage() {
           </div>
         </div>
       </div>
+
+      <KnowledgeDuplicateModal
+        open={dupModalOpen}
+        onClose={() => setDupModalOpen(false)}
+        existingTopicId={duplicatePeerId ?? ""}
+        newTopicTitle={form.topic?.trim() ?? ""}
+        newCategoryLabel={categoryLabel}
+        newContent={form.content?.trim() ?? ""}
+        loadingAction={dupActionLoading}
+        onUseExisting={() => {
+          if (duplicatePeerId) router.push(`/clinic/knowledge/${duplicatePeerId}/edit`);
+        }}
+        onOverwriteExisting={() => {
+          if (!duplicatePeerId) return;
+          setDupActionLoading(true);
+          void runCreate(true, { overwriteTopicId: duplicatePeerId }).finally(() => setDupActionLoading(false));
+        }}
+        onCreateAsNew={() => {
+          setDupActionLoading(true);
+          void runCreate(true, { forceCreateNew: true }).finally(() => setDupActionLoading(false));
+        }}
+      />
     </div>
   );
 }

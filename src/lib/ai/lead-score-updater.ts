@@ -122,7 +122,9 @@ export async function updateCustomerLeadScore(
       customerId: docId,
       customerName: name,
       leadScore: score,
-    }).catch((e) => console.warn("[Lead] partner webhook:", (e as Error)?.message?.slice(0, 50)));
+    }, { correlationId: `lead_hot_${docId}_${today}` }).catch((e) =>
+      console.warn("[Lead] partner webhook:", (e as Error)?.message?.slice(0, 50))
+    );
     await db.collection("organizations").doc(orgId).collection(COLLECTION_NOTIFICATIONS).add({
       type: "hot_lead",
       severity: "info",

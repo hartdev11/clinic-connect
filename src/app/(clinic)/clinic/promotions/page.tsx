@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect, useMemo } from "react";
+import Image from "next/image";
 import useSWR from "swr";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
@@ -13,25 +14,37 @@ import { apiFetcher } from "@/lib/api-fetcher";
 import { cn } from "@/lib/utils";
 import type { Promotion, PromotionStatus, PromotionTargetGroup } from "@/types/clinic";
 
-const STATUS_OPTIONS: { value: PromotionStatus | "all"; label: string }[] = [
-  { value: "all", label: "ทั้งหมด" },
-  { value: "active", label: "กำลังใช้งาน" },
-  { value: "scheduled", label: "กำหนดเวลา" },
-  { value: "expired", label: "หมดอายุ" },
-  { value: "archived", label: "เก็บถาวร" },
-  { value: "draft", label: "แบบร่าง" },
-];
-
-const STATUS_DOT_COLOR: Record<string, string> = {
-  active: "var(--ent-success)",
-  scheduled: "var(--ent-info)",
-  expired: "var(--cream-400)",
-  archived: "var(--cream-400)",
-  draft: "var(--cream-400)",
-};
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString("th-TH", { day: "numeric", month: "short", year: "numeric" });
+}
+
+function validatePromotionInputs(input: {
+  startAt?: string;
+  endAt?: string;
+  autoArchiveAt?: string;
+  maxUsage?: string;
+  extractedDiscount?: string;
+}): string | null {
+  const startMs = input.startAt ? new Date(input.startAt).getTime() : null;
+  const endMs = input.endAt ? new Date(input.endAt).getTime() : null;
+  const autoArchiveMs = input.autoArchiveAt ? new Date(input.autoArchiveAt).getTime() : null;
+  if (startMs && endMs && endMs < startMs) {
+    return "วันสิ้นสุดต้องมากกว่าหรือเท่ากับวันเริ่มต้น";
+  }
+  if (endMs && autoArchiveMs && autoArchiveMs < endMs) {
+    return "เวลาเก็บถาวรอัตโนมัติต้องไม่น้อยกว่าวันสิ้นสุด";
+  }
+  if (input.maxUsage && Number(input.maxUsage) < 0) {
+    return "จำนวนครั้งที่ใช้ได้ต้องมากกว่าหรือเท่ากับ 0";
+  }
+  if (input.extractedDiscount) {
+    const discount = Number(input.extractedDiscount);
+    if (Number.isNaN(discount) || discount < 0 || discount > 100) {
+      return "ส่วนลดต้องอยู่ระหว่าง 0 - 100%";
+    }
+  }
+  return null;
 }
 
 const STATUS_LABEL: Record<string, string> = {
@@ -45,7 +58,7 @@ const STATUS_LABEL: Record<string, string> = {
 /** Promotion Intelligence Overview — 4 luxury metric cards */
 function PromotionOverview({ stats }: { stats: { active: number; expiringSoon: number; scheduled: number; expired: number } }) {
   return (
-    <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
       {[
         { key: "active", label: "กำลังใช้งาน", value: stats.active },
         { key: "expiringSoon", label: "หมดอายุภายใน 3 วัน", value: stats.expiringSoon },
@@ -64,13 +77,11 @@ function PromotionOverview({ stats }: { stats: { active: number; expiringSoon: n
 /** Promotion card: cover, status badge, title, description, footer with dates + actions */
 function PromotionRow({
   item,
-  branches,
   onEdit,
   onMutate,
   index = 0,
 }: {
   item: Promotion;
-  branches: Array<{ id: string; name: string }>;
   onEdit: () => void;
   onMutate: () => void;
   index?: number;
@@ -79,7 +90,6 @@ function PromotionRow({
   const [actionError, setActionError] = useState<string | null>(null);
   const hasCover = item.media?.[0]?.type === "image";
   const coverUrl = hasCover ? `/api/clinic/promotions/${item.id}/cover` : null;
-  const branchNames = item.branchIds.map((id) => branches.find((b) => b.id === id)?.name ?? id).filter(Boolean);
   const endAtMs = item.endAt ? new Date(item.endAt).getTime() : 0;
   const expiringSoon = endAtMs > 0 && endAtMs <= Date.now() + 3 * 86400000;
 
@@ -138,9 +148,11 @@ function PromotionRow({
     >
       <div className="relative h-44 bg-gradient-to-br from-rg-200 to-rg-400 overflow-hidden">
         {coverUrl ? (
-          <img
+          <Image
             src={coverUrl}
             alt={item.name || ""}
+            fill
+            unoptimized
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
@@ -267,7 +279,6 @@ function CreateFromImageModal({
   const [extractedPrice, setExtractedPrice] = useState<string>("");
   const [extractedDiscount, setExtractedDiscount] = useState<string>("");
   const [urgencyScore, setUrgencyScore] = useState<number | null>(null);
-  const [imageSummary, setImageSummary] = useState("");
   const [aiSummary, setAiSummary] = useState("");
   const [aiTags, setAiTags] = useState<string[]>([]);
 
@@ -323,7 +334,6 @@ function CreateFromImageModal({
       setExtractedPrice(ex.extractedPrice != null ? String(ex.extractedPrice) : "");
       setExtractedDiscount(ex.extractedDiscount != null ? String(ex.extractedDiscount) : "");
       setUrgencyScore(typeof ex.urgencyScore === "number" ? ex.urgencyScore : null);
-      setImageSummary(typeof ex.imageSummary === "string" ? ex.imageSummary : "");
       setName(prev => prev || (ex.imageSummary?.slice(0, 80) ?? ""));
       setDescription(prev => prev || (ex.imageSummary ?? ""));
       setAiSummary(scanData.aiSummary ?? "");
@@ -339,6 +349,16 @@ function CreateFromImageModal({
   const handleSave = async () => {
     if (!tempUploadId || !name.trim()) {
       setError("กรุณากรอกชื่อโปรโมชั่น");
+      return;
+    }
+    const validationError = validatePromotionInputs({
+      startAt,
+      endAt,
+      maxUsage,
+      extractedDiscount,
+    });
+    if (validationError) {
+      setError(validationError);
       return;
     }
     setError(null);
@@ -419,7 +439,7 @@ function CreateFromImageModal({
                 {file && <p className="text-[12px] text-neutral-500 mt-1">{file.name}</p>}
                 {localPreviewUrl && (
                   <div className="mt-3 w-full rounded-[12px] overflow-hidden bg-neutral-100 flex justify-center">
-                    <img src={localPreviewUrl} alt="" className="max-w-full max-h-[400px] w-auto h-auto object-contain" />
+                    <Image src={localPreviewUrl} alt="" width={800} height={400} unoptimized className="max-w-full max-h-[400px] w-auto h-auto object-contain" />
                   </div>
                 )}
               </div>
@@ -446,7 +466,7 @@ function CreateFromImageModal({
             <form onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="space-y-5">
               {(imageDataUrl || previewUrl) && (
                 <div className="w-full rounded-[12px] overflow-hidden bg-neutral-100 flex justify-center">
-                  <img src={imageDataUrl ?? previewUrl ?? ""} alt="" className="max-w-full max-h-[400px] w-auto h-auto object-contain" />
+                  <Image src={imageDataUrl ?? previewUrl ?? ""} alt="" width={800} height={400} unoptimized className="max-w-full max-h-[400px] w-auto h-auto object-contain" />
                 </div>
               )}
               <div className="p-4 rounded-[12px] bg-cream-100 border border-neutral-100">
@@ -574,7 +594,7 @@ function PromotionForm({
   const [name, setName] = useState(promotion?.name ?? "");
   const [description, setDescription] = useState(promotion?.description ?? "");
   const [branchIds, setBranchIds] = useState<string[]>(promotion?.branchIds ?? []);
-  const [status, setStatus] = useState<PromotionStatus>(promotion?.status ?? "draft");
+  const status: PromotionStatus = promotion?.status ?? "draft";
   const [startAt, setStartAt] = useState(promotion?.startAt?.slice(0, 16) ?? "");
   const [endAt, setEndAt] = useState(promotion?.endAt?.slice(0, 16) ?? "");
   const [autoArchiveAt, setAutoArchiveAt] = useState(promotion?.autoArchiveAt?.slice(0, 16) ?? "");
@@ -600,6 +620,16 @@ function PromotionForm({
     setError(null);
     if (!name.trim()) {
       setError("กรุณากรอกชื่อโปรโมชั่น");
+      return;
+    }
+    const validationError = validatePromotionInputs({
+      startAt,
+      endAt,
+      autoArchiveAt,
+      maxUsage,
+    });
+    if (validationError) {
+      setError(validationError);
       return;
     }
     setSaving(true);
@@ -796,9 +826,12 @@ function PromotionForm({
                   {m.type === "video" ? (
                     <video src={m.url} className="w-full h-full object-cover" muted playsInline />
                   ) : (
-                    <img
+                    <Image
                       src={i === 0 && m.type === "image" ? `/api/clinic/promotions/${promotion.id}/cover` : m.url}
                       alt=""
+                      width={80}
+                      height={80}
+                      unoptimized
                       className="w-full h-full object-cover"
                     />
                   )}
@@ -900,7 +933,7 @@ export default function PromotionsPage() {
   const branches = branchesData?.items ?? [];
   const branchesLoading = branchesData === undefined;
 
-  const items = listData?.items ?? [];
+  const items = useMemo(() => listData?.items ?? [], [listData]);
   const displayedItems = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     if (!q) return items;
@@ -927,7 +960,7 @@ export default function PromotionsPage() {
           title="โปรโมชัน"
           subtitle="จัดการโปรโมชันและข้อเสนอพิเศษของคลินิก"
           actions={
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2 justify-end">
               <Button variant="ghost" size="sm" onClick={() => mutate()} title="โหลดใหม่">
                 โหลดใหม่
               </Button>
@@ -969,7 +1002,7 @@ export default function PromotionsPage() {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="flex flex-wrap items-center gap-3 mb-6"
+            className="flex flex-wrap items-center gap-2 sm:gap-3 mb-6"
           >
             <div className="flex items-center gap-1 p-1 bg-cream-200 rounded-2xl">
               {statusPills.map((opt) => (
@@ -991,7 +1024,7 @@ export default function PromotionsPage() {
             <select
               value={branchFilter}
               onChange={(e) => setBranchFilter(e.target.value)}
-              className="h-11 px-4 rounded-2xl font-body text-sm text-mauve-600 bg-white border border-cream-300 focus:outline-none focus:ring-2 focus:ring-rg-300/50 transition-all"
+              className="h-11 w-full sm:w-auto px-4 rounded-2xl font-body text-sm text-mauve-600 bg-white border border-cream-300 focus:outline-none focus:ring-2 focus:ring-rg-300/50 transition-all"
               aria-label="สาขา"
             >
               <option value="all">ทุกสาขา</option>
@@ -1002,7 +1035,7 @@ export default function PromotionsPage() {
             <select
               value={targetGroupFilter}
               onChange={(e) => setTargetGroupFilter((e.target.value || "") as PromotionTargetGroup | "")}
-              className="h-11 px-4 rounded-2xl font-body text-sm text-mauve-600 bg-white border border-cream-300 focus:outline-none focus:ring-2 focus:ring-rg-300/50 transition-all"
+              className="h-11 w-full sm:w-auto px-4 rounded-2xl font-body text-sm text-mauve-600 bg-white border border-cream-300 focus:outline-none focus:ring-2 focus:ring-rg-300/50 transition-all"
               aria-label="กลุ่มเป้าหมาย"
             >
               <option value="">ทุกกลุ่ม</option>
@@ -1010,7 +1043,7 @@ export default function PromotionsPage() {
               <option value="existing">ลูกค้าปัจจุบัน</option>
               <option value="all">ทุกคน</option>
             </select>
-            <div className="flex-1 min-w-[200px]">
+            <div className="flex-1 min-w-0 w-full sm:w-auto">
               <Input
                 placeholder="ค้นหาโปรโมชัน..."
                 icon={<span className="text-sm">⌕</span>}
@@ -1063,7 +1096,6 @@ export default function PromotionsPage() {
                 <PromotionRow
                   key={p.id}
                   item={p}
-                  branches={branches}
                   onEdit={() => { setEditingItem(p); setShowForm(true); }}
                   onMutate={mutate}
                   index={i}

@@ -2,13 +2,8 @@
  * Phase 3 #2 — Answer Constraint Engine (Anti-Hallucination Layer)
  * Freeze context, schema-based enforcement, disallow generation outside provided fields
  */
-import type { StructuredKnowledgeContext } from "@/types/knowledge-brain";
-
 export const RESPONSE_CONTRACT =
   "ห้ามสร้างข้อมูลที่ไม่มีใน structured context ต้องตอบเฉพาะจาก context ที่ให้เท่านั้น";
-
-/** Required fields that MUST be in context — no free-form */
-const REQUIRED_FIELDS = ["risks", "contraindications", "disclaimer"] as const;
 
 export interface FrozenContext {
   service_name: string;
@@ -77,8 +72,9 @@ const FABRICATION_PATTERNS = [
 
 export function validateOutputAgainstContext(
   reply: string,
-  contextSummary: string
+  contextSummary?: string
 ): { valid: boolean; violations: string[] } {
+  void contextSummary;
   const violations: string[] = [];
 
   for (const p of FABRICATION_PATTERNS) {

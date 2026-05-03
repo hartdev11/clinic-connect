@@ -1,0 +1,157 @@
+{
+  "version": "v2_prepaid",
+  "currency": "THB",
+  "is_active": true,
+  "tax": {
+    "enabled": false,
+    "rate": 0.07,
+    "mode": "exclusive"
+  },
+  "rounding": {
+    "mode": "half_up",
+    "precision": 2
+  },
+  "wallet_rules": {
+    "default_wallet_type": "token",
+    "allow_negative_balance": false,
+    "block_when_balance_zero": true,
+    "auto_suspend_on_zero": false
+  },
+  "alert_thresholds": {
+    "usage_percent": [70, 85, 100],
+    "wallet_balance_percent": [70, 85, 100]
+  },
+  "plans": [
+    {
+      "plan_id": "starter",
+      "name": "Starter",
+      "description": "Entry plan for small clinics",
+      "billing_type": "prepaid_subscription",
+      "base_price": 4900,
+      "billing_period_days": 30,
+      "included_branch_count": 1,
+      "included_conversations": 1000,
+      "included_tokens": 500000,
+      "trial_days": 7,
+      "grace_period_days": 3,
+      "white_label_enabled": false,
+      "feature_flags": {"multi_branch": false, "advanced_reports": false, "api_access": false, "white_label": false},
+      "is_active": true
+    },
+    {
+      "plan_id": "growth",
+      "name": "Growth",
+      "description": "Growth plan for active clinics",
+      "billing_type": "prepaid_subscription",
+      "base_price": 9900,
+      "billing_period_days": 30,
+      "included_branch_count": 2,
+      "included_conversations": 3000,
+      "included_tokens": 1500000,
+      "trial_days": 7,
+      "grace_period_days": 3,
+      "white_label_enabled": false,
+      "feature_flags": {"multi_branch": true, "advanced_reports": true, "api_access": false, "white_label": false},
+      "is_active": true
+    },
+    {
+      "plan_id": "pro",
+      "name": "Pro",
+      "description": "Advanced plan for multi-branch clinics",
+      "billing_type": "prepaid_subscription",
+      "base_price": 19900,
+      "billing_period_days": 30,
+      "included_branch_count": 5,
+      "included_conversations": 10000,
+      "included_tokens": 5000000,
+      "trial_days": 14,
+      "grace_period_days": 5,
+      "white_label_enabled": false,
+      "feature_flags": {"multi_branch": true, "advanced_reports": true, "api_access": true, "white_label": false},
+      "is_active": true
+    },
+    {
+      "plan_id": "enterprise",
+      "name": "Enterprise",
+      "description": "Enterprise plan with flexible commercial terms",
+      "billing_type": "prepaid_subscription",
+      "base_price": 49900,
+      "billing_period_days": 30,
+      "included_branch_count": 10,
+      "included_conversations": 50000,
+      "included_tokens": 20000000,
+      "trial_days": 14,
+      "grace_period_days": 7,
+      "white_label_enabled": true,
+      "feature_flags": {"multi_branch": true, "advanced_reports": true, "api_access": true, "white_label": true},
+      "is_active": true
+    }
+  ],
+  "branch_rules": {
+    "enabled": true,
+    "mode": "prepaid_addon",
+    "extra_branch_price": 1500,
+    "charge_on_excess_only": true
+  },
+  "topup_rules": {
+    "enabled": true,
+    "wallet_type": "token",
+    "packs": [
+      {"pack_id": "small", "name": "Small Token Pack", "tokens": 100000, "price": 500, "bonus_tokens": 0, "is_active": true},
+      {"pack_id": "medium", "name": "Medium Token Pack", "tokens": 500000, "price": 2200, "bonus_tokens": 0, "is_active": true},
+      {"pack_id": "large", "name": "Large Token Pack", "tokens": 1000000, "price": 4000, "bonus_tokens": 0, "is_active": true}
+    ]
+  },
+  "usage_rules": {
+    "conversation_unit_cost": 1,
+    "token_unit_cost": 1,
+    "deduct_mode": "realtime",
+    "reset_included_quota_every_billing_cycle": true
+  },
+  "promotion_rules": {
+    "enabled": true,
+    "allow_stacking": false,
+    "max_stack_count": 1,
+    "default_once_per_tenant": true,
+    "default_combinable_with_topup": false,
+    "supported_types": ["subscription_discount","topup_discount","topup_bonus","plan_upgrade_discount","early_adopter","affiliate_promo","manual_credit"]
+  },
+  "promotions": [
+    {
+      "promotion_id": "early_20_growth_50_6m",
+      "name": "Early 20 Clinics Growth 50% 6 Months",
+      "type": "subscription_discount",
+      "target": {"plan_ids": ["growth"], "new_tenant_only": true, "max_global_redemptions": 20, "first_paid_subscription_only": true},
+      "discount": {"mode": "percent", "value": 50},
+      "duration": {"mode": "months", "value": 6},
+      "limits": {"once_per_tenant": true, "combinable": false},
+      "schedule": {"starts_at": null, "ends_at": null},
+      "is_active": true
+    },
+    {
+      "promotion_id": "first_topup_bonus_20",
+      "name": "First Top-up Bonus 20%",
+      "type": "topup_bonus",
+      "target": {"new_tenant_only": false, "first_topup_only": true, "eligible_pack_ids": ["small","medium","large"]},
+      "bonus": {"mode": "percent_bonus_tokens", "value": 20},
+      "limits": {"once_per_tenant": true, "combinable": false},
+      "schedule": {"starts_at": null, "ends_at": null},
+      "is_active": true
+    },
+    {
+      "promotion_id": "affiliate_growth_15",
+      "name": "Affiliate Growth 15% Off",
+      "type": "affiliate_promo",
+      "target": {"plan_ids": ["growth","pro"], "affiliate_only": true},
+      "discount": {"mode": "percent", "value": 15},
+      "duration": {"mode": "one_time", "value": 1},
+      "limits": {"once_per_tenant": true, "combinable": false},
+      "schedule": {"starts_at": null, "ends_at": null},
+      "is_active": true
+    }
+  ],
+  "manual_credit_rules": {"enabled": true, "allow_admin_credit": true, "allow_negative_credit": false},
+  "invoice_rules": {"issue_invoice_on_subscription_purchase": true, "issue_invoice_on_topup_purchase": true, "invoice_due_days": 7, "invoice_prefix": "INV"},
+  "idempotency_rules": {"enabled": true, "actions": ["subscription_purchase","topup_purchase","apply_promotion","mark_payment"]},
+  "validation_rules": {"allow_negative_prices": false, "require_active_plan": true, "require_active_topup_pack": true, "require_snapshot_for_invoice": true, "require_wallet_for_usage": true}
+}

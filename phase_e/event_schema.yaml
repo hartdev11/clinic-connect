@@ -1,0 +1,51 @@
+version: 1.0
+description: >
+  Standard event schema for tracking user interaction,
+  AI responses, and conversion behavior in Phase E.
+
+global_fields:
+  session_id: string
+  timestamp: datetime
+  event_type: string
+
+events:
+  - name: user_input
+    required_fields:
+      text: string
+      intent: string
+  - name: ai_response
+    required_fields:
+      response_text: string
+      recommendations: list
+      cta: string
+      stage: string
+  - name: cta_shown
+    required_fields:
+      cta: string
+      procedure_ids: list
+  - name: cta_clicked
+    required_fields:
+      cta: string
+  - name: procedure_viewed
+    required_fields:
+      procedure_id: string
+  - name: procedure_selected
+    required_fields:
+      procedure_id: string
+  - name: booking_started
+    required_fields:
+      procedure_id: string
+  - name: booking_completed
+    required_fields:
+      procedure_id: string
+      revenue_estimate: float
+
+optional_fields:
+  user_profile:
+    age: int
+    gender: string
+    concern: string
+  metadata:
+    platform: string
+    campaign: string
+    source: string

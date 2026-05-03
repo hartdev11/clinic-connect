@@ -5,7 +5,6 @@
  * Circuit breaker: when Pinecone open → skip search, return []
  */
 import { getOpenAI } from "@/lib/agents/clients";
-import { getKnowledgeIndex, getPineconeClient } from "@/lib/pinecone";
 import {
   isVectorSearchDisabled,
   recordProviderFailure,
@@ -16,13 +15,47 @@ import type { GlobalKnowledge, ClinicKnowledge, StructuredKnowledgeContext } fro
 const EMBEDDING_MODEL = process.env.KNOWLEDGE_BRAIN_EMBEDDING_MODEL ?? "text-embedding-3-large";
 /** Use 1536 to match existing Pinecone index; large model with dimensions=1536 gives better quality */
 const EMBEDDING_DIMENSION = 1536;
-const NAMESPACE_PREFIX = "kb"; // knowledge brain
+const KNOWLEDGE_UPLOAD_PATH = "/api/knowledge/upload";
 
-function getOrgNamespace(orgId: string): string {
-  return `${NAMESPACE_PREFIX}_${orgId.replace(/[^a-zA-Z0-9_-]/g, "_")}`;
+function resolveKnowledgeVectorBaseUrl(): string | null {
+  return (
+    process.env.KNOWLEDGE_VECTOR_URL?.trim().replace(/\/+$/, "") ??
+    process.env.PHASE_G_URL?.trim().replace(/\/+$/, "") ??
+    null
+  );
 }
 
-const GLOBAL_NAMESPACE = `${NAMESPACE_PREFIX}_global`;
+function toKnowledgeSourceType(input: string): string {
+  const value = input.toLowerCase();
+  if (value.includes("faq")) return "faq_knowledge";
+  if (value.includes("price")) return "pricing_knowledge";
+  return "procedure_knowledge";
+}
+
+async function uploadKnowledgeToVm(payload: Record<string, unknown>): Promise<void> {
+  const baseUrl = resolveKnowledgeVectorBaseUrl();
+  if (!baseUrl) {
+    console.error("[KnowledgeBrain Upload] Missing KNOWLEDGE_VECTOR_URL/PHASE_G_URL");
+    return;
+  }
+  const serviceSecret = process.env.PHASE_SERVICE_SECRET?.trim() ?? "";
+  try {
+    const res = await fetch(`${baseUrl}${KNOWLEDGE_UPLOAD_PATH}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Service-Secret": serviceSecret,
+      },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      const details = await res.text().catch(() => "");
+      console.error("[KnowledgeBrain Upload] VM upload failed", res.status, details.slice(0, 300));
+    }
+  } catch (error) {
+    console.error("[KnowledgeBrain Upload] VM upload request error", error);
+  }
+}
 
 /** Build text สำหรับ embed — structured สำหรับ retrieval */
 function buildEmbeddableText(ctx: StructuredKnowledgeContext): string {
@@ -70,49 +103,24 @@ export async function upsertClinicKnowledgeToVector(
   ctx: StructuredKnowledgeContext
 ): Promise<void> {
   const text = buildEmbeddableText(ctx);
-  const embedding = await embedKnowledgeText(text);
-  const index = getKnowledgeIndex();
-  const ns = index.namespace(getOrgNamespace(orgId));
   const vectorId = `clinic_${clinicDoc.id}`;
-
-  const lastReviewed =
-    typeof clinicDoc.last_reviewed_at === "string"
-      ? new Date(clinicDoc.last_reviewed_at).getTime()
-      : typeof clinicDoc.updated_at === "string"
-        ? new Date(clinicDoc.updated_at).getTime()
-        : Date.now();
-  const expiryDays = typeof clinicDoc.expiry_policy_days === "number" ? clinicDoc.expiry_policy_days : null;
-
-  await ns.upsert({
-    records: [
-      {
-        id: vectorId,
-        values: embedding,
-        metadata: {
-          type: "clinic",
-          org_id: orgId,
-          service_name: ctx.service_name,
-          category: ctx.category,
-          content: text.slice(0, 2000),
-          version: clinicDoc.version,
-          deprecated: false,
-          embedded_at: Date.now(),
-          last_reviewed_at: lastReviewed,
-          ...(expiryDays != null ? { expiry_policy_days: expiryDays } : {}),
-          ...(Array.isArray(ctx.risks) && ctx.risks.length > 0
-            ? { risks: ctx.risks.slice(0, 10).join(";") }
-            : {}),
-          ...(Array.isArray(ctx.contraindications) && ctx.contraindications?.length
-            ? { contraindications: ctx.contraindications.slice(0, 5).join(";") }
-            : {}),
-          ...(ctx.price_range ? { price_range: String(ctx.price_range).slice(0, 100) } : {}),
-          ...(typeof clinicDoc.knowledge_quality_score === "number"
-            ? { quality_score: clinicDoc.knowledge_quality_score }
-            : {}),
-        },
-      },
-    ],
+  await uploadKnowledgeToVm({
+    tenant_id: orgId,
+    clinic_id: orgId,
+    scope: "clinic",
+    source_type: toKnowledgeSourceType(ctx.category),
+    content: text,
+    topic: ctx.service_name || clinicDoc.id,
+    language: "th",
+    document_id: vectorId,
+    document_version: String(clinicDoc.version ?? 1),
   });
+
+  // DISABLED: Using ChromaDB via VM instead
+  // const embedding = await embedKnowledgeText(text);
+  // const index = getKnowledgeIndex();
+  // const ns = index.namespace(getOrgNamespace(orgId));
+  // ... Pinecone upsert removed from indexing path ...
 }
 
 /** Upsert global knowledge ลง Pinecone global namespace */
@@ -121,33 +129,34 @@ export async function upsertGlobalKnowledgeToVector(
   ctx: StructuredKnowledgeContext
 ): Promise<void> {
   const text = buildEmbeddableText(ctx);
-  const embedding = await embedKnowledgeText(text);
-  const index = getKnowledgeIndex();
-  const ns = index.namespace(GLOBAL_NAMESPACE);
-
-  await ns.upsert({
-    records: [
-      {
-        id: `global_${globalDoc.id}`,
-        values: embedding,
-        metadata: {
-          type: "global",
-          service_name: ctx.service_name,
-          category: ctx.category,
-          content: text.slice(0, 2000),
-          version: globalDoc.version,
-        },
-      },
-    ],
+  await uploadKnowledgeToVm({
+    tenant_id: "global",
+    clinic_id: "global",
+    scope: "clinic",
+    source_type: toKnowledgeSourceType(ctx.category),
+    content: text,
+    topic: ctx.service_name || globalDoc.id,
+    language: "th",
+    document_id: `global_${globalDoc.id}`,
+    document_version: String(globalDoc.version ?? 1),
   });
+
+  // DISABLED: Using ChromaDB via VM instead
+  // const embedding = await embedKnowledgeText(text);
+  // const index = getKnowledgeIndex();
+  // const ns = index.namespace(GLOBAL_NAMESPACE);
+  // ... Pinecone upsert removed from indexing path ...
 }
 
 /** Delete clinic doc จาก vector (เมื่อ un-approve) */
 export async function deleteClinicKnowledgeFromVector(orgId: string, clinicId: string): Promise<void> {
   try {
-    const index = getKnowledgeIndex();
-    const ns = index.namespace(getOrgNamespace(orgId));
-    await ns.deleteOne({ id: `clinic_${clinicId}` });
+    await uploadKnowledgeToVm({
+      tenant_id: orgId,
+      clinic_id: orgId,
+      document_id: `clinic_${clinicId}`,
+      action: "delete",
+    });
   } catch {
     // ignore if not found
   }
@@ -200,55 +209,37 @@ export async function searchKnowledgeBrain(
   const cached = await getCachedRagResults<KnowledgeSearchHit[]>(orgId, query, "kb");
   if (cached !== null) return cached.slice(0, topK);
 
-  const embedding = await embedKnowledgeText(query);
-  const index = getKnowledgeIndex();
-  const orgNs = index.namespace(getOrgNamespace(orgId));
-  const globalNs = index.namespace(GLOBAL_NAMESPACE);
-
   try {
-    const [orgRes, globalRes] = await Promise.all([
-      orgNs.query({ vector: embedding, topK, includeMetadata: true }),
-      globalNs.query({ vector: embedding, topK, includeMetadata: true }),
-    ]);
-
-    const now = Date.now();
-    const MS_PER_DAY = 86400000;
-    const orgMatchesRaw = (orgRes.matches ?? []).map((m) => ({
-      id: m.id ?? "",
-      score: m.score,
-      metadata: m.metadata as Record<string, unknown> | undefined,
-      knowledge_source: "clinic" as const,
-      knowledge_version: (m.metadata?.version as number) ?? undefined,
-    }));
-
-    const orgMatches = orgMatchesRaw.filter((m) => {
-      const meta = m.metadata;
-      const expiryDays = typeof meta?.expiry_policy_days === "number" ? meta.expiry_policy_days : null;
-      if (expiryDays == null) return true; // no expiry policy = keep
-      const lastReviewed =
-        typeof meta?.last_reviewed_at === "number"
-          ? meta.last_reviewed_at
-          : meta?.embedded_at != null
-            ? Number(meta.embedded_at)
-            : now;
-      return now - lastReviewed < expiryDays * MS_PER_DAY; // within TTL = keep
+    const serviceSecret = process.env.PHASE_SERVICE_SECRET?.trim() ?? "";
+    const baseUrl = resolveKnowledgeVectorBaseUrl();
+    if (!baseUrl) return [];
+    const res = await fetch(`${baseUrl}${KNOWLEDGE_UPLOAD_PATH.replace("/upload", "/search")}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Service-Secret": serviceSecret,
+      },
+      body: JSON.stringify({
+        tenant_id: orgId,
+        clinic_id: orgId,
+        query,
+        top_k: topK,
+      }),
     });
-
-    if (orgMatches.length >= topK) return orgMatches.slice(0, topK);
-
-    const globalMatches = (globalRes.matches ?? []).map((m) => ({
-      id: m.id ?? "",
-      score: m.score,
-      metadata: m.metadata as Record<string, unknown> | undefined,
-      knowledge_source: "global" as const,
-      knowledge_version: (m.metadata?.version as number) ?? undefined,
+    if (!res.ok) return [];
+    const data = await res.json().catch(() => ({}));
+    const rows = Array.isArray(data?.results) ? data.results : [];
+    const combined: KnowledgeSearchHit[] = rows.map((row: Record<string, unknown>) => ({
+      id: String(row.id ?? ""),
+      score: typeof row.score === "number" ? row.score : undefined,
+      metadata: (row.metadata as Record<string, unknown> | undefined) ?? undefined,
+      knowledge_source:
+        row.knowledge_source === "global" || row.knowledge_source === "clinic"
+          ? row.knowledge_source
+          : "clinic",
+      knowledge_version:
+        typeof row.knowledge_version === "number" ? row.knowledge_version : undefined,
     }));
-
-    const combined: KnowledgeSearchHit[] = [...orgMatches];
-    for (const g of globalMatches) {
-      if (combined.length >= topK) break;
-      if (!combined.some((o) => o.id === g.id)) combined.push(g);
-    }
 
     const verified = filterByTenantIsolation(combined, orgId);
     const result = verified.slice(0, topK);

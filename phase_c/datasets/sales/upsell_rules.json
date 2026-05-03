@@ -1,0 +1,72 @@
+[
+  {
+    "base_procedure": "proc_001",
+    "upsell": [
+      "proc_006",
+      "proc_022"
+    ]
+  },
+  {
+    "base_procedure": "proc_006",
+    "upsell": [
+      "proc_008",
+      "proc_021"
+    ]
+  },
+  {
+    "base_procedure": "proc_021",
+    "upsell": [
+      "proc_023",
+      "proc_006"
+    ]
+  },
+  {
+    "base_procedure": "proc_029",
+    "upsell": [
+      "proc_041",
+      "proc_008"
+    ]
+  },
+  {
+    "base_procedure": "proc_028",
+    "upsell": [
+      "proc_026",
+      "proc_041"
+    ]
+  },
+  {
+    "base_procedure": "proc_041",
+    "upsell": [
+      "proc_008",
+      "proc_029"
+    ]
+  },
+  {
+    "base_procedure": "proc_077",
+    "upsell": [
+      "proc_078",
+      "proc_008"
+    ]
+  },
+  {
+    "base_procedure": "proc_069",
+    "upsell": [
+      "proc_067",
+      "proc_021"
+    ]
+  },
+  {
+    "base_procedure": "proc_061",
+    "upsell": [
+      "proc_006",
+      "proc_021"
+    ]
+  },
+  {
+    "base_procedure": "proc_010",
+    "upsell": [
+      "proc_021",
+      "proc_006"
+    ]
+  }
+]

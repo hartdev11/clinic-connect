@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "typecheck": "tsc --noEmit",
     "migrate:clinics-to-orgs": "tsx scripts/migrate-clinics-to-orgs.ts",
     "migrate:clinics-to-orgs:dry": "tsx scripts/migrate-clinics-to-orgs.ts --dry-run",
     "migrate:add-org-id": "tsx scripts/migrate-add-org-id-to-collections.ts",
@@ -27,9 +28,11 @@
     "retrain:setup-env": "node scripts/setup-retrain-env.mjs",
     "seed:agency": "tsx scripts/seed-agency.ts",
     "phase22:post-check": "tsx scripts/phase22-post-check.ts",
-    "firestore:deploy-indexes": "firebase deploy --only firestore:indexes"
+    "firestore:deploy-indexes": "firebase deploy --only firestore:indexes",
+    "auth:reset-firestore-password": "tsx src/scripts/reset-firestore-user-password.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.82.0",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",

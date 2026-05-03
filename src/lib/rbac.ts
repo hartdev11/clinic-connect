@@ -8,6 +8,17 @@ import { getUserById } from "@/lib/clinic-data";
 
 export type AllowedRole = UserRole;
 
+function normalizeLegacyRole(input: unknown): UserRole | null {
+  if (input === "super_admin" || input === "owner" || input === "manager" || input === "staff") {
+    return input;
+  }
+  // Backward compatibility for older seeded/user docs
+  if (input === "clinic_owner" || input === "org_owner") return "owner";
+  if (input === "clinic_manager" || input === "org_manager") return "manager";
+  if (input === "clinic_staff" || input === "org_staff") return "staff";
+  return null;
+}
+
 /** Effective user สำหรับ RBAC — legacy (user_id=null) = owner ทั้ง org */
 export interface EffectiveUser {
   /** E2.1 — org-level role */
@@ -20,13 +31,15 @@ export interface EffectiveUser {
 
 export async function getEffectiveUser(session: SessionPayload): Promise<EffectiveUser> {
   const userId = session.user_id;
+  const sessionRole = normalizeLegacyRole(session.role);
   if (!userId) {
-    return { role: "owner", branch_ids: null, branch_roles: null };
+    return { role: sessionRole ?? "staff", branch_ids: null, branch_roles: null };
   }
   const user = await getUserById(userId);
-  if (!user) return { role: "owner", branch_ids: null, branch_roles: null };
+  if (!user) return { role: sessionRole ?? "staff", branch_ids: null, branch_roles: null };
+  const normalizedRole = normalizeLegacyRole(user.role) ?? sessionRole ?? "staff";
   return {
-    role: user.role,
+    role: normalizedRole,
     branch_ids: user.branch_ids ?? null,
     branch_roles: user.branch_roles ?? null,
   };
@@ -37,9 +50,10 @@ export function requireRole(
   userRole: UserRole | null | undefined,
   allowed: AllowedRole[]
 ): boolean {
-  if (!userRole) return false;
-  if (userRole === "super_admin") return true;
-  return allowed.includes(userRole);
+  const normalized = normalizeLegacyRole(userRole);
+  if (!normalized) return false;
+  if (normalized === "super_admin") return true;
+  return allowed.includes(normalized);
 }
 
 /**
@@ -77,12 +91,13 @@ export function requireBranchAccess(
   userBranchRoles: Record<string, BranchRole> | null | undefined,
   requestedBranchId: string | null
 ): boolean {
+  const normalizedRole = normalizeLegacyRole(userRole) ?? "owner";
   if (!requestedBranchId) return true;
-  if (userRole === "super_admin") return true;
-  if (userRole === "owner") return true;
+  if (normalizedRole === "super_admin") return true;
+  if (normalizedRole === "owner") return true;
   if (userBranchRoles?.[requestedBranchId]) return true;
   const hasBranchRoles = userBranchRoles && Object.keys(userBranchRoles).length > 0;
   if (hasBranchRoles) return false;
-  if (!userBranchIds || userBranchIds.length === 0) return true;
+  if (!userBranchIds || userBranchIds.length === 0) return false;
   return userBranchIds.includes(requestedBranchId);
 }

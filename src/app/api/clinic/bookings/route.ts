@@ -7,6 +7,7 @@ import { getEffectiveUser, requireBranchAccess, requireRole } from "@/lib/rbac";
 import { isSlotAvailable } from "@/lib/slot-engine";
 import type { BookingCreate, BookingSource, BookingChannel } from "@/types/clinic";
 import { runWithObservability } from "@/lib/observability/run-with-observability";
+import { getRequestId } from "@/lib/request-context";
 
 const VALID_CHANNELS = ["line", "facebook", "instagram", "tiktok", "web", "walk_in", "phone", "referral", "other"] as const;
 
@@ -32,6 +33,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "customerName, service, scheduledAt required" }, { status: 400 });
     }
     const branchId = typeof body.branchId === "string" ? body.branchId : undefined;
+    if ((user.role === "manager" || user.role === "staff") && !branchId) {
+      return NextResponse.json(
+        { error: "กรุณาเลือกสาขาก่อนสร้างการจอง (จำกัดสิทธิ์ตามสาขา)" },
+        { status: 403 }
+      );
+    }
     if (branchId && !requireBranchAccess(user.role, user.branch_ids, user.branch_roles, branchId)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
@@ -75,8 +82,10 @@ export async function POST(request: NextRequest) {
     }
     const bookingId = result.id;
     const bookingDateTime = new Date(data.scheduledAt);
+    const correlationId = getRequestId(request) ?? `booking_create_${bookingId}`;
     await scheduleBookingReminder(bookingId, bookingDateTime, orgId, {
       customerId: data.customerId ?? undefined,
+      correlationId,
     }).catch((err) => console.warn("[Booking] scheduleBookingReminder:", (err as Error)?.message));
     dispatchPartnerWebhooks(orgId, "booking.created", {
       bookingId,
@@ -84,7 +93,7 @@ export async function POST(request: NextRequest) {
       service: data.service,
       scheduledAt: data.scheduledAt,
       branchName: data.branchName,
-    }).catch((e) => console.warn("[Booking] partner webhook:", (e as Error)?.message?.slice(0, 50)));
+    }, { correlationId }).catch((e) => console.warn("[Booking] partner webhook:", (e as Error)?.message?.slice(0, 50)));
     return { response: NextResponse.json({ id: bookingId, success: true }), orgId, branchId: branchId ?? branch?.id ?? null };
   } catch (err) {
     console.error("POST /api/clinic/bookings:", err);
@@ -110,6 +119,12 @@ export async function GET(request: NextRequest) {
     const user = await getEffectiveUser(session);
     const { searchParams } = new URL(request.url);
     const branchId = searchParams.get("branchId") ?? session.branch_id ?? null;
+    if ((user.role === "manager" || user.role === "staff") && !branchId) {
+      return NextResponse.json(
+        { error: "กรุณาเลือกสาขาก่อนดูรายการจอง (จำกัดสิทธิ์ตามสาขา)" },
+        { status: 403 }
+      );
+    }
     if (!requireBranchAccess(user.role, user.branch_ids, user.branch_roles, branchId)) {
       return NextResponse.json(
         { error: "จำกัดสิทธิ์: คุณไม่มีสิทธิ์เข้าถึง Booking ของสาขานี้" },

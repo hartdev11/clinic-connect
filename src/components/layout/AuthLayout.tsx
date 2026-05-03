@@ -1,7 +1,13 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import Image from "next/image";
 import { useEffect, useState } from 'react'
+import {
+  SparklesIcon,
+  CpuChipIcon,
+  ChartBarIcon,
+} from "@heroicons/react/24/solid";
 
 interface AuthLayoutProps {
   children: React.ReactNode
@@ -43,7 +49,6 @@ export function AuthLayout({
   quote,
   quoteAuthor,
   logoUrl,
-  primaryColor,
   brandName,
 }: AuthLayoutProps) {
   const [mounted, setMounted] = useState(false)
@@ -105,10 +110,10 @@ export function AuthLayout({
         >
           <div className="flex items-center gap-3">
             {logoUrl ? (
-              <img src={logoUrl} alt="" className="w-10 h-10 rounded-2xl object-contain bg-white/10 shadow-luxury" />
+              <Image src={logoUrl} alt="" width={40} height={40} unoptimized className="w-10 h-10 rounded-2xl object-contain bg-white/10 shadow-luxury" />
             ) : (
               <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-rg-300 to-rg-500 flex items-center justify-center shadow-luxury">
-                <span className="text-white text-lg">✦</span>
+                <SparklesIcon className="h-5 w-5 text-white" />
               </div>
             )}
             <div>
@@ -140,15 +145,15 @@ export function AuthLayout({
           <div className="flex flex-col gap-3">
             {[
               {
-                icon: '✦',
+                Icon: SparklesIcon,
                 text: 'จัดการลูกค้าและการจองอัจฉริยะ',
               },
               {
-                icon: '◈',
+                Icon: CpuChipIcon,
                 text: 'AI ตอบแชทลูกค้าอัตโนมัติผ่าน LINE',
               },
               {
-                icon: '⬡',
+                Icon: ChartBarIcon,
                 text: 'วิเคราะห์รายได้และ Insights ครบครัน',
               },
             ].map((f, i) => (
@@ -159,7 +164,7 @@ export function AuthLayout({
                 transition={{ delay: 0.7 + i * 0.1, duration: 0.5 }}
                 className="flex items-center gap-3"
               >
-                <span className="text-rg-400 text-xs">{f.icon}</span>
+                <f.Icon className="h-4 w-4 text-rg-400" />
                 <span className="text-sm font-body text-cream-200/80">
                   {f.text}
                 </span>
@@ -196,7 +201,7 @@ export function AuthLayout({
       >
         <div className="flex lg:hidden items-center gap-2 mb-8">
           <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-rg-300 to-rg-500 flex items-center justify-center">
-            <span className="text-white text-sm">✦</span>
+            <SparklesIcon className="h-4 w-4 text-white" />
           </div>
           <p className="font-display text-lg font-semibold text-mauve-800">
             Clinic Connect

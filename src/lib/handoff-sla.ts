@@ -8,7 +8,6 @@ import { db } from "@/lib/firebase-admin";
 
 const HANDOFF_SUB = "handoff_sessions";
 const RESPONSE_TARGET_SEC = 120;
-const RESOLUTION_TARGET_SEC = 600;
 
 function toDate(v: unknown): Date | null {
   if (!v) return null;

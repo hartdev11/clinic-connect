@@ -2,10 +2,7 @@
  * Phase 3 #6 — Deterministic Context Limiter
  * Max tokens, sort by relevance, remove redundant, always include risks/contraindications/disclaimer
  */
-import type { StructuredKnowledgeContext } from "@/types/knowledge-brain";
-
 const MAX_CONTEXT_CHARS = 4500; // ~1125 tokens @ 4 chars/token
-const ESTIMATED_CHARS_PER_TOKEN = 4;
 
 export interface LimitedContext {
   content: string;
@@ -14,9 +11,6 @@ export interface LimitedContext {
   includesContraindications: boolean;
   includesDisclaimer: boolean;
 }
-
-/** Required fields — always include */
-const REQUIRED_KEYS = ["risks", "contraindications", "disclaimer"] as const;
 
 export function limitContext(
   ctx: Record<string, unknown>,

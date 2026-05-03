@@ -1,0 +1,28 @@
+{
+  "partner_594c0a7b9e": {
+    "partner_id": "partner_594c0a7b9e",
+    "tenant_id": "tenant_b18306b1b0",
+    "company_name": "PG Partner",
+    "owner_name": "PG Owner",
+    "email": "pg_partner@example.com",
+    "phone": "0811110001",
+    "status": "approved",
+    "white_label_enabled": true,
+    "brand_name": "PGOS",
+    "logo_url": null,
+    "primary_color": "#111827",
+    "secondary_color": null,
+    "custom_domain": "portal.pgos.co",
+    "support_email": null,
+    "support_phone": null,
+    "feature_flags": {
+      "affiliate_module": true
+    },
+    "notes": [
+      "partner_created",
+      "status=pending",
+      "status:approved",
+      "auto_approve"
+    ]
+  }
+}

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { Input, Textarea } from "@/components/ui/Input";
 import { useClinicContext } from "@/contexts/ClinicContext";
 import { PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { CheckCircleIcon } from "@heroicons/react/24/solid";
 import { cn } from "@/lib/utils";
 import { VOICE_DEFINITIONS } from "@/lib/ai/tenant-prompt-builder";
 import type { VoiceId } from "@/types/ai-config";
@@ -60,6 +61,33 @@ const CLINIC_STYLES: { value: ClinicStyle; label: string }[] = [
 
 const CUSTOMER_MSG = "สวัสดีค่ะ อยากสอบถามเรื่องโบท็อกซ์";
 
+type AiConfigSettingsResponse = {
+  clinic_style?: ClinicStyle;
+  greeting_message?: string;
+  fallback_message?: string;
+  handoff_message?: string;
+  medicalPolicy?: MedicalPolicy;
+  voice_id?: VoiceId;
+  sales_strategy?: SalesStrategy;
+  show_price_range?: boolean;
+  show_exact_price?: boolean;
+  negotiation_allowed?: boolean;
+  promotion_display?: PromotionDisplay;
+  appliedToLiveChat?: boolean;
+  appliedAt?: string | null;
+};
+
+type PreviewResponse = {
+  previews?: { label: string; customerMessage: string; aiResponse: string }[];
+  effectiveConfig?: {
+    voice_id?: string | null;
+    medicalPolicy?: string | null;
+    sales_strategy?: string | null;
+    show_price_range?: boolean | null;
+    show_exact_price?: boolean | null;
+  };
+};
+
 export function AiConfigSettings() {
   const { currentOrg } = useClinicContext();
   const [templates, setTemplates] = useState<string[]>([]);
@@ -78,6 +106,11 @@ export function AiConfigSettings() {
   const [previewPreviews, setPreviewPreviews] = useState<{ label: string; customerMessage: string; aiResponse: string }[] | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
   const [history, setHistory] = useState<{ id?: string; summary: string; timeAgo: string; changedBy: string }[]>([]);
+  const [appliedAt, setAppliedAt] = useState<string | null>(null);
+  const [appliedToLiveChat, setAppliedToLiveChat] = useState(true);
+  const [verifiedToLiveChat, setVerifiedToLiveChat] = useState(false);
+  const [verifiedAt, setVerifiedAt] = useState<string | null>(null);
+  const [verifying, setVerifying] = useState(false);
   const [savingVoice, setSavingVoice] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -94,7 +127,7 @@ export function AiConfigSettings() {
         fetch("/api/clinic/ai-config/history", { credentials: "include" }),
       ]);
       const tplData = await tplRes.json();
-      const settingsData = await settingsRes.json();
+      const settingsData = (await settingsRes.json()) as AiConfigSettingsResponse;
       const historyData = await historyRes.json();
       const arr = Array.isArray(tplData?.templates) && tplData.templates.length > 0 ? tplData.templates : [...DEFAULT_TEMPLATES];
       setTemplates(arr);
@@ -109,6 +142,8 @@ export function AiConfigSettings() {
       if (typeof settingsData?.show_exact_price === "boolean") setShowExactPrice(settingsData.show_exact_price);
       if (typeof settingsData?.negotiation_allowed === "boolean") setNegotiationAllowed(settingsData.negotiation_allowed);
       if (settingsData?.promotion_display) setPromotionDisplay(settingsData.promotion_display);
+      setAppliedToLiveChat(settingsData?.appliedToLiveChat !== false);
+      setAppliedAt(settingsData?.appliedAt ?? null);
       if (Array.isArray(historyData?.history)) setHistory(historyData.history);
     } catch {
       setTemplates([...DEFAULT_TEMPLATES]);
@@ -136,12 +171,42 @@ export function AiConfigSettings() {
           show_exact_price: showExactPrice,
         }),
       });
-      const data = await res.json();
+      const data = (await res.json()) as PreviewResponse;
       if (data?.previews) setPreviewPreviews(data.previews);
     } catch {
       setPreviewPreviews(null);
     } finally {
       setPreviewLoading(false);
+    }
+  }, [voiceId, medicalPolicy, salesStrategy, showPriceRange, showExactPrice]);
+
+  const verifyLiveApply = useCallback(async () => {
+    setVerifying(true);
+    try {
+      const res = await fetch("/api/clinic/ai-config/preview", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({}),
+      });
+      const data = (await res.json()) as PreviewResponse;
+      const cfg = data?.effectiveConfig;
+      const isMatch =
+        res.ok &&
+        cfg?.voice_id === voiceId &&
+        cfg?.medicalPolicy === medicalPolicy &&
+        cfg?.sales_strategy === salesStrategy &&
+        cfg?.show_price_range === showPriceRange &&
+        cfg?.show_exact_price === showExactPrice;
+      setVerifiedToLiveChat(Boolean(isMatch));
+      setVerifiedAt(isMatch ? new Date().toISOString() : null);
+      return Boolean(isMatch);
+    } catch {
+      setVerifiedToLiveChat(false);
+      setVerifiedAt(null);
+      return false;
+    } finally {
+      setVerifying(false);
     }
   }, [voiceId, medicalPolicy, salesStrategy, showPriceRange, showExactPrice]);
 
@@ -196,8 +261,16 @@ export function AiConfigSettings() {
       });
       const json = await res.json();
       if (res.ok) {
-        setMessage({ type: "success", text: "บันทึก Voice, Medical Policy & Sales Strategy สำเร็จ" });
-        loadSettings();
+        setAppliedToLiveChat(json?.appliedToLiveChat !== false);
+        setAppliedAt(typeof json?.appliedAt === "string" ? json.appliedAt : new Date().toISOString());
+        const verified = await verifyLiveApply();
+        setMessage({
+          type: verified ? "success" : "error",
+          text: verified
+            ? "บันทึกสำเร็จ และยืนยันแล้วว่าใช้งานกับ live chat"
+            : "บันทึกสำเร็จ แต่ยังยืนยันการใช้งานกับ live chat ไม่ผ่าน",
+        });
+        await loadSettings();
       } else setMessage({ type: "error", text: json.error ?? "บันทึกไม่สำเร็จ" });
     } catch {
       setMessage({ type: "error", text: "เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง" });
@@ -320,6 +393,40 @@ export function AiConfigSettings() {
           <h3 className="font-display text-lg font-semibold text-mauve-800 pb-3 border-b border-cream-200">
             Voice Personality & Medical Policy
           </h3>
+          <div className="flex flex-wrap items-center gap-2">
+            <span
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-body border",
+                appliedToLiveChat
+                  ? "bg-emerald-50 text-emerald-800 border-emerald-200"
+                  : "bg-amber-50 text-amber-800 border-amber-200"
+              )}
+            >
+              <CheckCircleIcon className="h-4 w-4" />
+              {appliedToLiveChat ? "Applied to live chat" : "Pending live apply"}
+            </span>
+            {appliedAt && (
+              <span className="text-xs font-body text-mauve-500">
+                อัปเดตล่าสุด: {new Date(appliedAt).toLocaleString("th-TH")}
+              </span>
+            )}
+            <span
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-body border",
+                verifiedToLiveChat
+                  ? "bg-cyan-50 text-cyan-800 border-cyan-200"
+                  : "bg-slate-50 text-slate-700 border-slate-200"
+              )}
+            >
+              <CheckCircleIcon className="h-4 w-4" />
+              {verifiedToLiveChat ? "Verified with live prompt" : "Not verified"}
+            </span>
+            {verifiedAt && (
+              <span className="text-xs font-body text-mauve-500">
+                verify: {new Date(verifiedAt).toLocaleString("th-TH")}
+              </span>
+            )}
+          </div>
           <div className="grid lg:grid-cols-2 gap-6">
             {/* Voice cards */}
             <div>
@@ -394,6 +501,9 @@ export function AiConfigSettings() {
           <div className="flex gap-2">
             <Button variant="primary" size="sm" loading={savingVoice} disabled={!canEdit} onClick={saveVoiceMedicalStrategy}>
               บันทึก Voice & Medical Policy
+            </Button>
+            <Button variant="outline" size="sm" loading={verifying} disabled={!canEdit || savingVoice} onClick={verifyLiveApply}>
+              Verify live apply
             </Button>
           </div>
         </section>

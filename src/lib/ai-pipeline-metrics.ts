@@ -19,6 +19,7 @@ export interface PipelineMetricsPayload {
   /** Phase 22: Increment aiCost (THB) for real-time metrics */
   aiCostThb?: number;
   tokensUsed?: number;
+  handoffType?: "medical" | "booking_intent" | "complaint" | "low_ai_confidence";
 }
 
 /**
@@ -70,6 +71,19 @@ export async function recordPipelineMetrics(
       updates.totalTokens = FieldValue.increment(payload.tokensUsed);
     }
 
+    if (payload.handoffType) {
+      updates.handoff_total = FieldValue.increment(1);
+      if (payload.handoffType === "medical") {
+        updates.handoff_medical = FieldValue.increment(1);
+      } else if (payload.handoffType === "booking_intent") {
+        updates.handoff_booking_intent = FieldValue.increment(1);
+      } else if (payload.handoffType === "complaint") {
+        updates.handoff_complaint = FieldValue.increment(1);
+      } else if (payload.handoffType === "low_ai_confidence") {
+        updates.handoff_low_ai_confidence = FieldValue.increment(1);
+      }
+    }
+
     await ref.set(updates, { merge: true });
   } catch (err) {
     console.warn("[recordPipelineMetrics] error:", (err as Error)?.message?.slice(0, 80));
@@ -84,6 +98,11 @@ export interface PipelineMetricsDoc {
   cost_saved_thb?: number;
   confidence_sum?: number;
   confidence_count?: number;
+  handoff_total?: number;
+  handoff_medical?: number;
+  handoff_booking_intent?: number;
+  handoff_complaint?: number;
+  handoff_low_ai_confidence?: number;
   date?: string;
   lastUpdated?: string;
 }
@@ -106,6 +125,11 @@ export async function getPipelineMetrics(
     cost_saved_thb: Number(d.cost_saved_thb ?? 0),
     confidence_sum: Number(d.confidence_sum ?? 0),
     confidence_count: Number(d.confidence_count ?? 0),
+    handoff_total: Number(d.handoff_total ?? 0),
+    handoff_medical: Number(d.handoff_medical ?? 0),
+    handoff_booking_intent: Number(d.handoff_booking_intent ?? 0),
+    handoff_complaint: Number(d.handoff_complaint ?? 0),
+    handoff_low_ai_confidence: Number(d.handoff_low_ai_confidence ?? 0),
     date: String(d.date ?? date),
     lastUpdated: d.lastUpdated?.toDate?.()?.toISOString?.() ?? "",
   };
@@ -120,6 +144,11 @@ export async function getPipelineMetricsThisMonth(orgId: string): Promise<{
   costSavedThb: number;
   templateResponses: number;
   avgConfidence: number;
+  handoffTotal: number;
+  handoffMedical: number;
+  handoffBookingIntent: number;
+  handoffComplaint: number;
+  handoffLowAiConfidence: number;
 }> {
   const today = getTodayKeyBangkok();
   const [y, m] = today.split("-");
@@ -137,6 +166,11 @@ export async function getPipelineMetricsThisMonth(orgId: string): Promise<{
   let totalTemplates = 0;
   let confidenceSum = 0;
   let confidenceCount = 0;
+  let handoffTotal = 0;
+  let handoffMedical = 0;
+  let handoffBookingIntent = 0;
+  let handoffComplaint = 0;
+  let handoffLowAiConfidence = 0;
 
   for (const date of dates) {
     const m = await getPipelineMetrics(orgId, date);
@@ -148,6 +182,11 @@ export async function getPipelineMetricsThisMonth(orgId: string): Promise<{
       totalTemplates += m.template_responses ?? 0;
       confidenceSum += m.confidence_sum ?? 0;
       confidenceCount += m.confidence_count ?? 0;
+      handoffTotal += m.handoff_total ?? 0;
+      handoffMedical += m.handoff_medical ?? 0;
+      handoffBookingIntent += m.handoff_booking_intent ?? 0;
+      handoffComplaint += m.handoff_complaint ?? 0;
+      handoffLowAiConfidence += m.handoff_low_ai_confidence ?? 0;
     }
   }
 
@@ -160,6 +199,11 @@ export async function getPipelineMetricsThisMonth(orgId: string): Promise<{
     costSavedThb: totalCostSaved,
     templateResponses: totalTemplates,
     avgConfidence,
+    handoffTotal,
+    handoffMedical,
+    handoffBookingIntent,
+    handoffComplaint,
+    handoffLowAiConfidence,
   };
 }
 
@@ -177,6 +221,11 @@ export async function getAggregatePipelineMetricsForOrgs(
       costSavedThb: number;
       templateResponses: number;
       avgConfidence: number;
+      handoffTotal: number;
+      handoffMedical: number;
+      handoffBookingIntent: number;
+      handoffComplaint: number;
+      handoffLowAiConfidence: number;
     }
   >
 > {
@@ -188,6 +237,11 @@ export async function getAggregatePipelineMetricsForOrgs(
       costSavedThb: number;
       templateResponses: number;
       avgConfidence: number;
+      handoffTotal: number;
+      handoffMedical: number;
+      handoffBookingIntent: number;
+      handoffComplaint: number;
+      handoffLowAiConfidence: number;
     }
   > = {};
 

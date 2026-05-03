@@ -1,0 +1,155 @@
+{
+  "meta": {
+    "dashboard_version": "k_final_v1",
+    "generated_at": "",
+    "role": "",
+    "tenant_id": "",
+    "clinic_id": "",
+    "branch_id": "",
+    "affiliate_id": "",
+    "agent_id": ""
+  },
+  "overview": {
+    "total_users": 0,
+    "total_sessions": 0,
+    "total_leads": 0,
+    "total_bookings": 0,
+    "total_revenue": 0,
+    "conversion_rate": 0,
+    "ctr": 0
+  },
+  "funnel": {
+    "view": 0,
+    "click": 0,
+    "booking": 0
+  },
+  "trend": {
+    "daily": [],
+    "comparison": {
+      "previous_period_revenue": 0,
+      "previous_period_conversion": 0,
+      "revenue_growth_rate": 0,
+      "conversion_growth_rate": 0
+    }
+  },
+  "top_procedures": [
+    {
+      "procedure_id": "",
+      "procedure_name": "",
+      "views": 0,
+      "bookings": 0,
+      "revenue": 0,
+      "conversion_rate": 0
+    }
+  ],
+  "top_channels": [
+    {
+      "channel": "",
+      "sessions": 0,
+      "bookings": 0,
+      "revenue": 0,
+      "conversion_rate": 0
+    }
+  ],
+  "bookings": {
+    "recent": [
+      {
+        "booking_id": "",
+        "customer_id": "",
+        "procedure_id": "",
+        "procedure_name": "",
+        "branch_id": "",
+        "status": "",
+        "revenue": 0,
+        "timestamp": ""
+      }
+    ],
+    "summary": {
+      "pending": 0,
+      "confirmed": 0,
+      "completed": 0,
+      "cancelled": 0
+    }
+  },
+  "customers": {
+    "new_customers": 0,
+    "returning_customers": 0,
+    "hot_leads": 0,
+    "warm_leads": 0,
+    "cold_leads": 0
+  },
+  "affiliate": {
+    "enabled": false,
+    "total_clicks": 0,
+    "total_leads": 0,
+    "total_bookings": 0,
+    "total_revenue": 0,
+    "total_commission": 0,
+    "top_links": [
+      {
+        "link_id": "",
+        "campaign_id": "",
+        "clicks": 0,
+        "bookings": 0,
+        "revenue": 0,
+        "commission": 0
+      }
+    ]
+  },
+  "agent": {
+    "enabled": false,
+    "total_leads": 0,
+    "total_bookings": 0,
+    "close_rate": 0,
+    "total_revenue": 0,
+    "total_commission": 0,
+    "top_agents": [
+      {
+        "agent_id": "",
+        "agent_name": "",
+        "leads": 0,
+        "bookings": 0,
+        "close_rate": 0,
+        "revenue": 0,
+        "commission": 0
+      }
+    ]
+  },
+  "branch_performance": {
+    "enabled": false,
+    "branches": [
+      {
+        "branch_id": "",
+        "branch_name": "",
+        "sessions": 0,
+        "bookings": 0,
+        "revenue": 0,
+        "conversion_rate": 0
+      }
+    ]
+  },
+  "white_label": {
+    "enabled": false,
+    "partner_id": "",
+    "brand_name": "",
+    "custom_domain": "",
+    "primary_color": "",
+    "secondary_color": "",
+    "logo_url": ""
+  },
+  "insights": [
+    {
+      "type": "",
+      "title": "",
+      "message": "",
+      "priority": ""
+    }
+  ],
+  "alerts": [
+    {
+      "code": "",
+      "message": "",
+      "severity": ""
+    }
+  ]
+}

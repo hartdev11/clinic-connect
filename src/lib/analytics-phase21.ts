@@ -297,6 +297,10 @@ export async function getConversionAttribution(
 
   snap.docs.forEach((doc) => {
     const d = doc.data();
+    if (branchId) {
+      const docBranchId = (d.branch_id as string | undefined) ?? (d.branchId as string | undefined) ?? null;
+      if (docBranchId !== branchId) return;
+    }
     const tier = (d.leadTier as LeadTier) ?? "cold";
     if (!(tier in tierMap)) return;
     tierMap[tier as LeadTier].total++;

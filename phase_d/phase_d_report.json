@@ -1,0 +1,59 @@
+{
+  "total_tests": 23,
+  "errors": [],
+  "intent_distribution": {
+    "consultation": 15,
+    "pricing": 2,
+    "comparison": 1,
+    "objection": 2,
+    "booking": 3
+  },
+  "stage_distribution": {
+    "awareness": 3,
+    "consideration": 12,
+    "decision": 8
+  },
+  "top_procedures": [
+    [
+      "proc_001",
+      14
+    ],
+    [
+      "proc_021",
+      14
+    ],
+    [
+      "proc_006",
+      12
+    ],
+    [
+      "proc_002",
+      3
+    ],
+    [
+      "proc_003",
+      3
+    ],
+    [
+      "proc_023",
+      3
+    ],
+    [
+      "proc_007",
+      2
+    ],
+    [
+      "proc_013",
+      2
+    ],
+    [
+      "proc_061",
+      1
+    ],
+    [
+      "proc_024",
+      1
+    ]
+  ],
+  "unique_procedures": 24
+}

@@ -24,6 +24,7 @@ export function checkEscalation(intent: IntentType, userMessage?: string): Escal
 }
 
 /** Phase 7: ตรวจสอบ loop detected (ส่งให้ pipeline เรียกเพิ่ม) */
-export function checkLoopDetected(_recentMessages: string[]): boolean {
+export function checkLoopDetected(recentMessages: string[]): boolean {
+  void recentMessages;
   return false;
 }

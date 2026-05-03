@@ -5,7 +5,7 @@
  * - Alert log 100%
  * - Emergency global kill switch (GLOBAL_AI_DISABLED)
  */
-import { getDailyLLMCost, type LLMUsage } from "@/lib/llm-metrics";
+import { getDailyLLMCost } from "@/lib/llm-metrics";
 import { log } from "@/lib/logger";
 
 const SOFT_WARNING_THRESHOLD = 0.8; // 80%

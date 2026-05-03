@@ -1,0 +1,135 @@
+{
+  "cta_performance": [
+    {
+      "cta_id": "cta_05",
+      "clicks": 17,
+      "bookings": 18,
+      "conversion": 1.0588
+    },
+    {
+      "cta_id": "cta_01",
+      "clicks": 21,
+      "bookings": 19,
+      "conversion": 0.9048
+    },
+    {
+      "cta_id": "cta_04",
+      "clicks": 17,
+      "bookings": 15,
+      "conversion": 0.8824
+    },
+    {
+      "cta_id": "cta_02",
+      "clicks": 24,
+      "bookings": 19,
+      "conversion": 0.7917
+    },
+    {
+      "cta_id": "cta_03",
+      "clicks": 21,
+      "bookings": 16,
+      "conversion": 0.7619
+    }
+  ],
+  "top_procedures_enhanced": [
+    {
+      "procedure_id": "proc_001",
+      "views": 51,
+      "revenue": 94071.0,
+      "value_per_view": 1844.53
+    },
+    {
+      "procedure_id": "proc_008",
+      "views": 40,
+      "revenue": 85548.0,
+      "value_per_view": 2138.7
+    },
+    {
+      "procedure_id": "proc_006",
+      "views": 42,
+      "revenue": 84002.0,
+      "value_per_view": 2000.05
+    },
+    {
+      "procedure_id": "proc_004",
+      "views": 45,
+      "revenue": 77358.0,
+      "value_per_view": 1719.07
+    },
+    {
+      "procedure_id": "proc_012",
+      "views": 51,
+      "revenue": 74958.0,
+      "value_per_view": 1469.76
+    },
+    {
+      "procedure_id": "proc_005",
+      "views": 41,
+      "revenue": 69319.0,
+      "value_per_view": 1690.71
+    },
+    {
+      "procedure_id": "proc_003",
+      "views": 46,
+      "revenue": 68532.0,
+      "value_per_view": 1489.83
+    },
+    {
+      "procedure_id": "proc_019",
+      "views": 50,
+      "revenue": 62741.0,
+      "value_per_view": 1254.82
+    },
+    {
+      "procedure_id": "proc_013",
+      "views": 40,
+      "revenue": 31831.0,
+      "value_per_view": 795.77
+    },
+    {
+      "procedure_id": "proc_011",
+      "views": 45,
+      "revenue": 0.0,
+      "value_per_view": 0.0
+    }
+  ],
+  "business_metrics": {
+    "revenue_per_user": 2436.21,
+    "revenue_per_session": 1376.6
+  },
+  "funnel_dropoff": {
+    "view_to_click_drop": 0.8761,
+    "click_to_booking_drop": 0.13
+  },
+  "daily_trend": {
+    "2026-03-14": {
+      "revenue": 10000
+    },
+    "2026-03-15": {
+      "revenue": 15000
+    },
+    "2026-03-16": {
+      "revenue": 12000
+    },
+    "2026-03-17": {
+      "revenue": 18000
+    },
+    "2026-03-18": {
+      "revenue": 20000
+    },
+    "2026-03-19": {
+      "revenue": 17000
+    },
+    "2026-03-20": {
+      "revenue": 22000
+    }
+  },
+  "comparison": {
+    "current": {
+      "conversion": 0.09
+    },
+    "previous": {
+      "conversion": 0.07
+    }
+  }
+}

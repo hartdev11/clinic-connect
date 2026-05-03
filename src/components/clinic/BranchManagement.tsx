@@ -4,13 +4,14 @@
  * FE-3 — Branch Management Component
  * List, Create, Edit branches
  */
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { SectionHeader } from "@/components/layout/SectionHeader";
 import { RequireRole } from "@/components/rbac/RequireRole";
 import { useClinicContext } from "@/contexts/ClinicContext";
+import { useToast } from "@/components/ui/Toast";
 import useSWR from "swr";
 
 const fetcher = (url: string) =>
@@ -24,6 +25,7 @@ interface Branch {
 
 export function BranchManagement() {
   const { currentOrg, subscriptionPlan } = useClinicContext();
+  const { addToast } = useToast();
   const { data, mutate } = useSWR<{ items: Branch[] }>("/api/clinic/branches", fetcher);
   const branches = data?.items ?? [];
 
@@ -70,14 +72,17 @@ export function BranchManagement() {
       if (!res.ok) {
         setError(json.error || "เพิ่มสาขาไม่สำเร็จ");
         if (json.warning) setWarning(json.warning);
+        addToast({ title: json.error || "เพิ่มสาขาไม่สำเร็จ", variant: "error" });
         return;
       }
       if (json.warning) setWarning(json.warning);
       resetForm();
       setShowCreate(false);
+      addToast({ title: "เพิ่มสาขาสำเร็จ", variant: "success" });
       mutate();
-    } catch (err) {
+    } catch {
       setError("เกิดข้อผิดพลาด");
+      addToast({ title: "เกิดข้อผิดพลาด", message: "ไม่สามารถเพิ่มสาขาได้", variant: "error" });
     } finally {
       setLoading(false);
     }
@@ -99,12 +104,15 @@ export function BranchManagement() {
       if (!res.ok) {
         const json = await res.json();
         setError(json.error || "แก้ไขไม่สำเร็จ");
+        addToast({ title: json.error || "แก้ไขสาขาไม่สำเร็จ", variant: "error" });
         return;
       }
       cancelEdit();
+      addToast({ title: "บันทึกสาขาสำเร็จ", variant: "success" });
       mutate();
-    } catch (err) {
+    } catch {
       setError("เกิดข้อผิดพลาด");
+      addToast({ title: "เกิดข้อผิดพลาด", message: "ไม่สามารถแก้ไขสาขาได้", variant: "error" });
     } finally {
       setLoading(false);
     }

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SparklesIcon } from "@heroicons/react/24/solid";
 
 export function PublicFooter() {
   return (
@@ -7,7 +8,7 @@ export function PublicFooter() {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="flex items-center gap-3">
             <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 text-white font-bold text-sm shadow-md shadow-primary-400/25">
-              ✦
+              <SparklesIcon className="h-4 w-4" />
             </span>
             <span className="font-bold text-surface-800">Clinic Connect</span>
             <span className="text-xs font-medium text-surface-400 hidden sm:inline">

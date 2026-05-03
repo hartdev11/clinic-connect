@@ -15,14 +15,14 @@
  * ถ้า "ต้องใช้" → ห้ามลบ / ห้ามเดาใหม่
  */
 import { normalizeLineMessage } from "./normalizer";
-import { analyzeIntent, fallbackIntentFromKeywords } from "./intent";
+import { analyzeIntent } from "./intent";
 import { checkSafety } from "./safety";
 import { checkEscalation } from "./escalation";
 import { composeReply } from "./compose";
 import { getKnowledge } from "./knowledge";
 import { summarizeForCRM } from "./summary";
-import { composeSafeFallbackMessage, composeMemoryAnswer } from "./safe-fallback";
-import { createInitialState, updateStateFromIntent, isShortFollowUp, isRefinementMessage } from "./conversation-state";
+import { composeMemoryAnswer } from "./safe-fallback";
+import { createInitialState, updateStateFromIntent, isShortFollowUp } from "./conversation-state";
 import { finalGuard } from "../guards/final-guard";
 import { isRefinementMessage as isRefinementMessageFromGuard } from "../guards/refinement-guard";
 import { knowledgeReadyGuard } from "../guards/knowledge-readiness-guard";
@@ -33,6 +33,17 @@ import { isPreferenceResponse } from "../guards/preference-response-guard";
 import { humanFallbackReply } from "./human-fallback";
 import { detectTone } from "../tone/tone-detector";
 import { isDuplicateIntent } from "../guards/duplicate-intent-guard";
+import {
+  buildPromotionDetailChatReply,
+  buildPromotionOpinionReply,
+  extractPromotionTitleHint,
+  formatPromotionBulletText,
+  isAskingForOtherPromotionsCount,
+  isExplicitPromotionListingAsk,
+  isPromotionDetailScopeAsk,
+  isPromotionOpinionOrSuitabilityAsk,
+  pickPromotionMatchingHint,
+} from "./promotion-listing-intent";
 import { selectTemplate } from "./compose-templates";
 import { getSessionState, saveSessionState, clearSession } from "./session-storage";
 import type { IntentResult } from "./types";
@@ -83,7 +94,12 @@ export async function runPipeline(
   const channel = pipelineOptions?.channel ?? "default";
 
   // Presentation: normalize
-  const normalized = normalizeLineMessage(userText);
+  const normalized = await normalizeLineMessage(userText, {
+    orgId,
+    userId,
+    channel: channel === "line" || channel === "web" ? channel : "default",
+    historyLimit: 6,
+  });
   const text = normalized.message.trim();
   
   // Phase 11: AI Blocked — quota exceeded
@@ -391,11 +407,48 @@ export async function runPipeline(
   
   // Agent A: Intent & Context (ห้าม return null)
   let intentResult = await analyzeIntent(normalized);
+
+  // ถามรายการโปร/ราคาโปรชัด ๆ → บังคับ promotion_inquiry เพื่อดึงโปรจาก Firestore (กัน LLM ตีเป็น general_chat)
+  if (
+    isExplicitPromotionListingAsk(text) ||
+    isAskingForOtherPromotionsCount(text) ||
+    isPromotionDetailScopeAsk(text) ||
+    isPromotionOpinionOrSuitabilityAsk(text)
+  ) {
+    intentResult = {
+      ...intentResult,
+      intent: "promotion_inquiry",
+      confidence: Math.max(intentResult.confidence ?? 0.6, 0.9),
+    };
+  } else {
+    const lowerMsg = text.toLowerCase();
+    if (
+      intentResult.intent === "price_inquiry" &&
+      /มีโปร|โปรแบบ|โปรอะไร|โปรบ้าง|โปรมั้ย|โปรไหม|โปรโมชั่น/.test(lowerMsg) &&
+      /ราคา|เท่าไหร่|กี่บาท|บ้าง/.test(lowerMsg)
+    ) {
+      intentResult = {
+        ...intentResult,
+        intent: "promotion_inquiry",
+        confidence: Math.max(intentResult.confidence ?? 0.6, 0.88),
+      };
+    } else if (
+      intentResult.intent !== "promotion_inquiry" &&
+      /โปรโมชั่น|มี\s*โปร|โปร\s*ของ|โปร\s*ไหม|ส่วนลด|ลดราคา|โปร\s*ลด/.test(lowerMsg) &&
+      /ไหม|มั้ย|บ้าง|หรือเปล่า|เหรอ|อยากรู้|สอบถาม/.test(lowerMsg)
+    ) {
+      intentResult = {
+        ...intentResult,
+        intent: "promotion_inquiry",
+        confidence: Math.max(intentResult.confidence ?? 0.6, 0.82),
+      };
+    }
+  }
   
   // ✅ Duplicate Intent Guard (ตัวเล็ก แต่โคตรสำคัญ)
   // ป้องกันการถามซ้ำเมื่อลูกค้าพูดซ้ำ intent เดิม
   // ถ้า intent + service + area เหมือนเดิม → ห้ามถามซ้ำ
-  if (isDuplicateIntent(currentState, intentResult)) {
+  if (isDuplicateIntent(currentState, intentResult, { userMessage: text })) {
     // ซ้ำ → ตอบสั้น / acknowledge อย่างเดียว
     const duplicateReply = `ได้เลยค่ะ 😊`;
     
@@ -611,7 +664,7 @@ export async function runPipeline(
   // ป้องกันการถามซ้ำเมื่อลูกค้าพิมพ์ข้อความที่ความหมายเหมือนเดิม
   // กฎเหล็ก: ❌ ข้อความใหม่ ≠ state ใหม่เสมอ
   // ✅ ถ้าความหมายเท่าเดิม → ห้าม reset flow
-  if (intentDedupGuard(currentState, intentResult.intent, updatedState)) {
+  if (intentDedupGuard(currentState, intentResult.intent, updatedState, { userMessage: text })) {
     // ข้อความซ้ำความหมายเดิม → ไม่ถามซ้ำ แต่ตอบรับสั้น ๆ
     const dedupReply = composeDedupReply(updatedState);
     
@@ -752,6 +805,143 @@ export async function runPipeline(
       const { getActivePromotionsForAI, getPromotions } = await import("@/lib/clinic-data");
       const { searchPromotionsBySemantic } = await import("@/lib/promotion-embedding");
       const branchId = pipelineOptions?.branch_id ?? undefined;
+
+      /** ถามว่ามีโปรอื่นอีกไหม / มีกี่โปร — ใช้รายการ active ทั้งหมด ไม่ใช้ semantic (กันตอบโปรเดิมซ้ำ) */
+      if (isAskingForOtherPromotionsCount(text)) {
+        const allActive = await getActivePromotionsForAI(orgId, { branchId, limit: 25 });
+        const seen = new Set<string>();
+        const unique = allActive.filter((p) => {
+          if (seen.has(p.id)) return false;
+          seen.add(p.id);
+          return true;
+        });
+
+        if (unique.length === 0) {
+          let emptyReply: string;
+          try {
+            const anyPromos = await getPromotions(orgId, { status: "all", limit: 5 });
+            emptyReply = anyPromos.length
+              ? "ตอนนี้ยังไม่มีโปรที่เปิดใช้อยู่ค่ะ ถ้ามีโปรอื่นจะแจ้งในช่องนี้นะคะ 😊"
+              : "ตอนนี้ยังไม่มีโปรโมชันในระบบค่ะ เดี๋ยวแอดมินเช็กให้หรือโทรมาถามได้เลยนะคะ 😊";
+          } catch {
+            emptyReply = "ตอนนี้ยังไม่มีโปรที่เปิดใช้อยู่ค่ะ ลองถามทีมคลินิกเพิ่มได้เลยนะคะ 😊";
+          }
+          if (userId) saveSessionState(orgId, channel, userId, updatedState);
+          return { reply: emptyReply, intent: intentResult, state: updatedState, memory: null };
+        }
+
+        if (unique.length === 1) {
+          const shortReply =
+            "ตอนนี้ในระบบมีโปรที่เปิดใช้อยู่รายการนี้รายการเดียวค่ะ ยังไม่มีโปรอื่นที่ active เพิ่มในขณะนี้ค่ะ ถ้าอยากทราบเงื่อนไขหรือนัดใช้บริการ บอกได้เลยนะคะ 😊";
+          if (userId) saveSessionState(orgId, channel, userId, updatedState);
+          return {
+            reply: shortReply,
+            intent: intentResult,
+            state: updatedState,
+            memory: null,
+            media: undefined,
+          };
+        }
+
+        const lines = unique.slice(0, 8).map((p) => formatPromotionBulletText(p));
+        const mediaUrls: string[] = [];
+        for (const p of unique.slice(0, 4)) {
+          const firstImage = p.media?.find(
+            (m) => m.type === "image" && typeof m.url === "string" && /^https:\/\//i.test(m.url.trim())
+          );
+          if (firstImage?.url) mediaUrls.push(firstImage.url.trim());
+        }
+        const reply =
+          `ตอนนี้มีโปรที่เปิดใช้ทั้งหมด ${unique.length} รายการค่ะ\n\n` +
+          lines.join("\n\n") +
+          "\n\nสนใจรายการไหนหรืออยากทราบรายละเอียดเพิ่ม บอกได้เลยนะคะ 💕";
+        if (userId) saveSessionState(orgId, channel, userId, updatedState);
+        return {
+          reply,
+          intent: intentResult,
+          state: updatedState,
+          memory: null,
+          media: mediaUrls.length > 0 ? mediaUrls.slice(0, 4) : undefined,
+        };
+      }
+
+      /** ถามว่าโปรดีไหม / คุ้มไหม — ตอบสั้น ไม่ดัมป์รายละเอียดทั้งก้อน */
+      if (isPromotionOpinionOrSuitabilityAsk(text)) {
+        const allActive = await getActivePromotionsForAI(orgId, { branchId, limit: 25 });
+        const priorUser = updatedState.recentMessages.slice(0, -1);
+        let hint = extractPromotionTitleHint(text, priorUser);
+        if (!hint) {
+          hint =
+            [...priorUser]
+              .reverse()
+              .find(
+                (s) =>
+                  s.trim().length >= 15 &&
+                  /โปร|บาท|ลด|ฉีด|แพ็ก|package|hifu|botox|filler|โบท็อกซ์|ฟิลเลอร์|ultra/i.test(s)
+              )
+              ?.trim() ?? null;
+        }
+        let picked = pickPromotionMatchingHint(hint, allActive);
+        if (!picked && allActive.length === 1) picked = allActive[0];
+        if (picked) {
+          const reply = buildPromotionOpinionReply(picked);
+          if (userId) saveSessionState(orgId, channel, userId, updatedState);
+          return {
+            reply,
+            intent: intentResult,
+            state: updatedState,
+            memory: null,
+            media: undefined,
+          };
+        }
+        const soft =
+          "เรื่องว่าโปรเหมาะหรือคุ้มไหม ขึ้นกับเป้าหมายและสภาพของแต่ละคนค่ะ แนะนำให้ถามทีมคลินิกโดยตรงจะได้คำตอบตรงกับคุณที่สุดนะคะ 😊";
+        if (userId) saveSessionState(orgId, channel, userId, updatedState);
+        return {
+          reply: soft,
+          intent: intentResult,
+          state: updatedState,
+          memory: null,
+          media: undefined,
+        };
+      }
+
+      /** ถามรายละเอียดโปรนี้ / รวมอะไรบ้าง — จับคู่ชื่อจากข้อความหรือจาก session แล้วตอบจากฟิลด์โปรจริง */
+      if (isPromotionDetailScopeAsk(text)) {
+        const allActive = await getActivePromotionsForAI(orgId, { branchId, limit: 25 });
+        const priorUser = updatedState.recentMessages.slice(0, -1);
+        const hint = extractPromotionTitleHint(text, priorUser);
+        let picked = pickPromotionMatchingHint(hint, allActive);
+        if (!picked && allActive.length === 1) picked = allActive[0];
+        if (picked) {
+          const reply = buildPromotionDetailChatReply(picked);
+          const mediaUrls: string[] = [];
+          const firstImage = picked.media?.find(
+            (m) =>
+              m.type === "image" && typeof m.url === "string" && /^https:\/\//i.test((m.url || "").trim())
+          );
+          if (firstImage?.url) mediaUrls.push(firstImage.url.trim());
+          if (userId) saveSessionState(orgId, channel, userId, updatedState);
+          return {
+            reply,
+            intent: intentResult,
+            state: updatedState,
+            memory: null,
+            media: mediaUrls.length > 0 ? mediaUrls.slice(0, 1) : undefined,
+          };
+        }
+        const clarify =
+          "ยังจับชื่อโปรจากข้อความนี้ไม่ชัดค่ะ ลองพิมพ์ชื่อโปรในบรรทัดแรก แล้วบรรทัดถัดไปถามว่า «โปรนี้มีอะไรบ้าง» หรือถามว่า «มีโปรอะไรบ้าง» แล้วจะสรุปให้ทีละรายการนะคะ 😊";
+        if (userId) saveSessionState(orgId, channel, userId, updatedState);
+        return {
+          reply: clarify,
+          intent: intentResult,
+          state: updatedState,
+          memory: null,
+          media: undefined,
+        };
+      }
+
       const query = text.trim().length >= 2 ? text.trim() : "";
       let list: Array<{ promotion: import("@/types/clinic").Promotion; score?: number }>;
       if (query.length >= 2) {
@@ -799,12 +989,13 @@ export async function runPipeline(
       }
       const lines: string[] = [];
       for (const { promotion: p } of list.slice(0, 4)) {
-        const pricePart = p.extractedPrice != null ? ` — ฿${Number(p.extractedPrice).toLocaleString()}` : "";
-        lines.push(`• ${p.name}${pricePart}`);
-        const firstImage = p.media?.find((m) => m.type === "image" && typeof m.url === "string" && m.url.startsWith("https://"));
-        if (firstImage?.url) mediaUrls.push(firstImage.url);
+        lines.push(formatPromotionBulletText(p));
+        const firstImage = p.media?.find(
+          (m) => m.type === "image" && typeof m.url === "string" && /^https:\/\//i.test(m.url.trim())
+        );
+        if (firstImage?.url) mediaUrls.push(firstImage.url.trim());
       }
-      const reply = "มีโปรแบบนี้ค่ะ\n\n" + lines.join("\n") + "\n\nสนใจโปรไหนบอกได้เลยนะคะ 💕";
+      const reply = "มีโปรที่เปิดอยู่ตอนนี้ค่ะ\n\n" + lines.join("\n\n") + "\n\nสนใจอันไหนบอกได้เลยค่ะ";
       if (userId) saveSessionState(orgId, channel, userId, updatedState);
       return {
         reply,
@@ -999,3 +1190,4 @@ export async function runPipeline(
     memory 
   };
 }
+

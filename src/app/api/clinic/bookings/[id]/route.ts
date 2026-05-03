@@ -12,9 +12,11 @@ import {
   sendBookingConfirmation,
   sendBookingRejection,
   scheduleBookingReminder,
+  cancelBookingReminder,
 } from "@/lib/booking-notification";
 import type { BookingChannel } from "@/types/clinic";
 import { runWithObservability } from "@/lib/observability/run-with-observability";
+import { getRequestId } from "@/lib/request-context";
 
 const VALID_CHANNELS = ["line", "facebook", "instagram", "tiktok", "web", "web_chat", "walk_in", "phone", "referral", "other"] as const;
 const VALID_STATUSES = ["pending", "confirmed", "in_progress", "completed", "no-show", "cancelled", "pending_admin_confirm", "reschedule_pending_admin", "cancel_requested"] as const;
@@ -96,12 +98,20 @@ export async function PATCH(
     if (updates.scheduledAt) {
       const scheduledAt = new Date(updates.scheduledAt);
       const mergedBooking = await getBookingById(orgId, bookingId);
+      const correlationId = getRequestId(request) ?? `booking_patch_${bookingId}`;
       if (mergedBooking) {
         await scheduleBookingReminder(bookingId, scheduledAt, orgId, {
           customerId: mergedBooking.customerId ?? undefined,
           lineUserId: mergedBooking.chatUserId ?? undefined,
+          correlationId,
         }).catch((err) => console.warn("[Booking PATCH] scheduleBookingReminder:", (err as Error)?.message));
       }
+    }
+    const statusChangedToCancelledForReminder = updates.status === "cancelled" && booking.status !== "cancelled";
+    if (statusChangedToCancelledForReminder) {
+      await cancelBookingReminder(bookingId).catch((err) =>
+        console.warn("[Booking PATCH] cancelBookingReminder:", (err as Error)?.message)
+      );
     }
 
     // Enterprise: ปฏิเสธการจอง → ส่งเหตุผลให้ลูกค้าผ่านช่องทางที่จองมา

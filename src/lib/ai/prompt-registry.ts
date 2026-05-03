@@ -166,6 +166,7 @@ export async function rollbackToVersion(
   version: string,
   createdBy?: string
 ): Promise<boolean> {
+  void createdBy;
   const target = await getPromptByVersion(key, version);
   if (!target) return false;
 

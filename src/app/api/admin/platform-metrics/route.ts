@@ -5,7 +5,7 @@
 import { NextResponse } from "next/server";
 import { requireSuperAdminSession } from "@/lib/admin-super-guard";
 import { db } from "@/lib/firebase-admin";
-import { getTodayKeyBangkok, getDateKeyBangkokDaysAgo } from "@/lib/timezone";
+import { getTodayKeyBangkok } from "@/lib/timezone";
 import { getCurrentMonthConversationsUsed } from "@/lib/ai-usage-daily";
 import { getRevenueFromPaidInvoices } from "@/lib/financial-data";
 import { listOrgsWithUsageLast7Days } from "@/lib/ai-usage-daily";

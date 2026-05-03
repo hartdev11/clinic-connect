@@ -1,0 +1,117 @@
+{
+  "summary": {
+    "total_events": 994,
+    "total_users": 456,
+    "total_sessions": 807,
+    "views": 807,
+    "clicks": 100,
+    "bookings": 87,
+    "conversion_rate": 0.1078,
+    "ctr": 0.1239,
+    "total_revenue": 1110913
+  },
+  "funnel": {
+    "view": 807,
+    "click": 100,
+    "booking": 87
+  },
+  "top_procedures": [
+    {
+      "procedure_id": "proc_001",
+      "views": 51,
+      "revenue": 94071.0
+    },
+    {
+      "procedure_id": "proc_012",
+      "views": 51,
+      "revenue": 74958.0
+    },
+    {
+      "procedure_id": "proc_019",
+      "views": 50,
+      "revenue": 62741.0
+    },
+    {
+      "procedure_id": "proc_003",
+      "views": 46,
+      "revenue": 68532.0
+    },
+    {
+      "procedure_id": "proc_011",
+      "views": 45,
+      "revenue": 0.0
+    },
+    {
+      "procedure_id": "proc_004",
+      "views": 45,
+      "revenue": 77358.0
+    },
+    {
+      "procedure_id": "proc_006",
+      "views": 42,
+      "revenue": 84002.0
+    },
+    {
+      "procedure_id": "proc_005",
+      "views": 41,
+      "revenue": 69319.0
+    },
+    {
+      "procedure_id": "proc_008",
+      "views": 40,
+      "revenue": 85548.0
+    },
+    {
+      "procedure_id": "proc_013",
+      "views": 40,
+      "revenue": 31831.0
+    }
+  ],
+  "revenue_by_procedure": {
+    "proc_004": 77358.0,
+    "proc_001": 94071.0,
+    "proc_017": 24899.0,
+    "proc_019": 62741.0,
+    "proc_003": 68532.0,
+    "proc_008": 85548.0,
+    "proc_002": 62840.0,
+    "proc_020": 45767.0,
+    "proc_010": 49295.0,
+    "proc_015": 47823.0,
+    "proc_012": 74958.0,
+    "proc_016": 44493.0,
+    "proc_007": 54684.0,
+    "proc_006": 84002.0,
+    "proc_018": 32315.0,
+    "proc_013": 31831.0,
+    "proc_005": 69319.0,
+    "proc_014": 69606.0,
+    "proc_009": 30831.0,
+    "proc_011": 0.0
+  },
+  "events_by_channel": {
+    "google": 246,
+    "facebook": 271,
+    "line": 260,
+    "tiktok": 217
+  },
+  "events_by_branch": {
+    "cnx_01": 318,
+    "bkk_01": 320,
+    "bkk_02": 356
+  },
+  "cta_clicks": {
+    "cta_03": 21,
+    "cta_05": 17,
+    "cta_02": 24,
+    "cta_04": 17,
+    "cta_01": 21
+  },
+  "cta_bookings": {
+    "cta_04": 15,
+    "cta_01": 19,
+    "cta_05": 18,
+    "cta_03": 16,
+    "cta_02": 19
+  }
+}

@@ -1,0 +1,137 @@
+concerns:
+- id: wrinkles
+  category: aging
+  related_procedures:
+  - proc_001
+  - proc_021
+  - proc_023
+- id: fine_lines
+  category: aging
+  related_procedures:
+  - proc_001
+  - proc_008
+- id: forehead_lines
+  category: aging
+  related_procedures:
+  - proc_001
+- id: crow_feet
+  category: aging
+  related_procedures:
+  - proc_001
+- id: nasolabial_folds
+  category: aging
+  related_procedures:
+  - proc_006
+- id: marionette_lines
+  category: aging
+  related_procedures:
+  - proc_006
+- id: sagging_skin
+  category: aging
+  related_procedures:
+  - proc_021
+  - proc_023
+  - proc_061
+- id: neck_laxity
+  category: aging
+  related_procedures:
+  - proc_023
+- id: collagen_loss
+  category: aging
+  related_procedures:
+  - proc_010
+  - proc_011
+- id: facial_volume_loss
+  category: aging
+  related_procedures:
+  - proc_006
+  - proc_010
+- id: under_eye_hollow
+  category: eyes
+  related_procedures:
+  - proc_006
+- id: dark_circles
+  category: eyes
+  related_procedures:
+  - proc_029
+  - proc_030
+- id: eye_bags
+  category: eyes
+  related_procedures:
+  - proc_062
+- id: pigmentation
+  category: skin
+  related_procedures:
+  - proc_029
+  - proc_030
+- id: melasma
+  category: skin
+  related_procedures:
+  - proc_029
+- id: freckles
+  category: skin
+  related_procedures:
+  - proc_030
+- id: dull_skin
+  category: skin
+  related_procedures:
+  - proc_041
+  - proc_042
+- id: dehydrated_skin
+  category: skin
+  related_procedures:
+  - proc_008
+- id: enlarged_pores
+  category: skin
+  related_procedures:
+  - proc_041
+- id: acne
+  category: skin
+  related_procedures:
+  - proc_026
+  - proc_073
+- id: acne_scars
+  category: skin
+  related_procedures:
+  - proc_028
+  - proc_026
+- id: uneven_skin_texture
+  category: skin
+  related_procedures:
+  - proc_028
+- id: jawline_contour
+  category: facial_contour
+  related_procedures:
+  - proc_004
+- id: chin_shape
+  category: facial_contour
+  related_procedures:
+  - proc_004
+- id: cheek_volume
+  category: facial_contour
+  related_procedures:
+  - proc_006
+- id: facial_asymmetry
+  category: facial_contour
+  related_procedures:
+  - proc_006
+  - proc_004
+- id: skin_laxity
+  category: aging
+  related_procedures:
+  - proc_021
+  - proc_023
+- id: hair_loss
+  category: hair
+  related_procedures:
+  - proc_077
+  - proc_078
+- id: thinning_hair
+  category: hair
+  related_procedures:
+  - proc_077
+  - proc_078
+- id: scalp_visibility
+  category: hair
+  related_procedures:
+  - proc_078

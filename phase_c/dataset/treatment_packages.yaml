@@ -1,0 +1,254 @@
+- id: pack_001
+  name: full face rejuvenation
+  procedures:
+  - proc_001
+  - proc_006
+  - proc_021
+  description: Package for full face rejuvenation
+- id: pack_002
+  name: anti aging
+  procedures:
+  - proc_001
+  - proc_010
+  - proc_021
+  description: Package for anti aging
+- id: pack_003
+  name: acne scar repair
+  procedures:
+  - proc_028
+  - proc_026
+  - proc_041
+  description: Package for acne scar repair
+- id: pack_004
+  name: skin brightening
+  procedures:
+  - proc_029
+  - proc_041
+  - proc_008
+  description: Package for skin brightening
+- id: pack_005
+  name: lifting tightening
+  procedures:
+  - proc_021
+  - proc_023
+  - proc_061
+  description: Package for lifting tightening
+- id: pack_006
+  name: hydration glow
+  procedures:
+  - proc_008
+  - proc_041
+  - proc_042
+  description: Package for hydration glow
+- id: pack_007
+  name: jawline contour
+  procedures:
+  - proc_001
+  - proc_006
+  - proc_004
+  description: Package for jawline contour
+- id: pack_008
+  name: hair restoration
+  procedures:
+  - proc_077
+  - proc_078
+  description: Package for hair restoration
+- id: pack_009
+  name: fat reduction
+  procedures:
+  - proc_067
+  - proc_069
+  description: Package for fat reduction
+- id: pack_010
+  name: pigmentation correction
+  procedures:
+  - proc_029
+  - proc_030
+  - proc_041
+  description: Package for pigmentation correction
+- id: pack_011
+  name: wrinkle prevention
+  procedures:
+  - proc_001
+  - proc_008
+  description: Package for wrinkle prevention
+- id: pack_012
+  name: natural rejuvenation
+  procedures:
+  - proc_006
+  - proc_008
+  description: Package for natural rejuvenation
+- id: pack_013
+  name: collagen restoration
+  procedures:
+  - proc_010
+  - proc_021
+  description: Package for collagen restoration
+- id: pack_014
+  name: skin tightening
+  procedures:
+  - proc_021
+  - proc_023
+  description: Package for skin tightening
+- id: pack_015
+  name: acne control
+  procedures:
+  - proc_026
+  - proc_029
+  description: Package for acne control
+- id: pack_016
+  name: melasma management
+  procedures:
+  - proc_029
+  - proc_042
+  description: Package for melasma management
+- id: pack_017
+  name: skin glow
+  procedures:
+  - proc_041
+  - proc_042
+  description: Package for skin glow
+- id: pack_018
+  name: pore refining
+  procedures:
+  - proc_028
+  - proc_041
+  description: Package for pore refining
+- id: pack_019
+  name: under eye rejuvenation
+  procedures:
+  - proc_006
+  - proc_030
+  description: Package for under eye rejuvenation
+- id: pack_020
+  name: tear trough correction
+  procedures:
+  - proc_006
+  - proc_008
+  description: Package for tear trough correction
+- id: pack_021
+  name: chin enhancement
+  procedures:
+  - proc_004
+  - proc_008
+  description: Package for chin enhancement
+- id: pack_022
+  name: cheek volume restoration
+  procedures:
+  - proc_006
+  - proc_010
+  description: Package for cheek volume restoration
+- id: pack_023
+  name: facial symmetry
+  procedures:
+  - proc_006
+  - proc_004
+  description: Package for facial symmetry
+- id: pack_024
+  name: neck tightening
+  procedures:
+  - proc_023
+  - proc_021
+  description: Package for neck tightening
+- id: pack_025
+  name: anti aging starter
+  procedures:
+  - proc_001
+  - proc_008
+  - proc_041
+  description: Package for anti aging starter
+- id: pack_026
+  name: premium anti aging
+  procedures:
+  - proc_001
+  - proc_006
+  - proc_010
+  - proc_021
+  description: Package for premium anti aging
+- id: pack_027
+  name: advanced skin glow
+  procedures:
+  - proc_041
+  - proc_008
+  - proc_042
+  description: Package for advanced skin glow
+- id: pack_028
+  name: hydration repair
+  procedures:
+  - proc_008
+  - proc_041
+  description: Package for hydration repair
+- id: pack_029
+  name: collagen boost
+  procedures:
+  - proc_010
+  - proc_028
+  description: Package for collagen boost
+- id: pack_030
+  name: texture refinement
+  procedures:
+  - proc_028
+  - proc_041
+  description: Package for texture refinement
+- id: pack_031
+  name: pigmentation recovery
+  procedures:
+  - proc_029
+  - proc_042
+  description: Package for pigmentation recovery
+- id: pack_032
+  name: brightening laser
+  procedures:
+  - proc_030
+  - proc_041
+  description: Package for brightening laser
+- id: pack_033
+  name: facial balance
+  procedures:
+  - proc_004
+  - proc_006
+  description: Package for facial balance
+- id: pack_034
+  name: premium contour
+  procedures:
+  - proc_004
+  - proc_006
+  - proc_021
+  description: Package for premium contour
+- id: pack_035
+  name: cheek lifting
+  procedures:
+  - proc_006
+  - proc_021
+  description: Package for cheek lifting
+- id: pack_036
+  name: neck rejuvenation
+  procedures:
+  - proc_023
+  - proc_008
+  description: Package for neck rejuvenation
+- id: pack_037
+  name: anti aging maintenance
+  procedures:
+  - proc_001
+  - proc_008
+  - proc_042
+  description: Package for anti aging maintenance
+- id: pack_038
+  name: lifting maintenance
+  procedures:
+  - proc_021
+  - proc_023
+  - proc_008
+  description: Package for lifting maintenance
+- id: pack_039
+  name: hair restoration starter
+  procedures:
+  - proc_078
+  description: Package for hair restoration starter
+- id: pack_040
+  name: hair density improvement
+  procedures:
+  - proc_078
+  - proc_008
+  description: Package for hair density improvement

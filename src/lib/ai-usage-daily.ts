@@ -182,9 +182,11 @@ export async function resetCurrentMonthConversationsUsage(orgId: string): Promis
  * List org ids (for admin cost monitor).
  */
 export async function getOrgIdsWithUsageInRange(
-  _startDate: string,
-  _endDate: string
+  startDate: string,
+  endDate: string
 ): Promise<string[]> {
+  void startDate;
+  void endDate;
   const orgsSnap = await db.collection("organizations").limit(500).get();
   return orgsSnap.docs.map((d) => d.id);
 }

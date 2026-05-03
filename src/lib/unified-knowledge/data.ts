@@ -146,8 +146,9 @@ export async function updateClinicService(
   orgId: string,
   id: string,
   data: ClinicServiceUpdate,
-  _userId?: string | null
+  userId?: string | null
 ): Promise<boolean> {
+  void userId;
   const ref = clinicServicesRef(orgId).doc(id);
   const doc = await ref.get();
   if (!doc.exists) return false;
@@ -307,8 +308,9 @@ export async function updateClinicFaq(
   orgId: string,
   id: string,
   data: ClinicFaqUpdate,
-  _userId?: string | null
+  userId?: string | null
 ): Promise<boolean> {
+  void userId;
   const ref = clinicFaqRef(orgId).doc(id);
   const doc = await ref.get();
   if (!doc.exists) return false;

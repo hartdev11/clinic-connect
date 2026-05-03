@@ -17,13 +17,20 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Legend,
 } from "recharts";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { StatCard } from "@/components/ui/StatCard";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { apiFetcher } from "@/lib/api-fetcher";
+import {
+  BanknotesIcon,
+  CalendarDaysIcon,
+  UserGroupIcon,
+  SparklesIcon,
+  ChevronDownIcon,
+  ChevronRightIcon,
+} from "@heroicons/react/24/outline";
 
 /* Phase 3 — semantic chart colors (no hex) */
 const CHART_COLORS = [
@@ -239,7 +246,7 @@ export default function InsightsPage() {
   );
   const base = `/api/clinic/analytics`;
 
-  const { data: overview, error: overviewError, isLoading: overviewLoading } = useSWR<OverviewRes>(
+  const { data: overview, error: overviewError, isLoading: overviewLoading, mutate: mutateOverview } = useSWR<OverviewRes>(
     `${base}/overview?${query}`,
     apiFetcher,
     { revalidateOnFocus: true, dedupingInterval: 60_000 }
@@ -405,7 +412,7 @@ export default function InsightsPage() {
               label="รายได้รวม"
               value={formatRevenue(overview.revenue)}
               trend={comparison ? { value: comparison.revenue.percentChange, positive: comparison.revenue.direction === "up" } : undefined}
-              icon={<span>◻</span>}
+              icon={<BanknotesIcon className="h-5 w-5" />}
               delay={0}
               shimmer
             />
@@ -413,26 +420,34 @@ export default function InsightsPage() {
               label="การจองทั้งหมด"
               value={overview.totalBookings}
               trend={comparison ? { value: comparison.conversionRate.percentChange, positive: comparison.conversionRate.direction === "up" } : undefined}
-              icon={<span>⬡</span>}
+              icon={<CalendarDaysIcon className="h-5 w-5" />}
               delay={0.08}
             />
             <StatCard
               label="ลูกค้าใหม่"
               value={overview.totalChats}
               trend={comparison ? { value: comparison.aiCloseRate.percentChange, positive: comparison.aiCloseRate.direction === "up" } : undefined}
-              icon={<span>◎</span>}
+              icon={<UserGroupIcon className="h-5 w-5" />}
               delay={0.16}
             />
             <StatCard
               label="ความพึงพอใจ"
               value={`${overview.aiCloseRate}%`}
               trend={comparison ? { value: comparison.escalationRate.percentChange, positive: comparison.escalationRate.direction === "down" } : undefined}
-              icon={<span>✦</span>}
+              icon={<SparklesIcon className="h-5 w-5" />}
               delay={0.24}
             />
           </>
         ) : null}
       </div>
+      {overviewError && (
+        <div className="luxury-card p-4 border border-amber-200 bg-amber-50 flex items-center justify-between gap-3">
+          <p className="font-body text-sm text-amber-800">โหลด Insights บางส่วนไม่สำเร็จ กรุณาลองรีเฟรชอีกครั้ง</p>
+          <Button variant="secondary" size="sm" onClick={() => mutateOverview()}>
+            ลองอีกครั้ง
+          </Button>
+        </div>
+      )}
 
       {!hasAnyData && !overviewLoading && overview && (
         <div className="luxury-card p-6">
@@ -782,7 +797,7 @@ export default function InsightsPage() {
                 className="flex items-center justify-between w-full px-4 py-3 rounded-2xl border border-cream-200 bg-cream-50 font-body text-sm font-medium text-mauve-800 hover:bg-cream-100 transition-colors"
               >
                 Chat Heatmap (ชั่วโมง × วัน)
-                <span className="text-mauve-400">{heatmapOpen === "chat" ? "▼" : "▶"}</span>
+                {heatmapOpen === "chat" ? <ChevronDownIcon className="h-4 w-4 text-mauve-400" /> : <ChevronRightIcon className="h-4 w-4 text-mauve-400" />}
               </button>
               {heatmapOpen === "chat" && operational.chatPeakHeatmap.length > 0 && (
                 <div className="luxury-card p-4">
@@ -797,7 +812,7 @@ export default function InsightsPage() {
                 className="flex items-center justify-between w-full px-4 py-3 rounded-2xl border border-cream-200 bg-cream-50 font-body text-sm font-medium text-mauve-800 hover:bg-cream-100 transition-colors"
               >
                 Booking Heatmap (ชั่วโมง × วัน)
-                <span className="text-mauve-400">{heatmapOpen === "booking" ? "▼" : "▶"}</span>
+                {heatmapOpen === "booking" ? <ChevronDownIcon className="h-4 w-4 text-mauve-400" /> : <ChevronRightIcon className="h-4 w-4 text-mauve-400" />}
               </button>
               {heatmapOpen === "booking" && operational.bookingHeatmap && operational.bookingHeatmap.length > 0 && (
                 <div className="luxury-card p-4">

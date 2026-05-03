@@ -6,12 +6,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionFromCookies } from "@/lib/auth-session";
 import { getOrgIdFromClinicId } from "@/lib/clinic-data";
-import { getEffectiveUser, requireRole } from "@/lib/rbac";
+import { getEffectiveUser } from "@/lib/rbac";
+import { canAccessKnowledgeAction } from "@/lib/knowledge-permissions";
 import {
   listKnowledgeTopics,
   createKnowledgeTopicWithVersion,
+  createKnowledgeVersion,
+  getKnowledgeTopic,
+  getKnowledgeVersion,
+  setKnowledgeVersionIndexingStatus,
+  markVersionFailed,
+  setActiveVersionAndArchivePrevious,
+  findKnowledgeTopicIdByNormalizedTitle,
 } from "@/lib/knowledge-topics-data";
 import { enqueueKnowledgeVersionEmbed } from "@/lib/knowledge-brain/embedding-queue";
+import { upsertKnowledgeVersionToVector } from "@/lib/knowledge-vector";
 import {
   validateKnowledgeContent,
   getMaxContentLength,
@@ -41,22 +50,22 @@ function parseBody(body: unknown): KnowledgeVersionPayload | null {
   return { topic, category, summary, content, exampleQuestions };
 }
 
-async function getAuth(request: NextRequest) {
+async function getAuth() {
   const session = await getSessionFromCookies();
   if (!session) return { error: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) };
   const orgId = session.org_id ?? (await getOrgIdFromClinicId(session.clinicId));
   if (!orgId) return { error: NextResponse.json({ error: "Organization not found" }, { status: 404 }) };
   const user = await getEffectiveUser(session);
-  if (!requireRole(user.role, ["owner", "manager", "staff"])) {
-    return { error: NextResponse.json({ error: "จำกัดสิทธิ์: คุณไม่มีสิทธิ์เข้าถึงข้อมูล Knowledge" }, { status: 403 }) };
-  }
-  return { orgId, userId: session.user_id ?? "", user };
+  return { orgId, userId: session.user_id ?? "", user, session };
 }
 
 export async function GET(request: NextRequest) {
   return runWithObservability("/api/clinic/knowledge/topics", request, async () => {
-    const auth = await getAuth(request);
+    const auth = await getAuth();
     if ("error" in auth) return auth.error;
+    if (!canAccessKnowledgeAction("read", auth.session, auth.user.role)) {
+      return NextResponse.json({ error: "Forbidden", code: "INSUFFICIENT_ROLE" }, { status: 403 });
+    }
 
     const search = request.nextUrl.searchParams.get("search") ?? undefined;
     try {
@@ -74,8 +83,11 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   return runWithObservability("/api/clinic/knowledge/topics", request, async () => {
-    const auth = await getAuth(request);
+    const auth = await getAuth();
     if ("error" in auth) return auth.error;
+    if (!canAccessKnowledgeAction("create", auth.session, auth.user.role)) {
+      return NextResponse.json({ error: "Forbidden", code: "INSUFFICIENT_ROLE" }, { status: 403 });
+    }
 
     let body: unknown;
     try {
@@ -104,13 +116,63 @@ export async function POST(request: NextRequest) {
       }, { status: 200 });
     }
 
+    const raw = body && typeof body === "object" ? (body as Record<string, unknown>) : {};
+    const overwriteTopicId = typeof raw.overwriteTopicId === "string" ? raw.overwriteTopicId.trim() : "";
+    const forceCreateNew = raw.forceCreateNew === true;
+
+    if (overwriteTopicId) {
+      const existing = await getKnowledgeTopic(auth.orgId, overwriteTopicId);
+      if (!existing) {
+        return NextResponse.json({ error: "ไม่พบหัวข้อที่ต้องเขียนทับ" }, { status: 400 });
+      }
+      if (existing.topic.trim().toLowerCase() !== payload.topic.trim().toLowerCase()) {
+        return NextResponse.json({ error: "หัวข้อไม่ตรงกับรายการที่เลือกเขียนทับ" }, { status: 400 });
+      }
+    } else if (!forceCreateNew) {
+      const dupId = await findKnowledgeTopicIdByNormalizedTitle(auth.orgId, payload.topic);
+      if (dupId) {
+        return NextResponse.json(
+          {
+            code: "DUPLICATE_TOPIC",
+            existingTopicId: dupId,
+            error: "มีหัวข้อนี้ในระบบแล้ว — เลือกใช้ของเดิม เขียนทับ หรือสร้างใหม่",
+          },
+          { status: 409 }
+        );
+      }
+    }
+
     try {
-      const { topicId, versionId } = await createKnowledgeTopicWithVersion(
-        auth.orgId,
-        payload,
-        auth.userId
-      );
-      await enqueueKnowledgeVersionEmbed(auth.orgId, versionId);
+      let topicId: string;
+      let versionId: string;
+
+      if (overwriteTopicId) {
+        versionId = await createKnowledgeVersion(auth.orgId, overwriteTopicId, payload, auth.userId);
+        topicId = overwriteTopicId;
+      } else {
+        const created = await createKnowledgeTopicWithVersion(auth.orgId, payload, auth.userId);
+        topicId = created.topicId;
+        versionId = created.versionId;
+      }
+      const version = await getKnowledgeVersion(auth.orgId, versionId);
+      if (!version) {
+        throw new Error("ไม่พบเวอร์ชันที่เพิ่งสร้าง");
+      }
+      await setKnowledgeVersionIndexingStatus(auth.orgId, versionId, "processing", null);
+      try {
+        await upsertKnowledgeVersionToVector(auth.orgId, topicId, {
+          topic: version.topic,
+          category: version.category,
+          content: version.content,
+          summary: version.summary,
+        });
+        await setActiveVersionAndArchivePrevious(auth.orgId, topicId, versionId);
+      } catch (inlineError) {
+        const reason = inlineError instanceof Error ? inlineError.message : "Inline indexing failed";
+        await markVersionFailed(auth.orgId, versionId);
+        await setKnowledgeVersionIndexingStatus(auth.orgId, versionId, "failed", reason);
+        await enqueueKnowledgeVersionEmbed(auth.orgId, versionId);
+      }
       return {
         response: NextResponse.json({
           topicId,

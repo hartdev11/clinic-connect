@@ -3,7 +3,7 @@
  * เน้น performance: limit, orderBy, ไม่ดึงเกินจำเป็น
  */
 import { db } from "@/lib/firebase-admin";
-import { safeSumBaht, satangToBaht, toSatang } from "@/lib/money";
+import { satangToBaht, toSatang } from "@/lib/money";
 import type {
   Booking,
   BookingCreate,
@@ -155,6 +155,7 @@ export async function getUserById(userId: string): Promise<User | null> {
     branch_ids: d.branch_ids ?? null,
     branch_roles: d.branch_roles ?? null,
     default_branch_id: d.default_branch_id ?? null,
+    is_active: d.is_active !== false,
     createdAt: d.createdAt ? toISO(d.createdAt) : "",
     updatedAt: d.updatedAt ? toISO(d.updatedAt) : "",
   };
@@ -201,6 +202,7 @@ export async function getUsersByOrgId(orgId: string): Promise<User[]> {
       branch_roles: data.branch_roles ?? null,
       default_branch_id: data.default_branch_id ?? null,
       line_user_id: (data.line_user_id ?? null) as string | null | undefined,
+      is_active: data.is_active !== false,
       createdAt: data.createdAt ? toISO(data.createdAt) : "",
       updatedAt: data.updatedAt ? toISO(data.updatedAt) : "",
     };
@@ -217,6 +219,7 @@ export async function createUser(data: {
   branch_ids?: string[] | null;
   branch_roles?: Record<string, "manager" | "staff"> | null;
   default_branch_id?: string | null;
+  is_active?: boolean;
 }): Promise<string> {
   const FieldValue = (await import("firebase-admin/firestore")).FieldValue;
   const now = FieldValue.serverTimestamp();
@@ -234,6 +237,7 @@ export async function createUser(data: {
     branch_ids: data.branch_ids ?? null,
     branch_roles: data.branch_roles ?? null,
     default_branch_id: defaultBranch,
+    is_active: data.is_active !== false,
     createdAt: now,
     updatedAt: now,
   });
@@ -248,6 +252,7 @@ export async function updateUser(
     branch_ids?: string[] | null;
     branch_roles?: Record<string, "manager" | "staff"> | null;
     default_branch_id?: string | null;
+    is_active?: boolean;
   }
 ): Promise<void> {
   const FieldValue = (await import("firebase-admin/firestore")).FieldValue;
@@ -256,7 +261,12 @@ export async function updateUser(
   if (data.branch_ids !== undefined) updates.branch_ids = data.branch_ids;
   if (data.branch_roles !== undefined) updates.branch_roles = data.branch_roles;
   if (data.default_branch_id !== undefined) updates.default_branch_id = data.default_branch_id;
+  if (data.is_active !== undefined) updates.is_active = data.is_active;
   await db.collection(COLLECTIONS.users).doc(userId).update(updates);
+}
+
+export async function deleteUser(userId: string): Promise<void> {
+  await db.collection(COLLECTIONS.users).doc(userId).delete();
 }
 
 // ─── Org profile (อ่านจาก organizations + branches) ───────────────────────
@@ -1115,8 +1125,6 @@ export async function upsertLineCustomer(
   const channel = await getLineChannelByOrgId(orgId);
   if (channel?.channel_access_token) {
     accessToken = channel.channel_access_token;
-  } else if (process.env.LINE_ORG_ID === orgId && process.env.LINE_CHANNEL_ACCESS_TOKEN?.trim()) {
-    accessToken = process.env.LINE_CHANNEL_ACCESS_TOKEN.trim();
   }
   if (accessToken) {
     try {
@@ -1611,7 +1619,6 @@ export async function getPromotionStats(
   orgId: string,
   branchId?: string
 ): Promise<{ active: number; expiringSoon: number; scheduled: number; expired: number }> {
-  const Firestore = await import("firebase-admin/firestore");
   const now = new Date();
   const in3Days = new Date(now.getTime() + 3 * 86400000);
 
@@ -1719,6 +1726,35 @@ export async function getActivePromotionsForAI(
     return true;
   });
   return list.slice(0, limit);
+}
+
+/**
+ * หน้าเว็บสาธารณะ (/promotions) — โปรที่กำลัง "โชว์" ได้ตามช่วงเวลา
+ * (active หรือ scheduled ที่ถึง start แล้ว และยังไม่หมด end)
+ * ไม่กรอง visibleToAI — ลูกค้าทั่วไปเห็นได้ต่างจากบริบท AI
+ */
+export async function getPublicPromotionsForOrg(
+  orgId: string,
+  opts: { limit?: number } = {}
+): Promise<Promotion[]> {
+  const limit = Math.min(opts.limit ?? 30, 50);
+  const snapshot = await db
+    .collection(COLLECTIONS.promotions)
+    .where("org_id", "==", orgId)
+    .limit(120)
+    .get();
+
+  const now = Date.now();
+  const list = snapshot.docs
+    .map((doc) => mapPromotionDoc(doc, orgId))
+    .filter((p) => p.status === "active" || p.status === "scheduled")
+    .filter((p) => {
+      if (p.startAt && new Date(p.startAt).getTime() > now) return false;
+      if (p.endAt && new Date(p.endAt).getTime() < now) return false;
+      return true;
+    })
+    .slice(0, limit);
+  return list;
 }
 
 /** Enterprise: สร้างโปรโมชัน — full schema, invalidate AI cache */
@@ -1914,13 +1950,16 @@ export async function listConversationFeedback(
   const snapshot = await q.get();
   const items: ConversationFeedback[] = snapshot.docs.slice(0, limit).map((doc) => {
     const d = doc.data();
+    const messages = Array.isArray(d.messages) ? d.messages as Array<{ role?: string; content?: string }> : [];
+    const userFromMessages = messages.find((m) => m?.role === "user" && typeof m.content === "string")?.content ?? "";
+    const botFromMessages = messages.find((m) => m?.role === "assistant" && typeof m.content === "string")?.content ?? "";
     return {
       id: doc.id,
       org_id: d.org_id ?? null,
       branch_id: d.branch_id ?? null,
       user_id: d.user_id ?? null,
-      userMessage: d.userMessage ?? "",
-      botReply: d.botReply ?? "",
+      userMessage: d.userMessage ?? userFromMessages,
+      botReply: d.botReply ?? botFromMessages,
       intent: d.intent ?? null,
       service: d.service ?? null,
       area: d.area ?? null,
@@ -2016,13 +2055,16 @@ export async function listConversationFeedbackByUserId(
   const snapshot = await q.get();
   const items: ConversationFeedback[] = snapshot.docs.slice(0, limit).map((doc) => {
     const d = doc.data();
+    const messages = Array.isArray(d.messages) ? d.messages as Array<{ role?: string; content?: string }> : [];
+    const userFromMessages = messages.find((m) => m?.role === "user" && typeof m.content === "string")?.content ?? "";
+    const botFromMessages = messages.find((m) => m?.role === "assistant" && typeof m.content === "string")?.content ?? "";
     return {
       id: doc.id,
       org_id: d.org_id ?? null,
       branch_id: d.branch_id ?? null,
       user_id: d.user_id ?? null,
-      userMessage: d.userMessage ?? "",
-      botReply: d.botReply ?? "",
+      userMessage: d.userMessage ?? userFromMessages,
+      botReply: d.botReply ?? botFromMessages,
       intent: d.intent ?? null,
       service: d.service ?? null,
       area: d.area ?? null,

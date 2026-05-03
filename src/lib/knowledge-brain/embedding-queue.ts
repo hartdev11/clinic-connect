@@ -17,7 +17,8 @@ import {
 import {
   getKnowledgeVersion,
   setActiveVersionAndArchivePrevious,
-  markVersionFailed,
+  setKnowledgeVersionIndexingStatus,
+  recordKnowledgeVersionIndexingFailure,
 } from "@/lib/knowledge-topics-data";
 import { upsertKnowledgeVersionToVector } from "@/lib/knowledge-vector";
 import {
@@ -33,8 +34,6 @@ import {
   upsertUnifiedServiceToVector,
   upsertUnifiedFaqToVector,
 } from "@/lib/unified-knowledge/vector";
-import type { ClinicKnowledge, GlobalKnowledge } from "@/types/knowledge-brain";
-
 const QUEUE_COLLECTION = "embedding_job_queue";
 const PROCESSED_STATUS = "processed";
 const PENDING_STATUS = "pending";
@@ -211,6 +210,7 @@ async function processJob(
         await doc.ref.update({ status: PROCESSED_STATUS, processed_at: new Date() });
         return true;
       }
+      await setKnowledgeVersionIndexingStatus(orgId, versionId, "processing", null);
       await upsertKnowledgeVersionToVector(orgId, version.topicId, {
         topic: version.topic,
         category: version.category,
@@ -284,14 +284,34 @@ async function processJob(
       return false;
     }
 
+    const isKnowledgeVersion = d?.type === "knowledge_version" && d?.org_id && d?.version_id;
+    if (isKnowledgeVersion) {
+      const outcome = await recordKnowledgeVersionIndexingFailure(
+        String(d.org_id),
+        String(d.version_id),
+        msg ?? "Indexing failed"
+      );
+      if (outcome === "scheduled_retry") {
+        await doc.ref.update({
+          status: PENDING_STATUS,
+          next_retry_at: new Date(Date.now() + 5 * 60 * 1000),
+          error: msg,
+        });
+      } else {
+        await doc.ref.update({
+          status: FAILED_STATUS,
+          error: msg,
+          processed_at: new Date(),
+        });
+      }
+      return false;
+    }
+
     await doc.ref.update({
       status: FAILED_STATUS,
       error: msg,
       processed_at: new Date(),
     });
-    if (d?.type === "knowledge_version" && d?.org_id && d?.version_id) {
-      await markVersionFailed(String(d.org_id), String(d.version_id));
-    }
     return false;
   }
 }

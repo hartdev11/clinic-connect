@@ -17,6 +17,7 @@ import {
   ShieldCheckIcon,
   ServerStackIcon,
   HeartIcon,
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
 import {
   Squares2X2Icon as Squares2X2IconSolid,
@@ -211,7 +212,7 @@ function SidebarInnerContent() {
           className="flex items-center gap-3 group transition-colors"
         >
           <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-rg-300 to-rg-500 flex items-center justify-center shadow-luxury flex-shrink-0">
-            <span className="text-white text-base">✦</span>
+            <SparklesIcon className="w-5 h-5 text-white" />
           </div>
           <div className="min-w-0">
             <p className="font-display text-lg font-semibold text-cream-100 leading-tight truncate">
@@ -454,7 +455,7 @@ export function ClinicSidebar({
                     className="w-9 h-9 rounded-xl flex items-center justify-center text-cream-200 hover:bg-white/10 transition-colors"
                     aria-label="ปิดเมนู"
                   >
-                    ✕
+                    <XMarkIcon className="w-5 h-5" />
                   </button>
                 </div>
                 <SidebarInnerContent />

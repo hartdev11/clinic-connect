@@ -76,17 +76,23 @@ function buildReminderMessage(booking: {
 }
 
 const connection = new Redis(REDIS_URL, { maxRetriesPerRequest: null });
+let shuttingDown = false;
 
 async function processJob(job: { id: string; data: BookingReminderJobData }): Promise<void> {
-  const { bookingId, orgId, lineUserId: jobLineUserId, customerId } = job.data;
+  const { bookingId, orgId, correlationId, lineUserId: jobLineUserId, customerId } = job.data;
 
   const booking = await getBookingById(orgId, bookingId);
   if (!booking) {
-    console.warn("[Booking Reminder] Booking not found:", bookingId);
+    console.warn("[Booking Reminder] Booking not found:", bookingId, correlationId);
+    return;
+  }
+  const existingReminderSentAt = (booking as unknown as { reminder_sent_at?: unknown }).reminder_sent_at;
+  if (existingReminderSentAt) {
+    console.log("[Booking Reminder] Already sent, skip:", bookingId, correlationId);
     return;
   }
   if (["cancelled"].includes(booking.status)) {
-    console.log("[Booking Reminder] Booking cancelled, skip:", bookingId);
+    console.log("[Booking Reminder] Booking cancelled, skip:", bookingId, correlationId);
     return;
   }
 
@@ -98,7 +104,7 @@ async function processJob(job: { id: string; data: BookingReminderJobData }): Pr
     }
   }
   if (!lineUserId) {
-    console.warn("[Booking Reminder] No LINE user for booking:", bookingId);
+    console.warn("[Booking Reminder] No LINE user for booking:", bookingId, correlationId);
     return;
   }
 
@@ -143,3 +149,19 @@ worker.on("failed", (job, err) => {
 });
 
 console.log("[Booking Reminder Worker] Started, queue:", QUEUE_NAME);
+
+async function shutdown(signal: string) {
+  if (shuttingDown) return;
+  shuttingDown = true;
+  console.log(`[Booking Reminder Worker] ${signal} received, shutting down...`);
+  await worker.close().catch(() => {});
+  await connection.quit().catch(() => {});
+  process.exit(0);
+}
+
+process.on("SIGINT", () => {
+  void shutdown("SIGINT");
+});
+process.on("SIGTERM", () => {
+  void shutdown("SIGTERM");
+});

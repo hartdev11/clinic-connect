@@ -3,6 +3,14 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import {
+  ChatBubbleBottomCenterTextIcon,
+  CalendarDaysIcon,
+  SparklesIcon,
+  ChartBarIcon,
+  BanknotesIcon,
+  CircleStackIcon,
+} from "@heroicons/react/24/outline";
 
 const PARTICLE_STYLES = [
   { w: 5, h: 5, top: 18, left: 22, opacity: 0.35, delay: 0 },
@@ -16,12 +24,12 @@ const PARTICLE_STYLES = [
 ];
 
 const FEATURES = [
-  { icon: "◎", title: "จัดการลูกค้า", desc: "ระบบ CRM ครบครัน พร้อมประวัติแชท LINE" },
-  { icon: "⬡", title: "ระบบจอง", desc: "จองออนไลน์ได้ตลอด 24 ชั่วโมง" },
-  { icon: "✦", title: "AI ตอบแชท", desc: "บอท AI ตอบลูกค้าอัตโนมัติผ่าน LINE" },
-  { icon: "△", title: "Insights", desc: "วิเคราะห์ข้อมูลเชิงลึกแบบ Real-time" },
-  { icon: "◻", title: "การเงิน", desc: "ติดตามรายรับและใบแจ้งหนี้" },
-  { icon: "⬢", title: "Knowledge AI", desc: "ฝึก AI ด้วยข้อมูลของคลินิกคุณเอง" },
+  { Icon: ChatBubbleBottomCenterTextIcon, title: "จัดการลูกค้า", desc: "ระบบ CRM ครบครัน พร้อมประวัติแชท LINE" },
+  { Icon: CalendarDaysIcon, title: "ระบบจอง", desc: "จองออนไลน์ได้ตลอด 24 ชั่วโมง" },
+  { Icon: SparklesIcon, title: "AI ตอบแชท", desc: "บอท AI ตอบลูกค้าอัตโนมัติผ่าน LINE" },
+  { Icon: ChartBarIcon, title: "Insights", desc: "วิเคราะห์ข้อมูลเชิงลึกแบบ Real-time" },
+  { Icon: BanknotesIcon, title: "การเงิน", desc: "ติดตามรายรับและใบแจ้งหนี้" },
+  { Icon: CircleStackIcon, title: "Knowledge AI", desc: "ฝึก AI ด้วยข้อมูลของคลินิกคุณเอง" },
 ];
 
 export default function HomePage() {
@@ -56,7 +64,7 @@ export default function HomePage() {
           ))}
         </div>
 
-        <div className="relative z-10 max-w-6xl mx-auto px-6 py-20 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-20 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
           <div>
             <motion.div
               initial={{ opacity: 0, y: 16 }}
@@ -152,7 +160,7 @@ export default function HomePage() {
             <div className="luxury-card p-6 shimmer-border animate-float">
               <div className="flex items-center gap-3 mb-5">
                 <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-rg-300 to-rg-500 flex items-center justify-center text-white text-sm">
-                  ✦
+                  <SparklesIcon className="h-4 w-4" />
                 </div>
                 <div>
                   <p className="font-display text-base font-semibold text-mauve-800">
@@ -170,7 +178,7 @@ export default function HomePage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-3 mb-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
                 {[
                   { label: "การจองวันนี้", value: "24" },
                   { label: "ลูกค้าใหม่", value: "8" },
@@ -211,7 +219,7 @@ export default function HomePage() {
       </section>
 
       {/* ── FEATURES SECTION ── */}
-      <section className="py-24 px-6">
+      <section className="py-20 sm:py-24 px-4 sm:px-6">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -242,7 +250,7 @@ export default function HomePage() {
                 className="luxury-card p-6"
               >
                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-rg-100 to-rg-200 flex items-center justify-center text-rg-500 text-xl mb-4">
-                  {feature.icon}
+                  <feature.Icon className="h-6 w-6" />
                 </div>
                 <h3 className="font-display text-lg font-semibold text-mauve-800 mb-2">
                   {feature.title}
@@ -257,7 +265,7 @@ export default function HomePage() {
       </section>
 
       {/* ── CTA SECTION ── */}
-      <section className="py-24 px-6">
+      <section className="py-20 sm:py-24 px-4 sm:px-6">
         <div className="max-w-3xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -305,7 +313,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <footer className="py-8 px-6 border-t border-cream-300">
+      <footer className="py-8 px-4 sm:px-6 border-t border-cream-300">
         <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-4">
           <p className="font-body text-sm text-mauve-500">
             © Clinic Connect — Beauty Clinic Management

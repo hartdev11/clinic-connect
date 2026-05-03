@@ -23,6 +23,7 @@ interface User {
   branch_ids: string[] | null;
   branch_roles: Record<string, BranchRole> | null;
   default_branch_id: string | null;
+  is_active?: boolean;
 }
 
 interface Branch {
@@ -64,6 +65,7 @@ export default function UsersPage() {
   const [editBranchRoles, setEditBranchRoles] = useState<Record<string, BranchRole>>({});
   const [editLoading, setEditLoading] = useState(false);
   const [editError, setEditError] = useState("");
+  const [rowActionLoadingId, setRowActionLoadingId] = useState<string | null>(null);
 
   const setBranchRole = (
     branchId: string,
@@ -154,6 +156,46 @@ export default function UsersPage() {
       setEditError("เกิดข้อผิดพลาด");
     } finally {
       setEditLoading(false);
+    }
+  };
+
+  const handleToggleActive = async (u: User) => {
+    if (!confirm(u.is_active === false ? "เปิดใช้งานผู้ใช้นี้อีกครั้ง?" : "ปิดใช้งานผู้ใช้นี้?")) return;
+    setRowActionLoadingId(u.id);
+    try {
+      const res = await fetch(`/api/clinic/users/${u.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ is_active: u.is_active === false }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        alert(data.error || "อัปเดตสถานะไม่สำเร็จ");
+        return;
+      }
+      mutateUsers();
+    } finally {
+      setRowActionLoadingId(null);
+    }
+  };
+
+  const handleDelete = async (u: User) => {
+    if (!confirm(`ลบผู้ใช้ ${u.email} ถาวรใช่ไหม?`)) return;
+    setRowActionLoadingId(u.id);
+    try {
+      const res = await fetch(`/api/clinic/users/${u.id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        alert(data.error || "ลบไม่สำเร็จ");
+        return;
+      }
+      mutateUsers();
+    } finally {
+      setRowActionLoadingId(null);
     }
   };
 
@@ -326,6 +368,9 @@ export default function UsersPage() {
                 <p className="font-body text-sm font-medium text-mauve-800 truncate">{u.name ?? u.email}</p>
                 <p className="font-body text-xs text-mauve-400 truncate">{u.email}</p>
               </div>
+              {u.is_active === false && (
+                <Badge variant="warning">Inactive</Badge>
+              )}
               <Badge
                 variant={
                   u.role === "owner" ? "premium" : u.role === "manager" ? "info" : "default"
@@ -340,6 +385,15 @@ export default function UsersPage() {
                 <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
                     type="button"
+                    onClick={() => handleToggleActive(u)}
+                    disabled={rowActionLoadingId === u.id}
+                    className="px-2 h-8 rounded-xl hover:bg-amber-50 text-mauve-400 hover:text-amber-600 disabled:opacity-50 transition-all text-xs"
+                    title={u.is_active === false ? "เปิดใช้งาน" : "ปิดใช้งาน"}
+                  >
+                    {u.is_active === false ? "Enable" : "Disable"}
+                  </button>
+                  <button
+                    type="button"
                     onClick={() => startEdit(u)}
                     className="w-8 h-8 rounded-xl hover:bg-rg-100 text-mauve-400 hover:text-rg-600 flex items-center justify-center transition-all text-sm"
                   >
@@ -347,9 +401,10 @@ export default function UsersPage() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => {}}
+                    onClick={() => handleDelete(u)}
+                    disabled={rowActionLoadingId === u.id}
                     className="w-8 h-8 rounded-xl hover:bg-red-50 text-mauve-400 hover:text-red-500 flex items-center justify-center transition-all text-sm"
-                    title="ลบ (ยังไม่เปิดใช้)"
+                    title="ลบผู้ใช้"
                   >
                     ✕
                   </button>

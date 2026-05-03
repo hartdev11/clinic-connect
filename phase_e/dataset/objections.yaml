@@ -1,0 +1,600 @@
+- id: obj_001
+  objection: botox looks unnatural
+  response: Modern Botox uses controlled doses for natural results.
+  related_procedure: proc_001
+- id: obj_002
+  objection: botox is dangerous
+  response: Botox is FDA approved when done by professionals.
+  related_procedure: proc_001
+- id: obj_003
+  objection: botox makes the face stiff
+  response: Proper dosing prevents stiffness.
+  related_procedure: proc_001
+- id: obj_004
+  objection: fillers look swollen
+  response: Proper filler technique enhances natural structure.
+  related_procedure: proc_006
+- id: obj_005
+  objection: fillers migrate
+  response: Correct placement minimizes migration risk.
+  related_procedure: proc_006
+- id: obj_006
+  objection: fillers are permanent
+  response: Most fillers dissolve over time.
+  related_procedure: proc_006
+- id: obj_007
+  objection: hifu does not work
+  response: HIFU stimulates collagen in deeper layers.
+  related_procedure: proc_021
+- id: obj_008
+  objection: hifu is painful
+  response: Most feel mild heat only.
+  related_procedure: proc_021
+- id: obj_009
+  objection: thermage too expensive
+  response: Thermage offers long lasting collagen results.
+  related_procedure: proc_023
+- id: obj_010
+  objection: laser damages skin
+  response: Medical lasers target specific layers safely.
+  related_procedure: proc_029
+- id: obj_011
+  objection: laser worsens pigmentation
+  response: Properly used lasers safely treat pigmentation.
+  related_procedure: proc_029
+- id: obj_012
+  objection: acne scars never improve
+  response: Microneedling and laser significantly improve scars.
+  related_procedure: proc_028
+- id: obj_013
+  objection: microneedling damages skin
+  response: Controlled channels stimulate collagen.
+  related_procedure: proc_026
+- id: obj_014
+  objection: hydrafacial is just facial
+  response: Hydrafacial uses specialized deep cleansing.
+  related_procedure: proc_041
+- id: obj_015
+  objection: skin boosters unnecessary
+  response: Boosters improve hydration beyond topical skincare.
+  related_procedure: proc_008
+- id: obj_016
+  objection: sculptra causes lumps
+  response: Proper technique and massage reduce lumps.
+  related_procedure: proc_010
+- id: obj_017
+  objection: sculptra too slow
+  response: Gradual collagen leads to lasting results.
+  related_procedure: proc_010
+- id: obj_018
+  objection: rf microneedling painful
+  response: Numbing cream minimizes discomfort.
+  related_procedure: proc_024
+- id: obj_019
+  objection: lifting only for old people
+  response: Many start early to maintain firmness.
+  related_procedure: proc_021
+- id: obj_020
+  objection: lifting does not last
+  response: Collagen stimulation lasts many months.
+  related_procedure: proc_021
+- id: obj_021
+  objection: jawline filler looks masculine
+  response: Technique is adjusted for balance.
+  related_procedure: proc_004
+- id: obj_022
+  objection: chin filler obvious
+  response: Carefully shaped for natural proportions.
+  related_procedure: proc_004
+- id: obj_023
+  objection: cheek filler too wide
+  response: Strategic placement avoids widening.
+  related_procedure: proc_006
+- id: obj_024
+  objection: filler dissolving dangerous
+  response: Hyaluronidase safely dissolves fillers.
+  related_procedure: proc_006
+- id: obj_025
+  objection: treatments are addictive
+  response: Treatments are optional maintenance.
+  related_procedure: proc_042
+- id: obj_026
+  objection: treatments too expensive
+  response: Clinics offer options for all budgets.
+  related_procedure: proc_042
+- id: obj_027
+  objection: afraid of needles
+  response: Numbing cream minimizes injection discomfort.
+  related_procedure: proc_006
+- id: obj_028
+  objection: results look overdone
+  response: Modern practice focuses on subtle results.
+  related_procedure: proc_006
+- id: obj_029
+  objection: skin too sensitive
+  response: Treatments can be customized for sensitivity.
+  related_procedure: proc_041
+- id: obj_030
+  objection: pigmentation returns quickly
+  response: Maintenance and skincare prolong results.
+  related_procedure: proc_029
+- id: obj_031
+  objection: melasma impossible to treat
+  response: Combination therapy improves melasma.
+  related_procedure: proc_029
+- id: obj_032
+  objection: freckles always come back
+  response: Maintenance controls recurrence.
+  related_procedure: proc_030
+- id: obj_033
+  objection: acne scars permanent
+  response: Resurfacing significantly improves scars.
+  related_procedure: proc_028
+- id: obj_034
+  objection: skin boosters just water
+  response: Boosters improve deeper skin layers.
+  related_procedure: proc_008
+- id: obj_035
+  objection: botox weakens muscles
+  response: Effects are temporary and wear off.
+  related_procedure: proc_001
+- id: obj_036
+  objection: botox spreads
+  response: Properly injected botox stays localized.
+  related_procedure: proc_001
+- id: obj_037
+  objection: fillers stretch skin permanently
+  response: Temporary fillers dissolve over time.
+  related_procedure: proc_006
+- id: obj_038
+  objection: hifu inconsistent
+  response: Many see gradual tightening improvement.
+  related_procedure: proc_021
+- id: obj_039
+  objection: thermage too subtle
+  response: Subtle improvement looks more natural.
+  related_procedure: proc_023
+- id: obj_040
+  objection: laser thins skin
+  response: Lasers stimulate collagen renewal.
+  related_procedure: proc_029
+- id: obj_041
+  objection: pico fades quickly
+  response: Multiple sessions maintain results.
+  related_procedure: proc_029
+- id: obj_042
+  objection: microneedling causes bleeding
+  response: Minor bleeding is part of collagen process.
+  related_procedure: proc_026
+- id: obj_043
+  objection: hydrafacial too mild
+  response: Combines cleansing exfoliation and hydration.
+  related_procedure: proc_041
+- id: obj_044
+  objection: sculptra too many sessions
+  response: Sessions achieve gradual natural restoration.
+  related_procedure: proc_010
+- id: obj_045
+  objection: treatments risky
+  response: Qualified professionals ensure safety.
+  related_procedure: proc_042
+- id: obj_046
+  objection: treatments only for women
+  response: Many men choose aesthetic treatments.
+  related_procedure: proc_042
+- id: obj_047
+  objection: treatments are vanity
+  response: Treatments improve confidence and wellbeing.
+  related_procedure: proc_042
+- id: obj_048
+  objection: treatments take too long
+  response: Many treatments finish in 30 to 60 minutes.
+  related_procedure: proc_042
+- id: obj_049
+  objection: results not noticeable
+  response: Goals are discussed to achieve improvement.
+  related_procedure: proc_042
+- id: obj_050
+  objection: results exaggerated
+  response: Conservative plans focus on natural results.
+  related_procedure: proc_042
+- id: obj_051
+  objection: too much recovery time
+  response: Many treatments allow immediate return to activities.
+  related_procedure: proc_042
+- id: obj_052
+  objection: treatments cause redness
+  response: Redness resolves within hours or days.
+  related_procedure: proc_042
+- id: obj_053
+  objection: results not guaranteed
+  response: Many patients see noticeable improvement.
+  related_procedure: proc_042
+- id: obj_054
+  objection: treatments interfere with skincare
+  response: Doctors adjust skincare to complement treatments.
+  related_procedure: proc_042
+- id: obj_055
+  objection: treatments cause scarring
+  response: Non surgical procedures have very low scarring risk.
+  related_procedure: proc_042
+- id: obj_056
+  objection: prefer natural aging
+  response: Treatments support healthy skin naturally.
+  related_procedure: proc_042
+- id: obj_057
+  objection: injections cause bruising
+  response: Minor bruising resolves within days.
+  related_procedure: proc_006
+- id: obj_058
+  objection: swelling lasts too long
+  response: Swelling resolves within a few days.
+  related_procedure: proc_006
+- id: obj_059
+  objection: fillers distort proportions
+  response: Careful planning maintains facial harmony.
+  related_procedure: proc_006
+- id: obj_060
+  objection: hair transplant unnatural
+  response: Modern techniques create natural patterns.
+  related_procedure: proc_078
+- id: obj_061
+  objection: hair transplant invasive
+  response: Modern techniques are minimally invasive.
+  related_procedure: proc_078
+- id: obj_062
+  objection: transplanted hair falls out
+  response: Transplanted follicles are usually permanent.
+  related_procedure: proc_078
+- id: obj_063
+  objection: hair restoration too long
+  response: Results are gradual but long lasting.
+  related_procedure: proc_078
+- id: obj_064
+  objection: hair procedures leave scars
+  response: FUE leaves minimal scarring.
+  related_procedure: proc_078
+- id: obj_065
+  objection: fat dissolving dangerous
+  response: Qualified professionals ensure safety.
+  related_procedure: proc_069
+- id: obj_066
+  objection: fat dissolving not permanent
+  response: Destroyed fat cells do not return.
+  related_procedure: proc_069
+- id: obj_067
+  objection: coolsculpting painful
+  response: Most feel mild discomfort only.
+  related_procedure: proc_067
+- id: obj_068
+  objection: thread lifts invasive
+  response: Thread lifts use local anesthesia only.
+  related_procedure: proc_061
+- id: obj_069
+  objection: thread lifts do not last
+  response: Results last 12 to 18 months.
+  related_procedure: proc_061
+- id: obj_070
+  objection: chemical peels damage skin
+  response: Peels improve texture when used correctly.
+  related_procedure: proc_073
+- id: obj_071
+  objection: prp not proven
+  response: PRP uses growth factors to stimulate follicles.
+  related_procedure: proc_077
+- id: obj_072
+  objection: treatments do not work on dark skin
+  response: Treatments are adjusted for all skin types.
+  related_procedure: proc_029
+- id: obj_073
+  objection: too young for anti aging
+  response: Preventive treatments maintain skin quality.
+  related_procedure: proc_001
+- id: obj_074
+  objection: treatments conflict with natural beauty
+  response: Treatments enhance natural features.
+  related_procedure: proc_042
+- id: obj_075
+  objection: do not want to look different
+  response: Treatments refresh while maintaining identity.
+  related_procedure: proc_042
+- id: obj_076
+  objection: non surgical cannot replace surgery
+  response: Non surgical provides improvement without surgical risk.
+  related_procedure: proc_021
+- id: obj_077
+  objection: treatments require too much aftercare
+  response: Aftercare fits into daily routine.
+  related_procedure: proc_042
+- id: obj_078
+  objection: worried about side effects
+  response: Side effects are mild and temporary when done correctly.
+  related_procedure: proc_042
+- id: obj_079
+  objection: fillers stretch the skin permanently
+  response: Temporary fillers dissolve and do not permanently stretch skin.
+  related_procedure: proc_006
+- id: obj_080
+  objection: fillers always migrate
+  response: Correct placement reduces migration risk significantly.
+  related_procedure: proc_006
+- id: obj_081
+  objection: hifu results are inconsistent
+  response: Many patients see gradual tightening over months.
+  related_procedure: proc_021
+- id: obj_082
+  objection: hifu only works once
+  response: HIFU can be repeated to maintain collagen stimulation.
+  related_procedure: proc_021
+- id: obj_083
+  objection: thermage does not lift enough
+  response: Thermage focuses on gradual tightening rather than dramatic lifting.
+  related_procedure: proc_023
+- id: obj_084
+  objection: thermage results are subtle
+  response: Subtle improvement looks more natural.
+  related_procedure: proc_023
+- id: obj_085
+  objection: laser treatments thin the skin
+  response: Lasers stimulate collagen renewal not thinning.
+  related_procedure: proc_029
+- id: obj_086
+  objection: laser makes skin permanently sensitive
+  response: Sensitivity is temporary and skin recovers quickly.
+  related_procedure: proc_029
+- id: obj_087
+  objection: laser requires staying indoors
+  response: Patients resume activities with proper sun protection.
+  related_procedure: proc_029
+- id: obj_088
+  objection: pico laser results fade quickly
+  response: Multiple sessions and skincare maintain results.
+  related_procedure: proc_029
+- id: obj_089
+  objection: microneedling causes bleeding
+  response: Minor bleeding is part of the collagen process.
+  related_procedure: proc_026
+- id: obj_090
+  objection: microneedling spreads acne bacteria
+  response: Sterile conditions prevent infection risk.
+  related_procedure: proc_026
+- id: obj_091
+  objection: acne treatments worsen inflammation
+  response: Protocols are designed to reduce inflammation gradually.
+  related_procedure: proc_026
+- id: obj_092
+  objection: acne treatments dry the skin
+  response: Plans include hydration and barrier support.
+  related_procedure: proc_026
+- id: obj_093
+  objection: hydrafacial is too mild
+  response: Combines cleansing exfoliation and hydration for visible results.
+  related_procedure: proc_041
+- id: obj_094
+  objection: facials cannot fix real skin problems
+  response: Professional treatments target deeper layers than skincare.
+  related_procedure: proc_041
+- id: obj_095
+  objection: skin boosters only add water
+  response: Boosters stimulate skin quality beyond hydration.
+  related_procedure: proc_008
+- id: obj_096
+  objection: skin boosters not worth cost
+  response: Patients value improved texture and hydration.
+  related_procedure: proc_008
+- id: obj_097
+  objection: sculptra takes too many sessions
+  response: Sessions achieve gradual natural collagen restoration.
+  related_procedure: proc_010
+- id: obj_098
+  objection: sculptra is too slow
+  response: Gradual stimulation leads to lasting improvement.
+  related_procedure: proc_010
+- id: obj_099
+  objection: lifting only works temporarily
+  response: Collagen stimulation lasts many months.
+  related_procedure: proc_021
+- id: obj_100
+  objection: lifting unnecessary at my age
+  response: Early treatment maintains skin structure.
+  related_procedure: proc_021
+- id: obj_101
+  objection: procedures are risky
+  response: Qualified professionals ensure safety.
+  related_procedure: proc_042
+- id: obj_102
+  objection: treatments only for women
+  response: Many men choose aesthetic treatments.
+  related_procedure: proc_042
+- id: obj_103
+  objection: treatments are vanity
+  response: Treatments improve confidence and wellbeing.
+  related_procedure: proc_042
+- id: obj_104
+  objection: too much maintenance required
+  response: Schedules are customized to patient preference.
+  related_procedure: proc_042
+- id: obj_105
+  objection: treatments interfere with life
+  response: Modern procedures have minimal downtime.
+  related_procedure: proc_042
+- id: obj_106
+  objection: results not noticeable
+  response: Goals are discussed to achieve meaningful improvement.
+  related_procedure: proc_042
+- id: obj_107
+  objection: results look exaggerated
+  response: Conservative plans focus on natural results.
+  related_procedure: proc_042
+- id: obj_108
+  objection: too much recovery time
+  response: Many treatments allow immediate return to activities.
+  related_procedure: proc_042
+- id: obj_109
+  objection: treatments damage sensitive skin
+  response: Treatments are tailored for skin type.
+  related_procedure: proc_042
+- id: obj_110
+  objection: treatments cause long redness
+  response: Redness resolves within hours or days.
+  related_procedure: proc_042
+- id: obj_111
+  objection: results not guaranteed
+  response: Many patients see noticeable improvement.
+  related_procedure: proc_042
+- id: obj_112
+  objection: too many follow ups required
+  response: Follow ups ensure safe healing and optimal results.
+  related_procedure: proc_042
+- id: obj_113
+  objection: interferes with skincare routine
+  response: Doctors adjust skincare to complement treatments.
+  related_procedure: proc_042
+- id: obj_114
+  objection: treatments cause scarring
+  response: Non surgical procedures have very low scarring risk.
+  related_procedure: proc_042
+- id: obj_115
+  objection: results too subtle for cost
+  response: Subtle improvements produce natural long term benefits.
+  related_procedure: proc_042
+- id: obj_116
+  objection: prefer natural aging
+  response: Treatments support healthy skin naturally.
+  related_procedure: proc_042
+- id: obj_117
+  objection: might damage facial nerves
+  response: Professionals follow safe anatomical guidelines.
+  related_procedure: proc_006
+- id: obj_118
+  objection: injections cause bruising
+  response: Minor bruising resolves within days.
+  related_procedure: proc_006
+- id: obj_119
+  objection: swelling lasts too long
+  response: Swelling resolves within a few days.
+  related_procedure: proc_006
+- id: obj_120
+  objection: fillers distort proportions
+  response: Careful planning maintains facial harmony.
+  related_procedure: proc_006
+- id: obj_121
+  objection: jawline filler looks artificial
+  response: Strategic placement preserves natural appearance.
+  related_procedure: proc_004
+- id: obj_122
+  objection: chin filler makes face longer
+  response: Chin shaping improves balance not elongation.
+  related_procedure: proc_004
+- id: obj_123
+  objection: cheek fillers make face puffy
+  response: Volume control prevents excessive fullness.
+  related_procedure: proc_006
+- id: obj_124
+  objection: fillers change facial identity
+  response: Treatments enhance existing features.
+  related_procedure: proc_006
+- id: obj_125
+  objection: hair transplant looks unnatural
+  response: Modern techniques create natural patterns.
+  related_procedure: proc_078
+- id: obj_126
+  objection: hair transplant too invasive
+  response: Modern techniques are minimally invasive.
+  related_procedure: proc_078
+- id: obj_127
+  objection: transplanted hair falls out
+  response: Transplanted follicles are usually permanent.
+  related_procedure: proc_078
+- id: obj_128
+  objection: hair restoration takes too long
+  response: Results are gradual but long lasting.
+  related_procedure: proc_078
+- id: obj_129
+  objection: hair treatments only for severe loss
+  response: Early treatment maintains existing density.
+  related_procedure: proc_077
+- id: obj_130
+  objection: hair procedures leave scars
+  response: FUE leaves minimal scarring.
+  related_procedure: proc_078
+- id: obj_131
+  objection: fat dissolving dangerous
+  response: Qualified professionals ensure safety.
+  related_procedure: proc_069
+- id: obj_132
+  objection: fat dissolving not permanent
+  response: Destroyed fat cells do not return.
+  related_procedure: proc_069
+- id: obj_133
+  objection: coolsculpting is painful
+  response: Most feel mild discomfort only.
+  related_procedure: proc_067
+- id: obj_134
+  objection: coolsculpting does not work on small areas
+  response: Applicators are designed for various areas.
+  related_procedure: proc_067
+- id: obj_135
+  objection: thread lifts too invasive
+  response: Performed under local anesthesia only.
+  related_procedure: proc_061
+- id: obj_136
+  objection: thread lifts leave marks
+  response: Insertion points are small and heal well.
+  related_procedure: proc_061
+- id: obj_137
+  objection: thread lifts do not last
+  response: Results last 12 to 18 months.
+  related_procedure: proc_061
+- id: obj_138
+  objection: chemical peels damage skin
+  response: Peels improve texture when used correctly.
+  related_procedure: proc_073
+- id: obj_139
+  objection: peels cause permanent redness
+  response: Redness is temporary and resolves.
+  related_procedure: proc_073
+- id: obj_140
+  objection: prp not proven
+  response: PRP uses growth factors to stimulate follicles.
+  related_procedure: proc_077
+- id: obj_141
+  objection: prp needs too many sessions
+  response: Maintenance is less frequent after initial sessions.
+  related_procedure: proc_077
+- id: obj_142
+  objection: oxygen facial is gimmick
+  response: Improves hydration and circulation for glow.
+  related_procedure: proc_042
+- id: obj_143
+  objection: treatments not work on dark skin
+  response: Treatments are adjusted for all skin types.
+  related_procedure: proc_029
+- id: obj_144
+  objection: too young for anti aging
+  response: Preventive treatments maintain skin quality.
+  related_procedure: proc_001
+- id: obj_145
+  objection: treatments conflict with natural beauty
+  response: Treatments enhance natural features.
+  related_procedure: proc_042
+- id: obj_146
+  objection: not worth it for men
+  response: Men benefit from treatments for health and confidence.
+  related_procedure: proc_042
+- id: obj_147
+  objection: do not want to look different
+  response: Treatments refresh while maintaining identity.
+  related_procedure: proc_042
+- id: obj_148
+  objection: non surgical cannot replace surgery
+  response: Non surgical provides improvement without surgical risk.
+  related_procedure: proc_021
+- id: obj_149
+  objection: too much aftercare needed
+  response: Aftercare fits into daily routine.
+  related_procedure: proc_042
+- id: obj_150
+  objection: worried about side effects
+  response: Side effects are mild and temporary when done correctly.
+  related_procedure: proc_042

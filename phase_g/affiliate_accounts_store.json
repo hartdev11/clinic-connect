@@ -1,0 +1,22 @@
+{
+  "aff_13eaca6a35": {
+    "affiliate_id": "aff_13eaca6a35",
+    "tenant_id": "t_001",
+    "role_type": "affiliate",
+    "full_name": "PG Affiliate",
+    "email": "pg_aff@example.com",
+    "phone": "0812340001",
+    "company_name": null,
+    "social_handle": null,
+    "referral_code": "PGAFD7DEE0",
+    "status": "approved",
+    "payout_method": "promptpay",
+    "payout_account": "0812340001",
+    "notes": [
+      "account_created",
+      "status=pending",
+      "status:approved",
+      "auto_approve"
+    ]
+  }
+}

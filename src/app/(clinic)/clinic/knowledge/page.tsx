@@ -27,12 +27,15 @@ import { Button } from "@/components/ui/Button";
 import { Input, Textarea } from "@/components/ui/Input";
 import { Badge } from "@/components/ui/Badge";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { KnowledgeErrorState } from "@/components/clinic/KnowledgeErrorState";
+import { Dialog } from "@/components/ui/Dialog";
 import type {
   UnifiedKnowledgeStatus,
   GlobalService,
   ClinicService,
   ClinicFaq,
 } from "@/types/unified-knowledge";
+import type { KnowledgeTopicListItem, KnowledgeIndexingStatus, KnowledgeTopicCategory } from "@/types/knowledge";
 
 const PAGE_TITLE = "Knowledge Base";
 const PAGE_SUBTITLE = "จัดการข้อมูลที่ AI ใช้ตอบคำถามลูกค้า";
@@ -45,6 +48,45 @@ function formatDate(iso: string | null): string {
     year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
+  });
+}
+
+const BULK_IMPORT_MAX = 50;
+
+function mapImportCategory(c: string): KnowledgeTopicCategory {
+  const x = c.trim().toLowerCase();
+  if (x === "price" || x === "ราคา") return "price";
+  if (x === "faq" || x === "คำถามที่พบบ่อย") return "faq";
+  return "service";
+}
+
+interface BulkImportRow {
+  topic: string;
+  category: KnowledgeTopicCategory;
+  content: string;
+  language?: string;
+}
+
+function parseBulkImportJson(raw: string): BulkImportRow[] {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    throw new Error("JSON ไม่ถูกต้อง");
+  }
+  if (!Array.isArray(parsed)) throw new Error("ต้องเป็น JSON array");
+  if (parsed.length === 0) throw new Error("ไม่มีรายการ");
+  if (parsed.length > BULK_IMPORT_MAX) throw new Error(`สูงสุด ${BULK_IMPORT_MAX} รายการต่อครั้ง`);
+  return parsed.map((row, i) => {
+    if (!row || typeof row !== "object") throw new Error(`รายการ ${i + 1}: รูปแบบไม่ถูกต้อง`);
+    const o = row as Record<string, unknown>;
+    const topic = typeof o.topic === "string" ? o.topic.trim() : "";
+    const catRaw = typeof o.category === "string" ? o.category.trim() : "service";
+    const content = typeof o.content === "string" ? o.content.trim() : "";
+    const language = typeof o.language === "string" ? o.language : undefined;
+    if (!topic || !content) throw new Error(`รายการ ${i + 1}: ต้องมี topic และ content`);
+    if (content.length < 50) throw new Error(`รายการ ${i + 1}: รายละเอียดต้องยาวอย่างน้อย 50 ตัวอักษร`);
+    return { topic, category: mapImportCategory(catRaw), content, language };
   });
 }
 
@@ -411,8 +453,28 @@ export default function UnifiedKnowledgePage() {
   const [toast, setToast] = useState<string | null>(null);
   const [addServiceOpen, setAddServiceOpen] = useState(false);
   const [addFaqOpen, setAddFaqOpen] = useState(false);
-  const [processQueueLoading, setProcessQueueLoading] = useState(false);
-  const [processQueueMessage, setProcessQueueMessage] = useState<string | null>(null);
+  const [topicItems, setTopicItems] = useState<KnowledgeTopicListItem[]>([]);
+  const [loadingTopics, setLoadingTopics] = useState(true);
+  const [retryingTopicId, setRetryingTopicId] = useState<string | null>(null);
+  const [topicsError, setTopicsError] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<"all" | "indexed" | "processing" | "failed">("all");
+  const [indexedTimeFilter, setIndexedTimeFilter] = useState<"all" | "today" | "week" | "older">("all");
+  const [topicsPolling, setTopicsPolling] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
+  const [importText, setImportText] = useState("");
+  const [importPreview, setImportPreview] = useState<BulkImportRow[] | null>(null);
+  const [importParseError, setImportParseError] = useState<string | null>(null);
+  const [importStep, setImportStep] = useState<"edit" | "preview" | "running" | "done">("edit");
+  const [importProgress, setImportProgress] = useState({ current: 0, total: 0 });
+  const [importResults, setImportResults] = useState<Array<{ ok: boolean; topic: string; error?: string }>>([]);
+  const [importRunning, setImportRunning] = useState(false);
+
+  const indexingBadge = (status?: KnowledgeIndexingStatus) => {
+    if (status === "indexed") return <Badge variant="success" size="sm">indexed</Badge>;
+    if (status === "failed") return <Badge variant="danger" size="sm">failed</Badge>;
+    if (status === "retrying") return <Badge variant="info" size="sm">retrying</Badge>;
+    return <Badge variant="warning" size="sm">{status ?? "processing"}</Badge>;
+  };
 
   const fetchStatus = useCallback(async () => {
     setLoadingStatus(true);
@@ -466,9 +528,189 @@ export default function UnifiedKnowledgePage() {
     }
   }, []);
 
+  const fetchTopics = useCallback(async (opts?: { silent?: boolean }) => {
+    if (!opts?.silent) {
+      setLoadingTopics(true);
+      setTopicsError(null);
+    }
+    try {
+      const res = await fetch("/api/clinic/knowledge/topics", { credentials: "include" });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        setTopicItems(Array.isArray(data.topics) ? data.topics : []);
+      } else {
+        if (!opts?.silent) {
+          setTopicItems([]);
+          setTopicsError(data.error ?? "โหลดข้อมูลหัวข้อไม่สำเร็จ");
+        }
+      }
+    } catch {
+      if (!opts?.silent) {
+        setTopicItems([]);
+        setTopicsError("โหลดข้อมูลหัวข้อไม่สำเร็จ");
+      }
+    } finally {
+      if (!opts?.silent) setLoadingTopics(false);
+    }
+  }, []);
+
+  const handleRetryTopic = useCallback(async (topicId: string) => {
+    setRetryingTopicId(topicId);
+    try {
+      const res = await fetch(`/api/clinic/knowledge/topics/${topicId}/retry`, {
+        method: "POST",
+        credentials: "include",
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setToast(data.error ?? "รีไทรไม่สำเร็จ");
+      } else {
+        setToast("กำลังรีไทรการจัดทำดัชนี");
+      }
+      await fetchTopics();
+    } catch {
+      setToast("เกิดข้อผิดพลาดในการรีไทร");
+    } finally {
+      setRetryingTopicId(null);
+    }
+  }, [fetchTopics]);
+
+  const handleOpenImport = useCallback(() => {
+    setImportOpen(true);
+    setImportText("");
+    setImportPreview(null);
+    setImportParseError(null);
+    setImportStep("edit");
+    setImportResults([]);
+    setImportProgress({ current: 0, total: 0 });
+  }, []);
+
+  const handleParseImportPreview = useCallback(() => {
+    setImportParseError(null);
+    setImportPreview(null);
+    try {
+      const rows = parseBulkImportJson(importText);
+      setImportPreview(rows);
+      setImportStep("preview");
+    } catch (e) {
+      setImportParseError((e as Error).message);
+    }
+  }, [importText]);
+
+  const runBulkImport = useCallback(async () => {
+    if (!importPreview?.length || importRunning) return;
+    setImportRunning(true);
+    try {
+      setImportStep("running");
+      setImportProgress({ current: 0, total: importPreview.length });
+      const results: Array<{ ok: boolean; topic: string; error?: string }> = [];
+      for (let i = 0; i < importPreview.length; i++) {
+        const row = importPreview[i]!;
+        setImportProgress({ current: i + 1, total: importPreview.length });
+        try {
+          const res = await fetch("/api/clinic/knowledge/topics", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({
+              topic: row.topic,
+              category: row.category,
+              summary: [],
+              content: row.content,
+              exampleQuestions: [],
+              confirmFinancial: true,
+              forceCreateNew: true,
+            }),
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) {
+            results.push({
+              ok: false,
+              topic: row.topic,
+              error: typeof data.error === "string" ? data.error : `HTTP ${res.status}`,
+            });
+          } else {
+            results.push({ ok: true, topic: row.topic });
+          }
+        } catch (err) {
+          results.push({ ok: false, topic: row.topic, error: (err as Error).message });
+        }
+      }
+      setImportResults(results);
+      setImportStep("done");
+      await fetchTopics();
+    } finally {
+      setImportRunning(false);
+    }
+  }, [importPreview, fetchTopics, importRunning]);
+
+  const handleBulkRetryFailed = useCallback(async () => {
+    const failed = topicItems
+      .filter((topic) => {
+        const statusOk =
+          statusFilter === "all"
+            ? true
+            : statusFilter === "processing"
+              ? topic.indexingStatus === "processing" || topic.indexingStatus === "queued" || topic.indexingStatus === "retrying"
+              : topic.indexingStatus === statusFilter;
+        if (!statusOk) return false;
+        if (indexedTimeFilter === "all") return true;
+        const indexedAt = topic.lastIndexedAt ? new Date(topic.lastIndexedAt).getTime() : null;
+        if (!indexedAt) return indexedTimeFilter === "older";
+        const now = Date.now();
+        const dayMs = 24 * 60 * 60 * 1000;
+        if (indexedTimeFilter === "today") return now - indexedAt < dayMs;
+        if (indexedTimeFilter === "week") return now - indexedAt < 7 * dayMs;
+        return now - indexedAt >= 7 * dayMs;
+      })
+      .filter((item) => item.indexingStatus === "failed");
+    for (const item of failed) {
+      // Sequential retry avoids burst/429 and keeps feedback stable.
+      await handleRetryTopic(item.id);
+    }
+  }, [handleRetryTopic, indexedTimeFilter, statusFilter, topicItems]);
+
+  const filteredTopicItems = topicItems.filter((topic) => {
+    const statusOk =
+      statusFilter === "all"
+        ? true
+        : statusFilter === "processing"
+          ? topic.indexingStatus === "processing" || topic.indexingStatus === "queued" || topic.indexingStatus === "retrying"
+          : topic.indexingStatus === statusFilter;
+    if (!statusOk) return false;
+    if (indexedTimeFilter === "all") return true;
+    const indexedAt = topic.lastIndexedAt ? new Date(topic.lastIndexedAt).getTime() : null;
+    if (!indexedAt) return indexedTimeFilter === "older";
+    const now = Date.now();
+    const dayMs = 24 * 60 * 60 * 1000;
+    if (indexedTimeFilter === "today") return now - indexedAt < dayMs;
+    if (indexedTimeFilter === "week") return now - indexedAt < 7 * dayMs;
+    return now - indexedAt >= 7 * dayMs;
+  });
+
   useEffect(() => {
     fetchStatus();
   }, [fetchStatus]);
+  useEffect(() => {
+    fetchTopics();
+  }, [fetchTopics]);
+
+  useEffect(() => {
+    const active = topicItems.some((t) => {
+      const s = t.indexingStatus;
+      return s === "queued" || s === "processing" || s === "retrying";
+    });
+    setTopicsPolling(active);
+  }, [topicItems]);
+
+  useEffect(() => {
+    if (!topicsPolling) return;
+    const id = setInterval(() => {
+      void fetchTopics({ silent: true });
+    }, 5000);
+    return () => clearInterval(id);
+  }, [topicsPolling, fetchTopics]);
+
   useEffect(() => {
     if (tab === "services") {
       fetchServices();
@@ -650,30 +892,6 @@ export default function UnifiedKnowledgePage() {
     [fetchFaq, fetchStatus]
   );
 
-  const handleProcessQueue = useCallback(async () => {
-    setProcessQueueLoading(true);
-    setProcessQueueMessage(null);
-    try {
-      const res = await fetch("/api/clinic/knowledge/process-queue", {
-        method: "POST",
-        credentials: "include",
-      });
-      const data = await res.json().catch(() => ({}));
-      if (res.ok) {
-        setProcessQueueMessage(
-          data.message ?? `ประมวลผลแล้ว ${data.processed ?? 0} รายการ`
-        );
-        fetchStatus();
-      } else {
-        setProcessQueueMessage(data.error ?? "เรียกไม่สำเร็จ");
-      }
-    } catch {
-      setProcessQueueMessage("เกิดข้อผิดพลาด");
-    } finally {
-      setProcessQueueLoading(false);
-    }
-  }, [fetchStatus]);
-
   useEffect(() => {
     if (!toast) return;
     const t = setTimeout(() => setToast(null), 4000);
@@ -700,15 +918,6 @@ export default function UnifiedKnowledgePage() {
           actions={
             <div className="flex gap-3">
               <Button
-                variant="secondary"
-                size="sm"
-                onClick={handleProcessQueue}
-                disabled={processQueueLoading}
-                loading={processQueueLoading}
-              >
-                ⬢ Sync ทั้งหมด
-              </Button>
-              <Button
                 variant="primary"
                 size="sm"
                 shimmer
@@ -721,6 +930,107 @@ export default function UnifiedKnowledgePage() {
           }
         />
         <section className="mb-8">
+          <div className="mb-4 rounded-2xl border border-cream-200 bg-white p-4 shadow-luxury">
+            <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <h3 className="font-body text-sm font-semibold text-mauve-700">Knowledge Topics Indexing</h3>
+                {topicsPolling ? (
+                  <span className="font-body text-xs text-mauve-400 tabular-nums">Updating…</span>
+                ) : null}
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <Button type="button" variant="secondary" size="sm" onClick={handleOpenImport}>
+                  Import
+                </Button>
+                <Link href="/clinic/knowledge/new">
+                  <Button variant="secondary" size="sm">+ เพิ่มข้อมูล</Button>
+                </Link>
+              </div>
+            </div>
+            {loadingTopics ? (
+              <div className="space-y-2">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="h-10 rounded-xl bg-cream-100 animate-pulse" />
+                ))}
+              </div>
+            ) : topicsError ? (
+              <KnowledgeErrorState message={topicsError} onRetry={fetchTopics} />
+            ) : topicItems.length === 0 ? (
+              <p className="font-body text-sm text-mauve-500">ยังไม่มีหัวข้อความรู้</p>
+            ) : (
+              <div className="space-y-2">
+                <div className="mb-2 flex flex-wrap items-center gap-2">
+                  <select
+                    aria-label="Filter by indexing status"
+                    className="rounded-xl border border-cream-200 px-3 py-1.5 text-xs text-mauve-700"
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)}
+                  >
+                    <option value="all">สถานะ: all</option>
+                    <option value="indexed">สถานะ: indexed</option>
+                    <option value="processing">สถานะ: processing</option>
+                    <option value="failed">สถานะ: failed</option>
+                  </select>
+                  <select
+                    aria-label="Filter by last indexed time"
+                    className="rounded-xl border border-cream-200 px-3 py-1.5 text-xs text-mauve-700"
+                    value={indexedTimeFilter}
+                    onChange={(e) => setIndexedTimeFilter(e.target.value as typeof indexedTimeFilter)}
+                  >
+                    <option value="all">Indexed: all</option>
+                    <option value="today">Indexed: today</option>
+                    <option value="week">Indexed: this week</option>
+                    <option value="older">Indexed: older</option>
+                  </select>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={handleBulkRetryFailed}
+                    disabled={retryingTopicId !== null || !filteredTopicItems.some((item) => item.indexingStatus === "failed")}
+                  >
+                    Retry Failed All
+                  </Button>
+                </div>
+                {filteredTopicItems.slice(0, 20).map((topic) => (
+                  <div
+                    key={topic.id}
+                    className="flex items-center justify-between gap-2 rounded-xl border border-cream-100 px-3 py-2"
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate font-body text-sm text-mauve-700">{topic.topic}</p>
+                      <p className="font-body text-xs text-mauve-400">
+                        Last indexed: {formatDate(topic.lastIndexedAt ?? null)}
+                      </p>
+                      {topic.indexingError ? (
+                        <p className="truncate font-body text-xs text-red-600">{topic.indexingError}</p>
+                      ) : null}
+                    </div>
+                    <div className="shrink-0">
+                      <div className="flex flex-wrap items-center gap-2 justify-end">
+                        {indexingBadge(topic.indexingStatus)}
+                        {topic.indexingAutoRetryExhausted ? (
+                          <Badge variant="warning" size="sm" className="max-w-[14rem] whitespace-normal text-left">
+                            Auto-retry exhausted. Manual retry needed.
+                          </Badge>
+                        ) : null}
+                        {topic.indexingStatus === "failed" ? (
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => handleRetryTopic(topic.id)}
+                            disabled={retryingTopicId === topic.id}
+                            loading={retryingTopicId === topic.id}
+                          >
+                            Retry
+                          </Button>
+                        ) : null}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
           {status?.ai_status != null && (
             <div className="mb-4 flex flex-wrap items-center gap-3 rounded-2xl border border-cream-200 bg-white px-4 py-3 shadow-luxury">
               <span className="font-body text-sm font-medium text-mauve-700">สถานะ AI:</span>
@@ -740,9 +1050,6 @@ export default function UnifiedKnowledgePage() {
             </div>
           )}
           <StatusCards status={status} loading={loadingStatus} />
-          {processQueueMessage && (
-            <p className="mt-3 font-body text-sm text-mauve-600">{processQueueMessage}</p>
-          )}
           {status?.platform_managed_mode && (
             <div className="mt-4 rounded-2xl border border-rg-200/80 bg-rg-50/60 px-4 py-2 font-body text-sm text-mauve-800">
               โหมดจัดการโดยแพลตฟอร์ม: คุณแก้ไขได้เฉพาะ จุดเด่น ราคา และรายละเอียดเพิ่มเติม เทมเพลตบริการมาจากแพลตฟอร์ม
@@ -750,14 +1057,14 @@ export default function UnifiedKnowledgePage() {
           )}
         </section>
 
-        <div className="flex gap-1 p-1 bg-cream-200 rounded-2xl mb-6 w-fit">
+        <div className="flex flex-nowrap sm:flex-wrap gap-1 p-1 bg-cream-200 rounded-2xl mb-6 w-full overflow-x-auto sm:overflow-visible">
           {knowledgeTabs.map((t) => (
             <button
               key={t.value}
               type="button"
               onClick={() => setTab(t.value)}
               className={cn(
-                "px-5 py-2 rounded-xl text-sm font-body font-medium transition-all duration-200",
+                "shrink-0 px-4 sm:px-5 py-2 rounded-xl text-sm font-body font-medium transition-all duration-200",
                 tab === t.value
                   ? "bg-white text-mauve-700 shadow-luxury"
                   : "text-mauve-400 hover:text-mauve-600"
@@ -893,6 +1200,106 @@ export default function UnifiedKnowledgePage() {
           />
         )}
 
+        <Dialog
+          open={importOpen}
+          onClose={() => setImportOpen(false)}
+          title="Import knowledge topics"
+          className="max-w-3xl w-full max-h-[90vh]"
+        >
+          <div className="p-5 space-y-4">
+            {importStep === "edit" && (
+              <>
+                <p className="font-body text-sm text-mauve-600">
+                  JSON array สูงสุด {BULK_IMPORT_MAX} รายการ ฟิลด์: topic, category, content, language (ไม่บังคับ)
+                </p>
+                <Textarea
+                  value={importText}
+                  onChange={(e) => setImportText(e.target.value)}
+                  className="w-full min-h-[160px] font-mono text-sm rounded-2xl border border-cream-200 p-3"
+                  placeholder='[{"topic":"...","category":"service","content":"...","language":"th"}]'
+                />
+                {importParseError ? <p className="text-sm text-red-600">{importParseError}</p> : null}
+                <div className="flex gap-2 justify-end">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => setImportOpen(false)}
+                    disabled={importRunning}
+                  >
+                    ยกเลิก
+                  </Button>
+                  <Button type="button" variant="primary" size="sm" onClick={handleParseImportPreview}>
+                    ดูตัวอย่าง
+                  </Button>
+                </div>
+              </>
+            )}
+            {importStep === "preview" && importPreview && (
+              <>
+                <div className="max-h-[40vh] overflow-auto rounded-xl border border-cream-200">
+                  <table className="w-full text-sm font-body">
+                    <thead>
+                      <tr className="bg-cream-100 text-left">
+                        <th className="p-2">#</th>
+                        <th className="p-2">topic</th>
+                        <th className="p-2">category</th>
+                        <th className="p-2">content</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {importPreview.map((r, i) => (
+                        <tr key={i} className="border-t border-cream-100">
+                          <td className="p-2">{i + 1}</td>
+                          <td className="p-2 max-w-[8rem] truncate">{r.topic}</td>
+                          <td className="p-2">{r.category}</td>
+                          <td className="p-2 max-w-[12rem] truncate">{r.content}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="flex gap-2 justify-end">
+                  <Button type="button" variant="secondary" size="sm" onClick={() => setImportStep("edit")}>
+                    กลับ
+                  </Button>
+                  <Button type="button" variant="primary" size="sm" onClick={() => void runBulkImport()}>
+                    Import {importPreview.length} รายการ
+                  </Button>
+                </div>
+              </>
+            )}
+            {importStep === "running" && (
+              <div className="py-8 text-center font-body text-mauve-700">
+                <p>
+                  กำลังนำเข้า… {importProgress.current} / {importProgress.total}
+                </p>
+              </div>
+            )}
+            {importStep === "done" && (
+              <>
+                <p className="font-body text-sm text-mauve-800">
+                  สำเร็จ {importResults.filter((x) => x.ok).length} รายการ — ล้มเหลว{" "}
+                  {importResults.filter((x) => !x.ok).length} รายการ
+                </p>
+                <ul className="max-h-48 overflow-auto space-y-1 text-sm font-body">
+                  {importResults.map((r, i) => (
+                    <li key={i} className={r.ok ? "text-emerald-700" : "text-red-600"}>
+                      {r.ok ? "✓" : "✗"} {r.topic}
+                      {!r.ok && r.error ? ` — ${r.error}` : ""}
+                    </li>
+                  ))}
+                </ul>
+                <div className="flex justify-end">
+                  <Button type="button" variant="primary" size="sm" onClick={() => setImportOpen(false)}>
+                    ปิด
+                  </Button>
+                </div>
+              </>
+            )}
+          </div>
+        </Dialog>
+
         {toast && (
           <div
             role="alert"
@@ -937,59 +1344,49 @@ function AddServiceModal({
   };
 
   return (
-    <>
-      <div className="fixed inset-0 z-40 bg-black/30" onClick={onClose} aria-hidden />
-      <div
-        className="fixed left-1/2 top-1/2 z-50 w-full max-w-md -translate-x-1/2 -translate-y-1/2 luxury-card p-6 shadow-luxury"
-        role="dialog"
-        aria-labelledby="add-service-title"
-      >
-        <h2 id="add-service-title" className="font-display text-lg font-semibold text-mauve-800">
-          เพิ่มบริการ
-        </h2>
+    <Dialog open onClose={onClose} title="เพิ่มบริการ" className="max-w-md w-full">
+      <form onSubmit={handleSubmit} className="p-5 space-y-3">
         {platformManagedMode && (
-          <p className="mt-1 font-body text-xs text-mauve-400">โหมดจัดการโดยแพลตฟอร์ม: ต้องเลือกเทมเพลตจากแพลตฟอร์ม</p>
+          <p className="font-body text-xs text-mauve-400">โหมดจัดการโดยแพลตฟอร์ม: ต้องเลือกเทมเพลตจากแพลตฟอร์ม</p>
         )}
-        <form onSubmit={handleSubmit} className="mt-4 space-y-3">
-          <label className="block font-body text-sm font-medium text-mauve-700">
-            {platformManagedMode ? "เทมเพลต *" : "เทมเพลต (ถ้ามี)"}
-          </label>
-          <select
-            value={selectedGlobalId}
-            onChange={(e) => {
-              setSelectedGlobalId(e.target.value);
-              const g = globalServices.find((x) => x.id === e.target.value);
-              if (g && !customTitle) setCustomTitle(g.name);
-            }}
-            className="w-full rounded-2xl border border-cream-200 px-3 py-2 font-body text-sm text-mauve-800 bg-white focus:border-rg-400 focus:outline-none focus:ring-1 focus:ring-rg-400"
-            required={platformManagedMode}
-          >
-            {!platformManagedMode && <option value="">— ไม่ใช้เทมเพลต —</option>}
-            {globalServices.map((g) => (
-              <option key={g.id} value={g.id}>
-                {g.name}
-              </option>
-            ))}
-          </select>
-          <label className="block font-body text-sm font-medium text-mauve-700">ชื่อบริการ *</label>
-          <Input
-            value={customTitle}
-            onChange={(e) => setCustomTitle(e.target.value)}
-            placeholder="ชื่อบริการ"
-            required
-            className="w-full"
-          />
-          <div className="mt-4 flex gap-2 justify-end">
-            <Button type="button" variant="secondary" size="sm" onClick={onClose}>
-              ยกเลิก
-            </Button>
-            <Button type="submit" variant="primary" size="sm" disabled={submitting} loading={submitting}>
-              เพิ่ม
-            </Button>
-          </div>
-        </form>
-      </div>
-    </>
+        <label className="block font-body text-sm font-medium text-mauve-700">
+          {platformManagedMode ? "เทมเพลต *" : "เทมเพลต (ถ้ามี)"}
+        </label>
+        <select
+          value={selectedGlobalId}
+          onChange={(e) => {
+            setSelectedGlobalId(e.target.value);
+            const g = globalServices.find((x) => x.id === e.target.value);
+            if (g && !customTitle) setCustomTitle(g.name);
+          }}
+          className="w-full rounded-2xl border border-cream-200 px-3 py-2 font-body text-sm text-mauve-800 bg-white focus:border-rg-400 focus:outline-none focus:ring-1 focus:ring-rg-400"
+          required={platformManagedMode}
+        >
+          {!platformManagedMode && <option value="">— ไม่ใช้เทมเพลต —</option>}
+          {globalServices.map((g) => (
+            <option key={g.id} value={g.id}>
+              {g.name}
+            </option>
+          ))}
+        </select>
+        <label className="block font-body text-sm font-medium text-mauve-700">ชื่อบริการ *</label>
+        <Input
+          value={customTitle}
+          onChange={(e) => setCustomTitle(e.target.value)}
+          placeholder="ชื่อบริการ"
+          required
+          className="w-full"
+        />
+        <div className="mt-4 flex gap-2 justify-end">
+          <Button type="button" variant="secondary" size="sm" onClick={onClose}>
+            ยกเลิก
+          </Button>
+          <Button type="submit" variant="primary" size="sm" disabled={submitting} loading={submitting}>
+            เพิ่ม
+          </Button>
+        </div>
+      </form>
+    </Dialog>
   );
 }
 
@@ -1018,43 +1415,33 @@ function AddFaqModal({
   };
 
   return (
-    <>
-      <div className="fixed inset-0 z-40 bg-black/30" onClick={onClose} aria-hidden />
-      <div
-        className="fixed left-1/2 top-1/2 z-50 w-full max-w-md -translate-x-1/2 -translate-y-1/2 luxury-card p-6 shadow-luxury"
-        role="dialog"
-        aria-labelledby="add-faq-title"
-      >
-        <h2 id="add-faq-title" className="font-display text-lg font-semibold text-mauve-800">
-          เพิ่มคำถามที่พบบ่อย
-        </h2>
-        <form onSubmit={handleSubmit} className="mt-4 space-y-3">
-          <label className="block font-body text-sm font-medium text-mauve-700">คำถาม *</label>
-          <Input
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            placeholder="คำถาม"
-            required
-            className="w-full"
-          />
-          <label className="block font-body text-sm font-medium text-mauve-700">คำตอบ</label>
-          <Textarea
-            value={answer}
-            onChange={(e) => setAnswer(e.target.value)}
-            placeholder="คำตอบ"
-            className="w-full min-h-[80px] rounded-2xl border-cream-200"
-            rows={3}
-          />
-          <div className="mt-4 flex gap-2 justify-end">
-            <Button type="button" variant="secondary" size="sm" onClick={onClose}>
-              ยกเลิก
-            </Button>
-            <Button type="submit" variant="primary" size="sm" disabled={submitting} loading={submitting}>
-              เพิ่ม
-            </Button>
-          </div>
-        </form>
-      </div>
-    </>
+    <Dialog open onClose={onClose} title="เพิ่มคำถามที่พบบ่อย" className="max-w-md w-full">
+      <form onSubmit={handleSubmit} className="p-5 space-y-3">
+        <label className="block font-body text-sm font-medium text-mauve-700">คำถาม *</label>
+        <Input
+          value={question}
+          onChange={(e) => setQuestion(e.target.value)}
+          placeholder="คำถาม"
+          required
+          className="w-full"
+        />
+        <label className="block font-body text-sm font-medium text-mauve-700">คำตอบ</label>
+        <Textarea
+          value={answer}
+          onChange={(e) => setAnswer(e.target.value)}
+          placeholder="คำตอบ"
+          className="w-full min-h-[80px] rounded-2xl border-cream-200"
+          rows={3}
+        />
+        <div className="mt-4 flex gap-2 justify-end">
+          <Button type="button" variant="secondary" size="sm" onClick={onClose}>
+            ยกเลิก
+          </Button>
+          <Button type="submit" variant="primary" size="sm" disabled={submitting} loading={submitting}>
+            เพิ่ม
+          </Button>
+        </div>
+      </form>
+    </Dialog>
   );
 }

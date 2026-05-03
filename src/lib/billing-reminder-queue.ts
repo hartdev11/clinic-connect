@@ -5,23 +5,23 @@
  * ส่ง email + สร้าง notification
  */
 import { Queue } from "bullmq";
-import Redis from "ioredis";
+import { getSharedRedisConnection, isRedisConfigured } from "@/lib/redis-client";
 
 const QUEUE_NAME = "billing-reminders";
-const REDIS_URL = process.env.REDIS_URL ?? "";
 
 export type BillingReminderJobData = Record<string, never>;
 
 let _queue: Queue | null = null;
 
 function isConfigured(): boolean {
-  return typeof REDIS_URL === "string" && REDIS_URL.length > 0;
+  return isRedisConfigured();
 }
 
 export function getBillingReminderQueue(): Queue | null {
   if (!isConfigured()) return null;
   if (_queue) return _queue;
-  const conn = new Redis(REDIS_URL, { maxRetriesPerRequest: 2 });
+  const conn = getSharedRedisConnection();
+  if (!conn) return null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   _queue = new Queue(QUEUE_NAME, { connection: conn as any });
   return _queue;

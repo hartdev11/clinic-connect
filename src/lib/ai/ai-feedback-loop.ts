@@ -169,7 +169,6 @@ export async function recordFeedbackForPromptImprovement(params: {
 }
 
 /** Phase 2 #20: เมื่อ admin label fail — trace knowledge_version, increment failure_count, auto-flag */
-const FAILURE_RATE_THRESHOLD = 0.1; // 10%
 const MIN_FAILURES_FOR_REVIEW = 2;
 
 async function applyKnowledgeFailureFeedback(orgId: string, correlationId: string): Promise<void> {

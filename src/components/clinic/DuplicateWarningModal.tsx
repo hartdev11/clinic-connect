@@ -4,7 +4,6 @@
  * FE-4 — Duplicate Warning Modal
  * แสดงเมื่อพบ semantic similarity > 0.85
  */
-import { type ReactNode } from "react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import type { DuplicateResult } from "@/types/knowledge";

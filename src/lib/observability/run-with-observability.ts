@@ -3,8 +3,9 @@
  * Use in /api/clinic/* and /api/internal/* routes.
  */
 import { NextResponse } from "next/server";
-import { endTimer, startTimer, type LatencyContext } from "./latency";
+import { endTimer, startTimer } from "./latency";
 import { recordApiError } from "./errors";
+import { recordDurableMetric } from "./durable-export";
 
 type ResponseLike = NextResponse | { response: NextResponse; orgId?: string | null; branchId?: string | null };
 
@@ -32,9 +33,18 @@ export async function runWithObservability(
     const status = response.status;
     const orgId = isWrapped(result) ? result.orgId : undefined;
     const branchId = isWrapped(result) ? result.branchId : undefined;
+    const latencyMs = Date.now() - start;
     if (status >= 500) {
       try {
         recordApiError({ route, orgId, branchId, errorType: "http_5xx", statusCode: status });
+        recordDurableMetric({
+          kind: "api_error",
+          route,
+          method,
+          status,
+          orgId,
+          branchId,
+        });
       } catch {
         // no-op
       }
@@ -47,6 +57,19 @@ export async function runWithObservability(
       status,
       start,
     });
+    try {
+      recordDurableMetric({
+        kind: "api_latency",
+        route,
+        method,
+        status,
+        latencyMs,
+        orgId,
+        branchId,
+      });
+    } catch {
+      // no-op
+    }
     return response;
   } catch (err) {
     try {
@@ -54,6 +77,12 @@ export async function runWithObservability(
         route,
         errorType: err instanceof Error ? err.message : String(err),
         statusCode: 500,
+      });
+      recordDurableMetric({
+        kind: "api_error",
+        route,
+        method,
+        status: 500,
       });
     } catch {
       // no-op

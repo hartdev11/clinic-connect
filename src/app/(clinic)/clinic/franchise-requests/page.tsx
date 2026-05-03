@@ -84,7 +84,7 @@ export default function FranchiseRequestsPage() {
 
       {/* Stats row */}
       {!isLoading && !error && (
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <StatCard
             label="รอดำเนินการ"
             value={pendingCount}
@@ -132,7 +132,7 @@ export default function FranchiseRequestsPage() {
               initial={{ opacity: 0, x: -8 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: i * 0.05 }}
-              className="flex items-center gap-4 px-6 py-5 hover:bg-cream-50 transition-colors"
+              className="flex flex-col sm:flex-row sm:items-center gap-4 px-4 sm:px-6 py-5 hover:bg-cream-50 transition-colors"
             >
               {/* Clinic avatar */}
               <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-rg-100 to-rg-200 flex items-center justify-center text-rg-600 font-display font-semibold flex-shrink-0">
@@ -183,11 +183,11 @@ export default function FranchiseRequestsPage() {
 
               {/* Actions for pending — keep existing handlers */}
               {req.status === "pending" && (
-                <div className="flex gap-2 flex-shrink-0">
+                <div className="flex w-full sm:w-auto gap-2 flex-shrink-0">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-red-500 hover:bg-red-50"
+                    className="flex-1 sm:flex-none text-red-500 hover:bg-red-50"
                     onClick={() => handleApprove(req.id, false)}
                   >
                     ปฏิเสธ
@@ -195,6 +195,7 @@ export default function FranchiseRequestsPage() {
                   <Button
                     variant="primary"
                     size="sm"
+                    className="flex-1 sm:flex-none"
                     onClick={() => handleApprove(req.id, true)}
                   >
                     อนุมัติ

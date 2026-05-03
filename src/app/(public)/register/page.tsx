@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { AuthLayout } from "@/components/layout/AuthLayout";
+import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 
 const fadeSlideUp = {
   initial: { opacity: 0, y: 16 },
@@ -73,6 +74,9 @@ export default function RegisterPage() {
           clinicName: clinicName.trim(),
           branches: branches ? Number(branches) || 1 : 1,
           phone: phone.trim(),
+          address: address.trim(),
+          businessType,
+          fullName: fullName.trim(),
           email: email.trim().toLowerCase(),
           password,
         }),
@@ -259,7 +263,7 @@ export default function RegisterPage() {
                   className="flex items-center gap-2 p-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm font-body"
                   role="alert"
                 >
-                  <span>⚠</span> {error}
+                  <ExclamationTriangleIcon className="h-4 w-4" /> {error}
                 </motion.div>
               )}
 

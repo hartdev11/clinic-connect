@@ -78,10 +78,10 @@ export async function processBookingIntent(
   const isBooking = hasBookingKeyword || hasPhoneAndProcedure;
 
   if (isReschedule && opts.userId) {
-    return handleRescheduleFlow(trimmed, orgId, opts.userId, openai, isReschedule);
+    return handleRescheduleFlow(trimmed, orgId, opts.userId, openai);
   }
   if ((isCancel || isConfirmCancel) && opts.userId) {
-    return handleCancelFlow(trimmed, orgId, opts.userId, openai, isConfirmCancel, opts.conversationContext);
+    return handleCancelFlow(trimmed, orgId, opts.userId, openai, isConfirmCancel);
   }
   if (isBooking) {
     return handleCreateFlow(trimmed, orgId, opts, openai);
@@ -232,7 +232,9 @@ async function handleCreateFlow(
         service: data.service,
         scheduledAt: data.scheduledAt,
         branchName: data.branchName,
-      }).catch((e) => console.warn("[BookingIntent] partner webhook:", (e as Error)?.message?.slice(0, 50)));
+      }, { correlationId: `booking_intent_${result.id}` }).catch((e) =>
+        console.warn("[BookingIntent] partner webhook:", (e as Error)?.message?.slice(0, 50))
+      );
     }
     if ("error" in result) {
       const altCheck = effectiveBranchId
@@ -261,8 +263,9 @@ async function handleRescheduleFlow(
   orgId: string,
   userId: string,
   openai: NonNullable<ReturnType<typeof getOpenAI>>,
-  isReschedule: boolean
+  isReschedule?: boolean
 ): Promise<BookingIntentResult> {
+  void isReschedule;
   const booking = await getLatestReschedulableBooking(orgId, userId);
   if (!booking) {
     return {
@@ -345,6 +348,7 @@ async function handleCancelFlow(
   isConfirmCancel: boolean,
   context?: string
 ): Promise<BookingIntentResult> {
+  void context;
   const booking = await getLatestReschedulableBooking(orgId, userId);
   if (!booking) {
     return {

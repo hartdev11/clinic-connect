@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { type ComponentType, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
@@ -9,15 +9,25 @@ import { Input } from "@/components/ui/Input";
 import { Card } from "@/components/ui/Card";
 import { PACKAGES } from "@/lib/packages-config";
 import { cn } from "@/lib/utils";
+import {
+  SparklesIcon,
+  CpuChipIcon,
+  BuildingOffice2Icon,
+  ShieldCheckIcon,
+  CheckIcon,
+  ExclamationTriangleIcon,
+} from "@heroicons/react/24/solid";
 
 /** "main" = คลินิกเดี่ยวหรือสาขาหลัก (ไปเลือกที่ register) | "sub" = สาขาย่อย (กรอกรหัสสาขาหลัก) */
 type WhoAreYou = "main" | "sub";
 
-const PLAN_ICONS: Record<string, string> = {
-  starter: "✦",
-  professional: "◈",
-  multi_branch: "⬡",
-  enterprise: "◇",
+type IconComponent = ComponentType<{ className?: string }>;
+
+const PLAN_ICONS: Record<string, IconComponent> = {
+  starter: SparklesIcon,
+  professional: CpuChipIcon,
+  multi_branch: BuildingOffice2Icon,
+  enterprise: ShieldCheckIcon,
 };
 
 export default function PackagesPage() {
@@ -28,9 +38,6 @@ export default function PackagesPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [licenseKey, setLicenseKey] = useState("");
-  const [emailSent, setEmailSent] = useState(true);
-  const [emailSendError, setEmailSendError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [franchiseSubSuccess, setFranchiseSubSuccess] = useState(false);
   const [mainBranchCode, setMainBranchCode] = useState("");
@@ -76,9 +83,6 @@ export default function PackagesPage() {
       }
       const key = data.license_key ?? "";
       const isFranchiseSub = Boolean(data.franchiseSub);
-      setLicenseKey(key);
-      setEmailSent(data.emailSent !== false);
-      setEmailSendError(data.error ?? "");
       setSuccessMessage((data.message as string) ?? "");
       setFranchiseSubSuccess(isFranchiseSub);
       setSuccess(true);
@@ -100,7 +104,7 @@ export default function PackagesPage() {
     <div className="min-h-screen bg-cream-100">
       {/* Hero header */}
       <div
-        className="relative overflow-hidden py-20 px-6 text-center"
+        className="relative overflow-hidden py-16 sm:py-20 px-4 sm:px-6 text-center"
         style={{
           background:
             "linear-gradient(145deg, var(--mauve-800) 0%, var(--mauve-600) 60%, var(--rg-500) 100%)",
@@ -125,7 +129,7 @@ export default function PackagesPage() {
           <p className="font-body text-xs text-rg-300 tracking-widest uppercase mb-4">
             เลือกแผนที่เหมาะกับคุณ
           </p>
-          <h1 className="font-display text-5xl font-light text-cream-100 mb-4">
+          <h1 className="font-display text-4xl sm:text-5xl font-light text-cream-100 mb-4">
             แพ็คเกจของเรา
           </h1>
           <p className="font-body text-sm text-rg-300 max-w-md mx-auto leading-relaxed">
@@ -135,7 +139,7 @@ export default function PackagesPage() {
       </div>
 
       {/* Content */}
-      <div className="max-w-6xl mx-auto px-6 py-16">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
         {success ? (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -207,7 +211,10 @@ export default function PackagesPage() {
                           : "bg-cream-200 text-mauve-500"
                       )}
                     >
-                      {PLAN_ICONS[pkg.id] ?? "✦"}
+                      {(() => {
+                        const Icon = PLAN_ICONS[pkg.id] ?? SparklesIcon;
+                        return <Icon className="h-6 w-6" />;
+                      })()}
                     </div>
 
                     <h3 className="font-display text-xl font-semibold text-mauve-800 mb-1">
@@ -240,9 +247,7 @@ export default function PackagesPage() {
                           key={j}
                           className="flex items-start gap-2.5 text-sm font-body"
                         >
-                          <span className="text-rg-500 flex-shrink-0 mt-0.5">
-                            ✓
-                          </span>
+                          <CheckIcon className="h-4 w-4 text-rg-500 flex-shrink-0 mt-0.5" />
                           <span className="text-mauve-600">{f}</span>
                         </li>
                       ))}
@@ -310,7 +315,7 @@ export default function PackagesPage() {
                               : "bg-cream-200 text-mauve-500"
                           )}
                         >
-                          ◈
+                          <CpuChipIcon className="h-5 w-5" />
                         </div>
                         <div>
                           <p className="font-body font-medium text-mauve-700 text-sm">
@@ -345,7 +350,7 @@ export default function PackagesPage() {
                               : "bg-cream-200 text-mauve-500"
                           )}
                         >
-                          ⬡
+                          <BuildingOffice2Icon className="h-5 w-5" />
                         </div>
                         <div>
                           <p className="font-body font-medium text-mauve-700 text-sm">
@@ -420,7 +425,7 @@ export default function PackagesPage() {
                         className="flex items-center gap-2 p-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm font-body"
                         role="alert"
                       >
-                        <span>⚠</span> {error}
+                        <ExclamationTriangleIcon className="h-4 w-4" /> {error}
                       </motion.div>
                     )}
 

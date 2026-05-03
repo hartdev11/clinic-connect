@@ -4,10 +4,10 @@
  * หลัง 4 ครั้ง → Dead Letter → แจ้ง super_admin
  */
 import { Queue } from "bullmq";
-import Redis from "ioredis";
+import { getSharedRedisConnection, isRedisConfigured } from "@/lib/redis-client";
+import { buildRetryJobOptions } from "@/lib/queue-defaults";
 
 const QUEUE_NAME = "partner-webhook-retry";
-const REDIS_URL = process.env.REDIS_URL ?? "";
 
 export type PartnerWebhookRetryJobData = {
   orgId: string;
@@ -21,9 +21,10 @@ export type PartnerWebhookRetryJobData = {
 let _queue: Queue | null = null;
 
 export function getPartnerWebhookRetryQueue(): Queue | null {
-  if (!REDIS_URL) return null;
+  if (!isRedisConfigured()) return null;
   if (_queue) return _queue;
-  const conn = new Redis(REDIS_URL, { maxRetriesPerRequest: 2 });
+  const conn = getSharedRedisConnection();
+  if (!conn) return null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   _queue = new Queue(QUEUE_NAME, { connection: conn as any });
   return _queue;
@@ -35,11 +36,14 @@ export async function enqueuePartnerWebhookRetry(
   const queue = getPartnerWebhookRetryQueue();
   if (!queue) return null;
   try {
-    const job = await queue.add("retry", data, {
-      attempts: 4,
-      backoff: { type: "exponential", delay: 60 * 1000 },
-      jobId: `partner-${data.configId}-${data.event}-${Date.now()}`,
-    });
+    const job = await queue.add(
+      "retry",
+      data,
+      buildRetryJobOptions(`partner-${data.configId}-${data.event}-${Date.now()}`, {
+        attempts: 4,
+        backoffDelayMs: 60_000,
+      })
+    );
     return job.id ?? null;
   } catch (err) {
     console.warn("[PartnerWebhookRetry] enqueue failed:", (err as Error)?.message?.slice(0, 80));
