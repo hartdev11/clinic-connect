@@ -1,8 +1,8 @@
 {
   "crons": [
     { "path": "/api/admin/cleanup", "schedule": "0 2 * * *" },
-    { "path": "/api/admin/promotion-lifecycle", "schedule": "*/5 * * * *" },
-    { "path": "/api/admin/embedding-worker", "schedule": "*/5 * * * *" },
+    { "path": "/api/admin/promotion-lifecycle", "schedule": "0 3 * * *" },
+    { "path": "/api/admin/embedding-worker", "schedule": "0 4 * * *" },
     { "path": "/api/admin/retrain-monitor", "schedule": "0 6 * * *" }
   ]
 }
